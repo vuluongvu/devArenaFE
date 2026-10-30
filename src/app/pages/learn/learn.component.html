@@ -4,11 +4,11 @@
     <div class="header-text-block">
       <div class="header-pill">
         <app-icon name="layers" [size]="13" customClass="text-accent"></app-icon>
-        <span>DATA STRUCTURE VISUALIZER</span>
+        <span>INTERACTIVE CS LAB</span>
       </div>
-      <h1 class="page-title">Data Structure Visualizer</h1>
+      <h1 class="page-title">Data Structures & Algorithms Visualizer</h1>
       <p class="page-subtitle">
-        Interactive memory representations and standard operations (Insert, Delete, Update, Read) with universal algorithm pseudocode.
+        Interactive memory representations and standard operations (Insert, Delete, Update, Read) with concise algorithm pseudocode.
       </p>
     </div>
 
@@ -34,62 +34,113 @@
   </header>
 
   <!-- =================================================================== -->
-  <!-- 1. DATA STRUCTURE VISUALIZER STUDIO -->
+  <!-- 1. DATA STRUCTURES & ALGORITHMS VISUALIZER STUDIO -->
   <!-- =================================================================== -->
   <div *ngIf="activeMainTab === 'visualizer'" class="visualizer-container">
-    <!-- Sub-Navbar: Data Structure Selector -->
-    <div class="ds-selector-bar">
-      <div class="ds-tabs">
-        <button
-          class="ds-tab-btn"
-          [class.active]="activeDs === 'stack'"
-          (click)="activeDs = 'stack'"
-        >
-          <app-icon name="layers" [size]="15"></app-icon>
-          <span class="tab-label">Stack</span>
-          <span class="badge-pill">LIFO</span>
-        </button>
+    <!-- Category & Topic Selector Bar (Data Structures vs Algorithms) -->
+    <div class="category-nav-card">
+      <!-- Group 1: DATA STRUCTURES -->
+      <div class="category-group">
+        <div class="group-label">
+          <app-icon name="database" [size]="12"></app-icon>
+          <span>DATA STRUCTURES</span>
+        </div>
+        <div class="topic-pills">
+          <button
+            class="topic-btn"
+            [class.active]="activeTopic === 'stack'"
+            (click)="setTopic('stack')"
+          >
+            <app-icon name="layers" [size]="14"></app-icon>
+            <span>Stack</span>
+            <span class="pill-badge">LIFO</span>
+          </button>
 
-        <button
-          class="ds-tab-btn"
-          [class.active]="activeDs === 'queue'"
-          (click)="activeDs = 'queue'"
-        >
-          <app-icon name="sliders" [size]="15"></app-icon>
-          <span class="tab-label">Queue</span>
-          <span class="badge-pill">FIFO</span>
-        </button>
+          <button
+            class="topic-btn"
+            [class.active]="activeTopic === 'queue'"
+            (click)="setTopic('queue')"
+          >
+            <app-icon name="sliders" [size]="14"></app-icon>
+            <span>Queue</span>
+            <span class="pill-badge">FIFO</span>
+          </button>
 
-        <button
-          class="ds-tab-btn"
-          [class.active]="activeDs === 'two-pointers'"
-          (click)="activeDs = 'two-pointers'"
-        >
-          <app-icon name="compass" [size]="15"></app-icon>
-          <span class="tab-label">Two Pointers</span>
-          <span class="badge-pill">In-Place</span>
-        </button>
+          <button
+            class="topic-btn"
+            [class.active]="activeTopic === 'linked-list'"
+            (click)="setTopic('linked-list')"
+          >
+            <app-icon name="git-branch" [size]="14"></app-icon>
+            <span>Linked List</span>
+            <span class="pill-badge">Nodes</span>
+          </button>
+
+          <button
+            class="topic-btn"
+            [class.active]="activeTopic === 'bst'"
+            (click)="setTopic('bst')"
+          >
+            <app-icon name="terminal" [size]="14"></app-icon>
+            <span>BST</span>
+            <span class="pill-badge">Tree</span>
+          </button>
+        </div>
       </div>
 
-      <div class="ds-meta-badge">
-        <span>Standard Primitive Operations: Insert, Delete, Update, Read</span>
+      <div class="group-separator"></div>
+
+      <!-- Group 2: ALGORITHMS -->
+      <div class="category-group">
+        <div class="group-label">
+          <app-icon name="play" [size]="12"></app-icon>
+          <span>ALGORITHMS</span>
+        </div>
+        <div class="topic-pills">
+          <button
+            class="topic-btn"
+            [class.active]="activeTopic === 'binary-search'"
+            (click)="setTopic('binary-search')"
+          >
+            <app-icon name="search" [size]="14"></app-icon>
+            <span>Binary Search</span>
+            <span class="pill-badge">O(log N)</span>
+          </button>
+
+          <button
+            class="topic-btn"
+            [class.active]="activeTopic === 'two-pointers'"
+            (click)="setTopic('two-pointers')"
+          >
+            <app-icon name="compass" [size]="14"></app-icon>
+            <span>Two Pointers</span>
+            <span class="pill-badge">In-Place</span>
+          </button>
+
+          <button
+            class="topic-btn"
+            [class.active]="activeTopic === 'sliding-window'"
+            (click)="setTopic('sliding-window')"
+          >
+            <app-icon name="sliders" [size]="14"></app-icon>
+            <span>Sliding Window</span>
+            <span class="pill-badge">O(N)</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- ------------------------------------------------------------- -->
-    <!-- STACK VISUALIZER -->
-    <!-- ------------------------------------------------------------- -->
-    <div *ngIf="activeDs === 'stack'" class="stack-view-wrapper">
-      <!-- Status Notice Bar -->
+    <!-- ============================================================= -->
+    <!-- 1. STACK VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'stack'" class="topic-content-wrapper">
       <div class="status-bar">
         <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ statusMessage }}</span>
+        <span class="status-text">{{ stackStatus }}</span>
       </div>
 
-      <!-- Interactive Controls Deck (Insert, Update, Delete, Read) -->
       <div class="control-deck-card">
         <div class="deck-left">
-          <!-- Input & Push Group -->
           <div class="input-action-group">
             <input
               type="text"
@@ -103,63 +154,52 @@
               class="btn-deck btn-push"
               (click)="pushStack()"
               [disabled]="stackItems.length >= maxStackCapacity"
-              title="Insert element at TOP (push - O(1))"
             >
               <app-icon name="chevron-down" [size]="14"></app-icon>
               <span>Push</span>
             </button>
           </div>
 
-          <!-- Update Top Element -->
           <button
             class="btn-deck btn-update"
             (click)="updateTopStack()"
             [disabled]="stackItems.length === 0"
-            title="Update value of element at TOP (updateTop - O(1))"
           >
             <app-icon name="code" [size]="13"></app-icon>
             <span>Update Top</span>
           </button>
 
-          <!-- Pop Element -->
           <button
             class="btn-deck btn-pop"
             (click)="popStack()"
             [disabled]="stackItems.length === 0"
-            title="Remove element from TOP (pop - O(1))"
           >
             <app-icon name="chevron-left" [size]="14" customClass="rotate-up"></app-icon>
             <span>Pop()</span>
           </button>
 
-          <!-- Peek Element -->
           <button
             class="btn-deck btn-peek"
             (click)="peekStack()"
             [disabled]="stackItems.length === 0"
-            title="Read element at TOP without removal (peek - O(1))"
           >
             <app-icon name="eye" [size]="14"></app-icon>
             <span>Peek()</span>
           </button>
 
-          <!-- Push Random -->
           <button
             class="btn-deck btn-secondary"
-            (click)="pushRandom()"
+            (click)="pushRandomStack()"
             [disabled]="stackItems.length >= maxStackCapacity"
-            title="Push random integer"
           >
             <app-icon name="sparkles" [size]="13"></app-icon>
             <span>Random</span>
           </button>
 
-          <!-- Clear Stack -->
           <button
             class="btn-deck btn-ghost"
             (click)="clearStack()"
             [disabled]="stackItems.length === 0"
-            title="Clear all elements"
           >
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
             <span>Clear</span>
@@ -167,61 +207,39 @@
         </div>
 
         <div class="deck-right">
-          <div class="capacity-meter">
-            <span class="capacity-text">
-              Capacity: <strong>{{ stackItems.length }}</strong> / {{ maxStackCapacity }} slots
-            </span>
-            <div class="capacity-track">
-              <div
-                class="capacity-fill"
-                [style.width.%]="(stackItems.length / maxStackCapacity) * 100"
-                [class.fill-warning]="stackItems.length >= maxStackCapacity"
-              ></div>
-            </div>
-          </div>
+          <span class="capacity-text">Capacity: <strong>{{ stackItems.length }}</strong> / {{ maxStackCapacity }} slots</span>
         </div>
       </div>
 
-      <!-- Main Visual Stage: Beaker + Pseudocode -->
       <div class="stage-grid">
-        <!-- Visual Stage Left: The Stack Beaker -->
+        <!-- Stage Left: Beaker -->
         <div class="beaker-stage-card">
           <div class="stage-header">
-            <div class="stage-header-main">
-              <div class="ds-badge-box">
-                <app-icon name="layers" [size]="16" customClass="ds-badge-icon"></app-icon>
-              </div>
-              <h3 class="stage-heading">Stack</h3>
+            <div>
+              <h3 class="stage-heading">LIFO Stack Memory Model</h3>
+              <span class="stage-subheading">Elements enter and exit exclusively via the single TOP boundary.</span>
             </div>
             <div class="top-tag" *ngIf="stackTopItem">
-              <span>Current TOP: <strong>'{{ stackTopItem.value }}'</strong></span>
+              <span>TOP: <strong>'{{ stackTopItem.value }}'</strong></span>
             </div>
           </div>
-          <p class="stage-subheading">
-            LIFO memory model where insertions, deletions, and updates occur exclusively at the TOP.
-          </p>
 
-          <!-- Glass Beaker Canvas -->
           <div class="beaker-outer">
-            <!-- Beaker Open Mouth Indicator -->
             <div class="beaker-mouth">
               <span class="mouth-label">Single Access Boundary (TOP)</span>
               <div class="mouth-arrow-group">
-                <span class="arrow-down">↓ PUSH (Insert)</span>
-                <span class="arrow-up">↑ POP (Delete)</span>
+                <span class="arrow-down">↓ PUSH</span>
+                <span class="arrow-up">↑ POP</span>
               </div>
             </div>
 
-            <!-- Beaker Chamber (Vertical) -->
             <div class="beaker-chamber">
-              <!-- Empty State Overlay -->
               <div *ngIf="stackItems.length === 0" class="beaker-empty-state">
                 <app-icon name="layers" [size]="36" customClass="text-muted"></app-icon>
                 <div class="empty-title">Stack is Empty</div>
-                <div class="empty-subtitle">Enter a value and click Push to insert elements.</div>
+                <div class="empty-subtitle">Use Push to insert elements.</div>
               </div>
 
-              <!-- Stacking Items (Flex column-reverse: index 0 at bottom, top at top) -->
               <div class="stack-items-container">
                 <div
                   *ngFor="let item of stackItems; let i = index; let isLast = last"
@@ -235,37 +253,25 @@
                     <span class="block-index">[{{ i }}]</span>
                     <span class="block-value">{{ item.value }}</span>
                   </div>
-
                   <div class="block-right">
-                    <span *ngIf="isLast" class="top-badge">
-                      <app-icon name="chevron-left" [size]="12"></app-icon>
-                      <span>TOP</span>
-                    </span>
+                    <span *ngIf="isLast" class="top-badge">TOP</span>
                     <span *ngIf="!isLast" class="block-tag">in-stack</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Beaker Solid Base -->
             <div class="beaker-base">
               <span>Closed Base (Index 0 — First In, Last Out)</span>
             </div>
           </div>
-
-          <!-- Invariant Explanatory Footnote -->
-          <div class="stage-footer-note">
-            <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-            <span><strong>LIFO Principle:</strong> Last-In, First-Out. Push, Pop, Peek, and Update Top operate in strict constant <code>O(1)</code> time without memory shifting.</span>
-          </div>
         </div>
 
-        <!-- Visual Stage Right: Metrics & Universal Pseudocode -->
+        <!-- Stage Right: Pseudocode & Complexity -->
         <div class="inspector-column">
-          <!-- Metric Cards Grid -->
           <div class="metrics-subgrid">
             <div class="stat-box">
-              <span class="stat-box-label">CURRENT SIZE</span>
+              <span class="stat-box-label">SIZE</span>
               <span class="stat-box-value">{{ stackItems.length }}</span>
             </div>
             <div class="stat-box">
@@ -273,26 +279,20 @@
               <span class="stat-box-value mono">{{ stackTopItem ? stackTopItem.value : 'null' }}</span>
             </div>
             <div class="stat-box">
-              <span class="stat-box-label">TIME COMPLEXITY</span>
+              <span class="stat-box-label">TIME</span>
               <span class="stat-box-value text-easy">O(1)</span>
             </div>
             <div class="stat-box">
-              <span class="stat-box-label">SPACE COMPLEXITY</span>
+              <span class="stat-box-label">SPACE</span>
               <span class="stat-box-value">O(N)</span>
             </div>
           </div>
 
-          <!-- Universal Pseudocode Specification -->
           <div class="code-snippet-card">
             <div class="code-card-header">
-              <div class="code-header-left">
-                <app-icon name="code" [size]="15" customClass="text-accent"></app-icon>
-                <span class="code-title">Pseudocode (Methods)</span>
-              </div>
               <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Core Methods</span>
             </div>
-
-            <!-- Pseudocode Block -->
             <pre class="code-block"><code><span class="f">push</span>(x):
     items.append(x)
 
@@ -309,12 +309,8 @@
     <span class="k">return</span> size == 0</code></pre>
           </div>
 
-          <!-- Complexity & Operations Cheat Sheet -->
           <div class="summary-card">
-            <div class="summary-card-header">
-              <app-icon name="terminal" [size]="15" customClass="text-accent"></app-icon>
-              <h4 class="card-mini-title">Primitive Operations Summary</h4>
-            </div>
+            <h4 class="card-mini-title">Operations Summary</h4>
             <div class="summary-rows">
               <div class="summary-row">
                 <span class="op-badge op-push">INSERT</span>
@@ -330,7 +326,7 @@
               </div>
               <div class="summary-row">
                 <span class="op-badge op-peek">READ</span>
-                <span class="op-name"><code>peek() / top()</code></span>
+                <span class="op-name"><code>peek()</code></span>
                 <span class="op-desc">Inspects element at TOP</span>
                 <span class="op-comp">O(1)</span>
               </div>
@@ -346,16 +342,21 @@
       </div>
     </div>
 
-    <!-- ------------------------------------------------------------- -->
-    <!-- QUEUE VISUALIZER -->
-    <!-- ------------------------------------------------------------- -->
-    <div *ngIf="activeDs === 'queue'" class="queue-view-wrapper">
+    <!-- ============================================================= -->
+    <!-- 2. QUEUE VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'queue'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ queueStatus }}</span>
+      </div>
+
       <div class="control-deck-card">
         <div class="deck-left">
           <div class="input-action-group">
             <input
               type="text"
-              [(ngModel)]="enqueueInput"
+              [(ngModel)]="queueInput"
               (keyup.enter)="enqueue()"
               placeholder="Enter value..."
               class="deck-input"
@@ -367,9 +368,18 @@
               [disabled]="queueItems.length >= maxQueueCapacity"
             >
               <app-icon name="chevron-right" [size]="14"></app-icon>
-              <span>Enqueue (Insert Rear)</span>
+              <span>Enqueue</span>
             </button>
           </div>
+
+          <button
+            class="btn-deck btn-update"
+            (click)="updateFrontQueue()"
+            [disabled]="queueItems.length === 0"
+          >
+            <app-icon name="code" [size]="13"></app-icon>
+            <span>Update Front</span>
+          </button>
 
           <button
             class="btn-deck btn-pop"
@@ -377,10 +387,23 @@
             [disabled]="queueItems.length === 0"
           >
             <app-icon name="chevron-left" [size]="14"></app-icon>
-            <span>Dequeue (Delete Front)</span>
+            <span>Dequeue</span>
           </button>
 
-          <button class="btn-deck btn-ghost" (click)="clearQueue()" [disabled]="queueItems.length === 0">
+          <button
+            class="btn-deck btn-peek"
+            (click)="peekQueue()"
+            [disabled]="queueItems.length === 0"
+          >
+            <app-icon name="eye" [size]="14"></app-icon>
+            <span>Peek()</span>
+          </button>
+
+          <button
+            class="btn-deck btn-ghost"
+            (click)="clearQueue()"
+            [disabled]="queueItems.length === 0"
+          >
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
             <span>Clear</span>
           </button>
@@ -391,52 +414,446 @@
         </div>
       </div>
 
-      <!-- Pipeline Visualization -->
-      <div class="beaker-stage-card">
-        <div class="stage-header">
-          <div class="stage-header-main">
-            <app-icon name="sliders" [size]="18" customClass="text-accent"></app-icon>
-            <h3 class="stage-heading">Queue</h3>
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">FIFO Queue Pipeline Model</h3>
+              <span class="stage-subheading">Elements enter at the REAR and exit sequentially at the FRONT.</span>
+            </div>
+          </div>
+
+          <div class="queue-pipeline-container">
+            <div class="queue-pointer front-pointer">
+              <span class="pointer-label">FRONT</span>
+              <span class="pointer-sub">Exit (Dequeue)</span>
+              <app-icon name="chevron-left" [size]="18" customClass="text-accent"></app-icon>
+            </div>
+
+            <div class="queue-track">
+              <div *ngIf="queueItems.length === 0" class="beaker-empty-state">
+                <div class="empty-title">Queue is Empty</div>
+              </div>
+
+              <div *ngFor="let q of queueItems; let idx = index" class="queue-element" [class.is-peeking]="q.isPeeking" [class.is-updated]="q.isUpdated">
+                <span class="queue-element-idx">[{{ idx }}]</span>
+                <span class="queue-element-val">{{ q.value }}</span>
+              </div>
+            </div>
+
+            <div class="queue-pointer rear-pointer">
+              <app-icon name="chevron-right" [size]="18" customClass="text-accent"></app-icon>
+              <span class="pointer-label">REAR</span>
+              <span class="pointer-sub">Entry (Enqueue)</span>
+            </div>
           </div>
         </div>
-        <p class="stage-subheading">
-          FIFO pipeline where elements enter sequentially at the REAR and exit sequentially at the FRONT.
-        </p>
 
-        <div class="queue-pipeline-container">
-          <div class="queue-pointer front-pointer">
-            <span class="pointer-label">FRONT</span>
-            <span class="pointer-sub">Dequeue exit</span>
-            <app-icon name="chevron-left" [size]="18" customClass="text-accent"></app-icon>
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">LENGTH</span>
+              <span class="stat-box-value">{{ queueItems.length }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">FRONT</span>
+              <span class="stat-box-value mono">{{ queueItems.length > 0 ? queueItems[0].value : 'null' }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">TIME</span>
+              <span class="stat-box-value text-easy">O(1)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SPACE</span>
+              <span class="stat-box-value">O(N)</span>
+            </div>
           </div>
 
-          <div class="queue-track">
-            <div *ngIf="queueItems.length === 0" class="beaker-empty-state">
-              <div class="empty-title">Queue is Empty</div>
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Core Methods</span>
             </div>
+            <pre class="code-block"><code><span class="f">enqueue</span>(x):
+    items.append(x)
 
-            <div *ngFor="let q of queueItems; let idx = index" class="queue-element">
-              <span class="queue-element-idx">[{{ idx }}]</span>
-              <span class="queue-element-val">{{ q.value }}</span>
-            </div>
-          </div>
+<span class="f">dequeue</span>():
+    <span class="k">return</span> items.removeFirst()
 
-          <div class="queue-pointer rear-pointer">
-            <app-icon name="chevron-right" [size]="18" customClass="text-accent"></app-icon>
-            <span class="pointer-label">REAR</span>
-            <span class="pointer-sub">Enqueue entry</span>
+<span class="f">peek</span>():
+    <span class="k">return</span> items.first()
+
+<span class="f">updateFront</span>(x):
+    items.first() = x
+
+<span class="f">isEmpty</span>():
+    <span class="k">return</span> size == 0</code></pre>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ------------------------------------------------------------- -->
-    <!-- TWO POINTERS VISUALIZER -->
-    <!-- ------------------------------------------------------------- -->
-    <div *ngIf="activeDs === 'two-pointers'" class="two-pointers-wrapper">
+    <!-- ============================================================= -->
+    <!-- 3. LINKED LIST VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'linked-list'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ listStatus }}</span>
+      </div>
+
       <div class="control-deck-card">
         <div class="deck-left">
-          <button class="btn-deck btn-push" (click)="stepTwoPointers()" [disabled]="twoPointerDone">
+          <div class="input-action-group">
+            <input
+              type="text"
+              [(ngModel)]="listInput"
+              (keyup.enter)="insertListHead()"
+              placeholder="Node value..."
+              class="deck-input"
+              maxlength="10"
+            />
+            <button class="btn-deck btn-push" (click)="insertListHead()">
+              <app-icon name="chevron-left" [size]="14"></app-icon>
+              <span>Insert Head</span>
+            </button>
+          </div>
+
+          <button class="btn-deck btn-secondary" (click)="appendListTail()">
+            <app-icon name="chevron-right" [size]="14"></app-icon>
+            <span>Append Tail</span>
+          </button>
+
+          <button class="btn-deck btn-pop" (click)="deleteListHead()" [disabled]="listNodes.length === 0">
+            <span>Delete Head</span>
+          </button>
+
+          <button class="btn-deck btn-pop" (click)="deleteListTail()" [disabled]="listNodes.length === 0">
+            <span>Delete Tail</span>
+          </button>
+
+          <button class="btn-deck btn-ghost" (click)="clearList()" [disabled]="listNodes.length === 0">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Clear</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Node count: <strong>{{ listNodes.length }}</strong></span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Singly Linked List Chain</h3>
+              <span class="stage-subheading">Linear collection where each node points to the next node in memory.</span>
+            </div>
+          </div>
+
+          <div class="linked-list-canvas">
+            <div class="head-marker">
+              <span class="marker-tag">HEAD</span>
+              <span class="marker-arrow">→</span>
+            </div>
+
+            <div *ngIf="listNodes.length === 0" class="beaker-empty-state">
+              <div class="empty-title">HEAD → null (Empty List)</div>
+            </div>
+
+            <div class="list-nodes-chain">
+              <div *ngFor="let node of listNodes; let isLast = last" class="list-node-unit">
+                <div class="node-box">
+                  <span class="node-val">{{ node.value }}</span>
+                  <span class="node-ptr">•</span>
+                </div>
+                <div class="node-arrow" *ngIf="!isLast">→</div>
+              </div>
+              <div *ngIf="listNodes.length > 0" class="null-terminal">
+                <span class="node-arrow">→</span>
+                <span class="null-box">NULL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">NODES</span>
+              <span class="stat-box-value">{{ listNodes.length }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">HEAD VAL</span>
+              <span class="stat-box-value mono">{{ listNodes.length > 0 ? listNodes[0].value : 'null' }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">INSERT HEAD</span>
+              <span class="stat-box-value text-easy">O(1)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SEARCH</span>
+              <span class="stat-box-value">O(N)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Core Methods</span>
+            </div>
+            <pre class="code-block"><code><span class="f">insertHead</span>(x):
+    node = Node(x)
+    node.next = head
+    head = node
+
+<span class="f">deleteHead</span>():
+    head = head.next
+
+<span class="f">appendTail</span>(x):
+    tail.next = Node(x)
+
+<span class="f">search</span>(x):
+    curr = head
+    <span class="k">while</span> curr != null:
+        <span class="k">if</span> curr.val == x: <span class="k">return</span> <span class="k">true</span>
+        curr = curr.next
+    <span class="k">return</span> <span class="k">false</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 4. BST VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'bst'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ bstStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <div class="input-action-group">
+            <input
+              type="number"
+              [(ngModel)]="bstInput"
+              (keyup.enter)="insertBST()"
+              placeholder="Integer (e.g. 35)..."
+              class="deck-input"
+            />
+            <button class="btn-deck btn-push" (click)="insertBST()">
+              <span>Insert(x)</span>
+            </button>
+          </div>
+
+          <button class="btn-deck btn-peek" (click)="searchBST()">
+            <app-icon name="search" [size]="14"></app-icon>
+            <span>Search(x)</span>
+          </button>
+
+          <button class="btn-deck btn-ghost" (click)="resetBST()">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset Tree</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Root: <strong>50</strong> (Invariant: Left &lt; Root &lt; Right)</span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Binary Search Tree (BST) Graph</h3>
+              <span class="stage-subheading">Hierarchical tree maintaining logarithmic ordering on all subtrees.</span>
+            </div>
+          </div>
+
+          <div class="bst-tree-container">
+            <!-- Level 0: Root -->
+            <div class="bst-tree-level">
+              <div class="bst-circle is-root" [class.highlight]="bstNodes[0].highlight">50</div>
+            </div>
+
+            <!-- Level 1 -->
+            <div class="bst-tree-level">
+              <div class="bst-circle" [class.highlight]="bstNodes[1].highlight">30</div>
+              <div class="bst-circle" [class.highlight]="bstNodes[2].highlight">70</div>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="bst-tree-level">
+              <div class="bst-circle" [class.highlight]="bstNodes[3].highlight">20</div>
+              <div class="bst-circle" [class.highlight]="bstNodes[4].highlight">40</div>
+              <div class="bst-circle" [class.highlight]="bstNodes[5].highlight">60</div>
+              <div class="bst-circle" [class.highlight]="bstNodes[6].highlight">80</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">NODES</span>
+              <span class="stat-box-value">{{ bstNodes.length }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">HEIGHT</span>
+              <span class="stat-box-value">3</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SEARCH</span>
+              <span class="stat-box-value text-easy">O(log N)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">INSERT</span>
+              <span class="stat-box-value text-easy">O(log N)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Core Methods</span>
+            </div>
+            <pre class="code-block"><code><span class="f">insert</span>(node, x):
+    <span class="k">if</span> node == null: <span class="k">return</span> Node(x)
+    <span class="k">if</span> x &lt; node.val:
+        node.left = insert(node.left, x)
+    <span class="k">else</span>:
+        node.right = insert(node.right, x)
+    <span class="k">return</span> node
+
+<span class="f">search</span>(node, x):
+    <span class="k">if</span> node == null or node.val == x:
+        <span class="k">return</span> node
+    <span class="k">if</span> x &lt; node.val:
+        <span class="k">return</span> search(node.left, x)
+    <span class="k">return</span> search(node.right, x)</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 5. BINARY SEARCH ALGORITHM VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'binary-search'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ bsStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <button class="btn-deck btn-push" (click)="stepBinarySearch()" [disabled]="bsFound">
+            <app-icon name="play" [size]="14"></app-icon>
+            <span>Step Search</span>
+          </button>
+          <button class="btn-deck btn-secondary" (click)="resetBinarySearch(42)">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset (Target 42)</span>
+          </button>
+          <button class="btn-deck btn-ghost" (click)="resetBinarySearch(11)">
+            <span>Target: 11</span>
+          </button>
+          <button class="btn-deck btn-ghost" (click)="resetBinarySearch(88)">
+            <span>Target: 88</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Target: <strong>{{ bsTarget }}</strong> | Search Space: [{{ bsLeft }}..{{ bsRight }}]</span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Binary Search on Sorted Range</h3>
+              <span class="stage-subheading">Halving search interval by inspecting the midpoint each step.</span>
+            </div>
+          </div>
+
+          <div class="array-visual-row">
+            <div *ngFor="let val of bsArray; let i = index" class="array-cell-unit">
+              <div class="pointer-top-indicator">
+                <span *ngIf="i === bsLeft" class="ptr-badge ptr-left">L ({{ i }})</span>
+                <span *ngIf="i === bsMid" class="ptr-badge ptr-mid">MID ({{ i }})</span>
+                <span *ngIf="i === bsRight" class="ptr-badge ptr-right">R ({{ i }})</span>
+              </div>
+              <div
+                class="array-cell"
+                [class.is-mid]="i === bsMid"
+                [class.is-match]="i === bsMid && bsFound"
+                [class.is-pruned]="i < bsLeft || i > bsRight"
+              >
+                {{ val }}
+              </div>
+              <div class="pointer-bottom-index">idx {{ i }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">LEFT</span>
+              <span class="stat-box-value">{{ bsLeft }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">MID</span>
+              <span class="stat-box-value mono">{{ bsMid }} ({{ bsArray[bsMid] }})</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">RIGHT</span>
+              <span class="stat-box-value">{{ bsRight }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">COMPLEXITY</span>
+              <span class="stat-box-value text-easy">O(log N)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Algorithm Specification</span>
+            </div>
+            <pre class="code-block"><code><span class="f">binarySearch</span>(arr, target):
+    left = 0, right = len - 1
+    <span class="k">while</span> left &lt;= right:
+        mid = (left + right) / 2
+        <span class="k">if</span> arr[mid] == target:
+            <span class="k">return</span> mid
+        <span class="k">else if</span> arr[mid] &lt; target:
+            left = mid + 1
+        <span class="k">else</span>:
+            right = mid - 1
+    <span class="k">return</span> -1</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 6. TWO POINTERS ALGORITHM VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'two-pointers'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ tpStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <button class="btn-deck btn-push" (click)="stepTwoPointers()" [disabled]="tpDone">
             <app-icon name="play" [size]="14"></app-icon>
             <span>Step Pointers</span>
           </button>
@@ -450,37 +867,158 @@
         </div>
       </div>
 
-      <div class="beaker-stage-card">
-        <div class="stage-header">
-          <div class="stage-header-main">
-            <app-icon name="compass" [size]="18" customClass="text-accent"></app-icon>
-            <h3 class="stage-heading">Two Pointers</h3>
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Two Pointers Convergence: 'racecar'</h3>
+              <span class="stage-subheading">Opposite bounds shrinking inward while verifying symmetry.</span>
+            </div>
+          </div>
+
+          <div class="two-pointers-display">
+            <div class="pointers-row">
+              <div *ngFor="let char of tpArray; let i = index" class="pointer-cell-wrap">
+                <div class="pointer-top-indicator">
+                  <span *ngIf="i === tpLeft" class="ptr-badge ptr-left">L ({{ i }})</span>
+                  <span *ngIf="i === tpRight" class="ptr-badge ptr-right">R ({{ i }})</span>
+                </div>
+                <div
+                  class="array-cell"
+                  [class.is-left]="i === tpLeft"
+                  [class.is-right]="i === tpRight"
+                  [class.is-matched]="i >= tpLeft && i <= tpRight"
+                >
+                  {{ char }}
+                </div>
+                <div class="pointer-bottom-index">idx {{ i }}</div>
+              </div>
+            </div>
           </div>
         </div>
-        <p class="stage-subheading">{{ twoPointerMessage }}</p>
 
-        <div class="two-pointers-display">
-          <div class="pointers-row">
-            <div
-              *ngFor="let char of twoPointerArray; let i = index"
-              class="pointer-cell-wrap"
-            >
-              <div class="pointer-top-indicator">
-                <span *ngIf="i === leftPointer" class="ptr-badge ptr-left">L ({{ i }})</span>
-                <span *ngIf="i === rightPointer" class="ptr-badge ptr-right">R ({{ i }})</span>
-              </div>
-
-              <div
-                class="array-cell"
-                [class.is-left]="i === leftPointer"
-                [class.is-right]="i === rightPointer"
-                [class.is-matched]="i >= leftPointer && i <= rightPointer"
-              >
-                {{ char }}
-              </div>
-
-              <div class="pointer-bottom-index">idx {{ i }}</div>
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">LEFT (L)</span>
+              <span class="stat-box-value">{{ tpLeft }}</span>
             </div>
+            <div class="stat-box">
+              <span class="stat-box-label">RIGHT (R)</span>
+              <span class="stat-box-value mono">{{ tpRight }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">TIME</span>
+              <span class="stat-box-value text-easy">O(N)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SPACE</span>
+              <span class="stat-box-value text-easy">O(1)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Algorithm Specification</span>
+            </div>
+            <pre class="code-block"><code><span class="f">isPalindrome</span>(s):
+    left = 0, right = len - 1
+    <span class="k">while</span> left &lt; right:
+        <span class="k">if</span> s[left] != s[right]:
+            <span class="k">return</span> <span class="k">false</span>
+        left++
+        right--
+    <span class="k">return</span> <span class="k">true</span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 7. SLIDING WINDOW ALGORITHM VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'sliding-window'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ swStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <button class="btn-deck btn-push" (click)="stepSlidingWindow()">
+            <app-icon name="play" [size]="14"></app-icon>
+            <span>Slide Window (Next)</span>
+          </button>
+          <button class="btn-deck btn-secondary" (click)="resetSlidingWindow()">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset</span>
+          </button>
+        </div>
+        <div class="deck-right">
+          <span class="capacity-text">Window Size: <strong>{{ swWindowSize }}</strong> | Current Sum: <strong>{{ swCurrentSum }}</strong> | Max: <strong>{{ swMaxSum }}</strong></span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Sliding Window (Size K = 3)</h3>
+              <span class="stage-subheading">Subarray of fixed length sliding across contiguous sequence.</span>
+            </div>
+          </div>
+
+          <div class="two-pointers-display">
+            <div class="pointers-row">
+              <div *ngFor="let num of swArray; let i = index" class="pointer-cell-wrap">
+                <div class="pointer-top-indicator">
+                  <span *ngIf="i >= swStart && i < swStart + swWindowSize" class="ptr-badge ptr-mid">WINDOW</span>
+                </div>
+                <div
+                  class="array-cell"
+                  [class.is-in-window]="i >= swStart && i < swStart + swWindowSize"
+                >
+                  {{ num }}
+                </div>
+                <div class="pointer-bottom-index">idx {{ i }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">START IDX</span>
+              <span class="stat-box-value">{{ swStart }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">CURR SUM</span>
+              <span class="stat-box-value mono">{{ swCurrentSum }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">MAX SUM</span>
+              <span class="stat-box-value text-easy">{{ swMaxSum }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">TIME</span>
+              <span class="stat-box-value text-easy">O(N)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Algorithm Specification</span>
+            </div>
+            <pre class="code-block"><code><span class="f">maxSubarraySum</span>(arr, k):
+    windowSum = sum(arr[0..k-1])
+    maxSum = windowSum
+    <span class="k">for</span> i <span class="k">from</span> k <span class="k">to</span> len - 1:
+        windowSum += arr[i] - arr[i - k]
+        maxSum = max(maxSum, windowSum)
+    <span class="k">return</span> maxSum</code></pre>
           </div>
         </div>
       </div>
@@ -492,7 +1030,6 @@
   <!-- =================================================================== -->
   <div *ngIf="activeMainTab === 'curricula'" class="paths-container">
     <div *ngFor="let path of learningPaths()" class="path-card">
-      <!-- Card Header -->
       <div class="path-header">
         <div class="path-meta-row">
           <span class="path-level-tag">{{ path.level }}</span>
@@ -505,7 +1042,6 @@
         <h2 class="path-title">{{ path.title }}</h2>
         <p class="path-desc">{{ path.description }}</p>
 
-        <!-- Overall Path Progress -->
         <div class="path-progress-box">
           <div class="progress-info">
             <span>Progress: <strong>{{ path.completedModules }}</strong> of {{ path.totalModules }} modules complete</span>
@@ -520,7 +1056,6 @@
         </div>
       </div>
 
-      <!-- Topics / Modules Accordion -->
       <div class="path-modules-list">
         <div *ngFor="let topic of path.topics; let modIdx = index" class="module-item">
           <div class="module-header">
@@ -536,7 +1071,6 @@
             </div>
           </div>
 
-          <!-- Module Problems Mini Table -->
           <div class="module-problems-list">
             <div *ngFor="let p of topic.problems" class="module-prob-row">
               <div class="prob-left">
