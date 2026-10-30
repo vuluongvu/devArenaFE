@@ -13,55 +13,10 @@ import { AuthService } from '../../core/services/auth.service';
   template: `
     <header class="app-header">
       <div class="header-inner">
-        <!-- Left: Brand Logo & Wordmark -->
+        <!-- Left: Brand Wordmark -->
         <div class="brand-group">
-          <!-- Mobile Sidebar Toggle -->
-          <button
-            class="mobile-toggle-btn"
-            (click)="toggleSidebar.emit()"
-            aria-label="Toggle Navigation Menu"
-          >
-            <app-icon name="menu" [size]="20"></app-icon>
-          </button>
-
-          <!-- Desktop Sidebar Collapse Toggle -->
-          <button
-            type="button"
-            class="desktop-collapse-btn"
-            (click)="toggleCollapse.emit()"
-            [title]="isSidebarCollapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)'"
-            [attr.aria-label]="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-          >
-            <app-icon
-              [name]="isSidebarCollapsed ? 'panel-left-open' : 'panel-left-close'"
-              [size]="18"
-            ></app-icon>
-          </button>
-
           <a routerLink="/" class="brand-link">
-            <!-- NestJS Shield/Flame inspired Logo Mark -->
-            <div class="logo-mark">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4z"
-                  fill="var(--color-accent)"
-                  opacity="0.16"
-                  stroke="var(--color-accent)"
-                  stroke-width="1.8"
-                />
-                <path
-                  d="M9 10l-2 2 2 2M15 10l2 2-2 2"
-                  stroke="var(--color-accent)"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </div>
-            <div class="brand-name">
-              <span class="brand-title">DevArena</span>
-              <span class="brand-badge">v1.2</span>
-            </div>
+            <span class="brand-title">DevArena</span>
           </a>
 
           <!-- Primary Navigation Links -->
@@ -193,67 +148,16 @@ import { AuthService } from '../../core/services/auth.service';
       align-items: center;
       gap: 24px;
     }
-    .mobile-toggle-btn {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: var(--radius-sm);
-      color: var(--color-text-secondary);
-    }
-    .mobile-toggle-btn:hover {
-      background-color: var(--color-surface-hover);
-      color: var(--color-text-primary);
-    }
-    .desktop-collapse-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      border-radius: var(--radius-sm);
-      color: var(--color-text-secondary);
-      border: 1px solid var(--color-border);
-      background-color: var(--color-surface);
-      cursor: pointer;
-      transition: color var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
-      margin-right: -10px;
-    }
-    .desktop-collapse-btn:hover {
-      color: var(--color-text-primary);
-      background-color: var(--color-surface-hover);
-      border-color: var(--color-border-hover);
-    }
     .brand-link {
       display: flex;
       align-items: center;
-      gap: 12px;
-    }
-    .logo-mark {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .brand-name {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
+      text-decoration: none;
     }
     .brand-title {
-      font-size: 17.5px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-size: 18px;
+      font-weight: 750;
+      letter-spacing: -0.025em;
       color: var(--color-text-primary);
-    }
-    .brand-badge {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--color-accent);
-      background-color: var(--color-accent-subtle);
-      border: 1px solid var(--color-accent-border);
-      border-radius: var(--radius-sm);
-      padding: 1px 6px;
     }
     .nav-links {
       display: flex;
@@ -470,12 +374,6 @@ import { AuthService } from '../../core/services/auth.service';
     }
 
     @media (max-width: 900px) {
-      .mobile-toggle-btn {
-        display: flex;
-      }
-      .desktop-collapse-btn {
-        display: none;
-      }
       .nav-links {
         display: none;
       }

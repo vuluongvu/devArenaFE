@@ -13,6 +13,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
+import { MarkdownPipe } from '../../shared/pipes/markdown.pipe';
 import { ProblemService } from '../../core/services/problem.service';
 import { SubmissionService } from '../../core/services/submission.service';
 import { ThemeService } from '../../core/services/theme.service';
@@ -32,7 +33,7 @@ type ConsoleTab = 'testcases' | 'output' | 'result';
 @Component({
   selector: 'app-workspace',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, IconComponent, BadgeComponent],
+  imports: [CommonModule, RouterModule, FormsModule, IconComponent, BadgeComponent, MarkdownPipe],
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.css']
 })
@@ -70,6 +71,28 @@ export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = true;
   errorMessage = '';
 
+  /**
+   * Separates the problem statement description from the constraints section
+   * so they can be rendered with Markdown and structured cleanly around Examples.
+   */
+  get statementDescription(): string {
+    if (!this.problem?.statement) return '';
+    const match = this.problem.statement.match(/(?:#{1,4}\s*Constraints:?|\*\*Constraints:?\*\*)/i);
+    if (match && match.index !== undefined) {
+      return this.problem.statement.substring(0, match.index).trim();
+    }
+    return this.problem.statement;
+  }
+
+  get statementConstraints(): string {
+    if (!this.problem?.statement) return '';
+    const match = this.problem.statement.match(/(?:#{1,4}\s*Constraints:?|\*\*Constraints:?\*\*)/i);
+    if (match && match.index !== undefined) {
+      return this.problem.statement.substring(match.index).trim();
+    }
+    return '';
+  }
+
   // Workspace Tabs & Layout
   activeLeftTab: LeftTab = 'description';
   activeConsoleTab: ConsoleTab = 'testcases';
@@ -101,6 +124,7 @@ export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
   runResult: RunCodeResult | null = null;
   submitResult: SubmissionEvaluationResult | null = null;
   submissionsList: SubmissionHistoryItem[] = [];
+  selectedSubmission: SubmissionHistoryItem | null = null;
 
   // Feedback Toast
   toastMessage: string | null = null;
@@ -521,6 +545,39 @@ int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
     const sol = this.getEditorialCode();
     navigator.clipboard.writeText(sol);
     this.showToast('Editorial solution copied to clipboard!');
+  }
+
+  viewSubmission(sub: SubmissionHistoryItem): void {
+    this.selectedSubmission = sub;
+  }
+
+  closeSubmission(): void {
+    this.selectedSubmission = null;
+  }
+
+  copySubmissionCode(): void {
+    if (!this.selectedSubmission?.sourceCode) return;
+    navigator.clipboard.writeText(this.selectedSubmission.sourceCode);
+    this.showToast('Submitted source code copied to clipboard!');
+  }
+
+  loadSubmissionIntoEditor(): void {
+    if (!this.selectedSubmission?.sourceCode) return;
+    this.code = this.selectedSubmission.sourceCode;
+    if (this.editorInstance) {
+      this.editorInstance.setValue(this.code);
+    }
+    if (this.selectedSubmission.language) {
+      this.selectedLanguage = this.selectedSubmission.language;
+      if (this.editorInstance) {
+        const lang = this.monacoService.getMonacoLanguage(this.selectedLanguage);
+        const model = this.editorInstance.getModel();
+        if (model && (window as any).monaco) {
+          (window as any).monaco.editor.setModelLanguage(model, lang);
+        }
+      }
+    }
+    this.showToast(`Restored submission code (${this.selectedLanguage}) into editor!`);
   }
 
   showToast(msg: string): void {

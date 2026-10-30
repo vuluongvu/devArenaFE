@@ -242,3 +242,132 @@ code, pre {
 .text-easy { color: var(--color-easy) !important; }
 .text-medium { color: var(--color-medium) !important; }
 .text-hard { color: var(--color-hard) !important; }
+
+/* ==========================================================================
+   Markdown Typography & Editorial Rendering
+   ========================================================================== */
+.markdown-body {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--color-text-primary);
+}
+
+.markdown-body p {
+  margin-bottom: 12px;
+}
+
+.markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-top: 18px;
+  margin-bottom: 10px;
+}
+
+.markdown-body h1 {
+  font-size: 19px;
+  letter-spacing: -0.02em;
+}
+
+.markdown-body h2 {
+  font-size: 16.5px;
+  letter-spacing: -0.01em;
+}
+
+.markdown-body h3 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 16px;
+  margin-bottom: 10px;
+}
+
+.markdown-body h4 {
+  font-size: 13.5px;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 20px;
+  margin: 8px 0 14px 0;
+}
+
+.markdown-body ul {
+  list-style-type: disc;
+}
+
+.markdown-body ol {
+  list-style-type: decimal;
+}
+
+.markdown-body li {
+  margin-bottom: 6px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
+
+.markdown-body li:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background-color: var(--color-sidebar);
+  border: 1px solid var(--color-border);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+
+.markdown-body pre {
+  background-color: var(--color-sidebar);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  overflow-x: auto;
+  margin: 14px 0;
+}
+
+.markdown-body pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+}
+
+.markdown-body strong {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.markdown-body em {
+  font-style: italic;
+  color: var(--color-text-primary);
+}
+
+.markdown-body sup {
+  font-size: 0.75em;
+  vertical-align: super;
+  line-height: 0;
+}
+
+.markdown-body sub {
+  font-size: 0.75em;
+  vertical-align: sub;
+  line-height: 0;
+}
+
+.markdown-body blockquote {
+  border-left: 3px solid var(--color-border-hover);
+  padding-left: 12px;
+  color: var(--color-text-secondary);
+  margin: 12px 0;
+}

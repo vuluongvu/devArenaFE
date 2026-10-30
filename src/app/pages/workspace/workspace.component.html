@@ -137,13 +137,11 @@
             </div>
           </header>
 
-          <!-- Problem Statement Body -->
-          <div class="markdown-body">
-            <p class="statement-text">{{ problem.statement }}</p>
-          </div>
+          <!-- Problem Statement Body (Rendered with Markdown) -->
+          <div class="markdown-body" [innerHTML]="statementDescription | markdown"></div>
 
           <!-- Sample Test Cases -->
-          <div class="sample-cases-section">
+          <div class="sample-cases-section" *ngIf="problem.sampleTestCases && problem.sampleTestCases.length > 0">
             <h2 class="sub-heading">Examples</h2>
             <div *ngFor="let sample of problem.sampleTestCases; let idx = index" class="example-box">
               <div class="example-title">Example {{ idx + 1 }}</div>
@@ -162,6 +160,9 @@
             </div>
           </div>
 
+          <!-- Constraints Section (Rendered with Markdown) -->
+          <div *ngIf="statementConstraints" class="constraints-section markdown-body" [innerHTML]="statementConstraints | markdown"></div>
+
           <!-- Related Topic Tags -->
           <div class="topics-section">
             <h2 class="sub-heading">Related Topics</h2>
@@ -175,7 +176,7 @@
         <article *ngIf="activeLeftTab === 'editorial'" class="editorial-article">
           <div *ngIf="problem.solutionEditorial as ed; else noEditorial">
             <h2 class="editorial-title">Algorithmic Approach & Walkthrough</h2>
-            <p class="editorial-summary">{{ ed.summary }}</p>
+            <div class="editorial-summary markdown-body" [innerHTML]="ed.summary | markdown"></div>
 
             <!-- Complexity Cards -->
             <div class="complexity-grid">
@@ -192,7 +193,7 @@
             <!-- Approach Detail -->
             <div class="approach-box">
               <h3 class="approach-heading">Detailed Invariant & Logic</h3>
-              <p class="approach-text">{{ ed.approach }}</p>
+              <div class="approach-text markdown-body" [innerHTML]="ed.approach | markdown"></div>
             </div>
 
             <!-- Reference Solution Code -->
@@ -218,44 +219,125 @@
 
         <!-- SUBMISSIONS TAB -->
         <article *ngIf="activeLeftTab === 'submissions'" class="submissions-article">
-          <h2 class="editorial-title">Evaluation History</h2>
-          <div *ngIf="submissionsList.length === 0" class="empty-submissions">
-            <app-icon name="clock" [size]="28" customClass="text-muted"></app-icon>
-            <p>No submissions recorded for this problem yet.</p>
-            <span>Write your solution in the editor and click "Submit" to run all testcases.</span>
+          <!-- VIEW 1: SUBMISSIONS LIST -->
+          <div *ngIf="!selectedSubmission" class="submissions-list-view">
+            <div class="sub-header-row">
+              <h2 class="editorial-title">Evaluation History</h2>
+              <span class="sub-count-badge" *ngIf="submissionsList.length > 0">{{ submissionsList.length }} submissions</span>
+            </div>
+
+            <div *ngIf="submissionsList.length === 0" class="empty-submissions">
+              <app-icon name="clock" [size]="28" customClass="text-muted"></app-icon>
+              <p>No submissions recorded for this problem yet.</p>
+              <span>Write your solution in the editor and click "Submit" to run all testcases.</span>
+            </div>
+
+            <div *ngIf="submissionsList.length > 0" class="submissions-table-wrap">
+              <table class="sub-table">
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>Language</th>
+                    <th>Runtime</th>
+                    <th>Memory</th>
+                    <th>Passed</th>
+                    <th>Submitted</th>
+                    <th class="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let s of submissionsList" class="sub-clickable-row" (click)="viewSubmission(s)">
+                    <td>
+                      <span
+                        class="sub-verdict-badge"
+                        [class.verdict-pass]="s.status === 'ACCEPTED'"
+                        [class.verdict-fail]="s.status !== 'ACCEPTED'"
+                      >
+                        {{ s.status }}
+                      </span>
+                    </td>
+                    <td><code class="mini-code">{{ s.language }}</code></td>
+                    <td>{{ s.executionTimeMs }} ms</td>
+                    <td>{{ (s.memoryUsedKb / 1024).toFixed(1) }} MB</td>
+                    <td>{{ s.passedTestCases }} / {{ s.totalTestCases }}</td>
+                    <td class="text-muted">{{ s.submittedAt }}</td>
+                    <td class="text-right">
+                      <button class="inspect-btn" (click)="$event.stopPropagation(); viewSubmission(s)" title="Inspect submitted code">
+                        <app-icon name="code" [size]="13"></app-icon>
+                        <span>View</span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          <div *ngIf="submissionsList.length > 0" class="submissions-table-wrap">
-            <table class="sub-table">
-              <thead>
-                <tr>
-                  <th>Status</th>
-                  <th>Language</th>
-                  <th>Runtime</th>
-                  <th>Memory</th>
-                  <th>Passed</th>
-                  <th>Submitted</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let s of submissionsList">
-                  <td>
-                    <span
-                      class="sub-verdict-badge"
-                      [class.verdict-pass]="s.status === 'ACCEPTED'"
-                      [class.verdict-fail]="s.status !== 'ACCEPTED'"
-                    >
-                      {{ s.status }}
-                    </span>
-                  </td>
-                  <td><code class="mini-code">{{ s.language }}</code></td>
-                  <td>{{ s.executionTimeMs }} ms</td>
-                  <td>{{ (s.memoryUsedKb / 1024).toFixed(1) }} MB</td>
-                  <td>{{ s.passedTestCases }} / {{ s.totalTestCases }}</td>
-                  <td class="text-muted">{{ s.submittedAt }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- VIEW 2: SUBMISSION CODE INSPECTOR -->
+          <div *ngIf="selectedSubmission as sub" class="submission-detail-view">
+            <!-- Navigation back to list -->
+            <div class="detail-nav-bar">
+              <button class="back-link-btn" (click)="closeSubmission()">
+                <app-icon name="chevron-left" [size]="15"></app-icon>
+                <span>Back to Submissions</span>
+              </button>
+              <span class="detail-timestamp text-muted">Submitted {{ sub.submittedAt }}</span>
+            </div>
+
+            <!-- Submission Summary Card -->
+            <div class="sub-summary-card" [class.pass-card]="sub.status === 'ACCEPTED'" [class.fail-card]="sub.status !== 'ACCEPTED'">
+              <div class="summary-top">
+                <div class="summary-verdict">
+                  <app-icon [name]="sub.status === 'ACCEPTED' ? 'check-circle' : 'alert-circle'" [size]="20"></app-icon>
+                  <span class="verdict-name">{{ sub.status }}</span>
+                </div>
+                <div class="summary-actions">
+                  <button class="tool-action-btn" (click)="copySubmissionCode()" title="Copy submitted code to clipboard">
+                    <app-icon name="copy" [size]="13"></app-icon>
+                    <span>Copy Code</span>
+                  </button>
+                  <button class="tool-action-btn btn-restore" (click)="loadSubmissionIntoEditor()" title="Load this code into the active Monaco editor">
+                    <app-icon name="rotate-ccw" [size]="13"></app-icon>
+                    <span>Load to Editor</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Performance Stats -->
+              <div class="summary-metrics-grid">
+                <div class="metric-box">
+                  <span class="metric-title">Language</span>
+                  <span class="metric-data"><code class="mini-code">{{ sub.language }}</code></span>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-title">Runtime</span>
+                  <span class="metric-data"><strong>{{ sub.executionTimeMs }}</strong> ms</span>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-title">Memory</span>
+                  <span class="metric-data"><strong>{{ (sub.memoryUsedKb / 1024).toFixed(1) }}</strong> MB</span>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-title">Test Cases</span>
+                  <span class="metric-data"><strong>{{ sub.passedTestCases }}</strong> / {{ sub.totalTestCases }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Code Viewer Section -->
+            <div class="submission-code-box">
+              <div class="code-box-header">
+                <div class="file-info">
+                  <app-icon name="terminal" [size]="13" customClass="text-muted"></app-icon>
+                  <span>Submitted Source Code ({{ sub.language }})</span>
+                </div>
+                <button class="copy-code-btn" (click)="copySubmissionCode()">
+                  <app-icon name="copy" [size]="13"></app-icon>
+                  <span>Copy</span>
+                </button>
+              </div>
+              <pre class="submission-pre"><code>{{ sub.sourceCode || '// No source code recorded for this submission.' }}</code></pre>
+            </div>
           </div>
         </article>
       </div>

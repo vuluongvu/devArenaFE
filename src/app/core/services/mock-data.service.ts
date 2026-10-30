@@ -1230,7 +1230,18 @@ class Solution {
       totalTestCases: 5,
       executionTimeMs: 42,
       memoryUsedKb: 38400,
-      submittedAt: '12 minutes ago'
+      submittedAt: '12 minutes ago',
+      sourceCode: `function twoSum(nums: number[], target: number): number[] {
+    const map = new Map<number, number>();
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (map.has(complement)) {
+            return [map.get(complement)!, i];
+        }
+        map.set(nums[i], i);
+    }
+    return [];
+}`
     },
     {
       id: 102,
@@ -1244,7 +1255,16 @@ class Solution {
       totalTestCases: 3,
       executionTimeMs: 58,
       memoryUsedKb: 39100,
-      submittedAt: '2 hours ago'
+      submittedAt: '2 hours ago',
+      sourceCode: `function isAnagram(s: string, t: string): boolean {
+    if (s.length !== t.length) return false;
+    const counts = new Array(26).fill(0);
+    for (let i = 0; i < s.length; i++) {
+        counts[s.charCodeAt(i) - 97]++;
+        counts[t.charCodeAt(i) - 97]--;
+    }
+    return counts.every(c => c === 0);
+}`
     },
     {
       id: 103,
@@ -1258,7 +1278,29 @@ class Solution {
       totalTestCases: 2,
       executionTimeMs: 110,
       memoryUsedKb: 45200,
-      submittedAt: 'Yesterday'
+      submittedAt: 'Yesterday',
+      sourceCode: `function threeSum(nums: number[]): number[][] {
+    nums.sort((a, b) => a - b);
+    const result: number[][] = [];
+    for (let i = 0; i < nums.length - 2; i++) {
+        if (i > 0 && nums[i] === nums[i - 1]) continue;
+        let left = i + 1;
+        let right = nums.length - 1;
+        while (left < right) {
+            const sum = nums[i] + nums[left] + nums[right];
+            if (sum === 0) {
+                result.push([nums[i], nums[left], nums[right]]);
+                left++;
+                right--;
+            } else if (sum < 0) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+    }
+    return result;
+}`
     },
     {
       id: 104,
@@ -1272,7 +1314,19 @@ class Solution {
       totalTestCases: 3,
       executionTimeMs: 38,
       memoryUsedKb: 37800,
-      submittedAt: '3 days ago'
+      submittedAt: '3 days ago',
+      sourceCode: `function isValid(s: string): boolean {
+    const stack: string[] = [];
+    const map: Record<string, string> = { ')': '(', '}': '{', ']': '[' };
+    for (const char of s) {
+        if (char === '(' || char === '{' || char === '[') {
+            stack.push(char);
+        } else if (stack.pop() !== map[char]) {
+            return false;
+        }
+    }
+    return stack.length === 0;
+}`
     },
     {
       id: 105,
@@ -1286,7 +1340,22 @@ class Solution {
       totalTestCases: 2,
       executionTimeMs: 29,
       memoryUsedKb: 36500,
-      submittedAt: '5 days ago'
+      submittedAt: '5 days ago',
+      sourceCode: `function search(nums: number[], target: number): number {
+    let left = 0;
+    let right = nums.length - 1;
+    while (left <= right) {
+        const mid = Math.floor(left + (right - left) / 2);
+        if (nums[mid] === target) {
+            return mid;
+        } else if (nums[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    return -1;
+}`
     }
   ];
 

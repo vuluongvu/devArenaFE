@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
+import { MarkdownPipe } from '../../shared/pipes/markdown.pipe';
 import { ProblemService } from '../../core/services/problem.service';
 import { ProgressService } from '../../core/services/progress.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, IconComponent, BadgeComponent],
+  imports: [CommonModule, RouterModule, IconComponent, BadgeComponent, MarkdownPipe],
   template: `
     <div class="home-container">
       <!-- Editorial Hero Section -->
@@ -49,7 +50,7 @@ import { ProgressService } from '../../core/services/progress.service';
         <div class="pick-body">
           <div class="pick-info">
             <h2 class="pick-title">{{ p.title }}</h2>
-            <p class="pick-desc">{{ p.statement.split('\\n\\n')[0] }}</p>
+            <div class="pick-desc markdown-body" [innerHTML]="p.statement.split('\\n\\n')[0] | markdown"></div>
             <div class="pick-tags">
               <span class="category-pill">{{ p.category }}</span>
               <span *ngFor="let t of p.tags" class="tag-pill">{{ t }}</span>
