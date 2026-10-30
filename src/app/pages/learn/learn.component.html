@@ -6,9 +6,9 @@
         <app-icon name="layers" [size]="13" customClass="text-accent"></app-icon>
         <span>DATA STRUCTURE VISUALIZER</span>
       </div>
-      <h1 class="page-title">Mô Phỏng Cấu Trúc Dữ Liệu</h1>
+      <h1 class="page-title">Data Structure Visualizer</h1>
       <p class="page-subtitle">
-        Trực quan hóa cấu trúc bộ nhớ và các thao tác thêm, sửa, xóa mặc định cùng mã nguồn chuẩn bằng C++, Java và Python.
+        Interactive memory representations and standard operations (Insert, Delete, Update, Read) with universal algorithm pseudocode.
       </p>
     </div>
 
@@ -28,7 +28,7 @@
         (click)="activeMainTab = 'curricula'"
       >
         <app-icon name="book" [size]="15"></app-icon>
-        <span>Lộ Trình Học</span>
+        <span>Curricula & Paths</span>
       </button>
     </div>
   </header>
@@ -46,7 +46,7 @@
           (click)="activeDs = 'stack'"
         >
           <app-icon name="layers" [size]="15"></app-icon>
-          <span class="tab-label">Stack (Ngăn Xếp)</span>
+          <span class="tab-label">Stack</span>
           <span class="badge-pill">LIFO</span>
         </button>
 
@@ -56,7 +56,7 @@
           (click)="activeDs = 'queue'"
         >
           <app-icon name="sliders" [size]="15"></app-icon>
-          <span class="tab-label">Queue (Hàng Đợi)</span>
+          <span class="tab-label">Queue</span>
           <span class="badge-pill">FIFO</span>
         </button>
 
@@ -72,7 +72,7 @@
       </div>
 
       <div class="ds-meta-badge">
-        <span>Thao tác cơ bản: Thêm, Sửa, Xóa, Xem (CRUD)</span>
+        <span>Standard Primitive Operations: Insert, Delete, Update, Read</span>
       </div>
     </div>
 
@@ -86,16 +86,16 @@
         <span class="status-text">{{ statusMessage }}</span>
       </div>
 
-      <!-- Interactive Controls Deck (Thêm, Sửa, Xóa, Xem) -->
+      <!-- Interactive Controls Deck (Insert, Update, Delete, Read) -->
       <div class="control-deck-card">
         <div class="deck-left">
-          <!-- Input & Push / Sửa Group -->
+          <!-- Input & Push Group -->
           <div class="input-action-group">
             <input
               type="text"
               [(ngModel)]="pushInput"
               (keyup.enter)="pushStack()"
-              placeholder="Nhập giá trị..."
+              placeholder="Enter value..."
               class="deck-input"
               maxlength="10"
             />
@@ -103,73 +103,73 @@
               class="btn-deck btn-push"
               (click)="pushStack()"
               [disabled]="stackItems.length >= maxStackCapacity"
-              title="Thêm phần tử vào đỉnh (Push - O(1))"
+              title="Insert element at TOP (push - O(1))"
             >
               <app-icon name="chevron-down" [size]="14"></app-icon>
-              <span>Thêm (Push)</span>
+              <span>Push</span>
             </button>
           </div>
 
-          <!-- Sửa Đỉnh -->
+          <!-- Update Top Element -->
           <button
             class="btn-deck btn-update"
             (click)="updateTopStack()"
             [disabled]="stackItems.length === 0"
-            title="Sửa giá trị phần tử ở đỉnh (Update Top - O(1))"
+            title="Update value of element at TOP (updateTop - O(1))"
           >
             <app-icon name="code" [size]="13"></app-icon>
-            <span>Sửa Đỉnh</span>
+            <span>Update Top</span>
           </button>
 
-          <!-- Xóa Đỉnh (Pop) -->
+          <!-- Pop Element -->
           <button
             class="btn-deck btn-pop"
             (click)="popStack()"
             [disabled]="stackItems.length === 0"
-            title="Xóa phần tử ở đỉnh (Pop - O(1))"
+            title="Remove element from TOP (pop - O(1))"
           >
             <app-icon name="chevron-left" [size]="14" customClass="rotate-up"></app-icon>
-            <span>Xóa Đỉnh (Pop)</span>
+            <span>Pop()</span>
           </button>
 
-          <!-- Xem Đỉnh (Peek) -->
+          <!-- Peek Element -->
           <button
             class="btn-deck btn-peek"
             (click)="peekStack()"
             [disabled]="stackItems.length === 0"
-            title="Xem phần tử ở đỉnh (Peek - O(1))"
+            title="Read element at TOP without removal (peek - O(1))"
           >
             <app-icon name="eye" [size]="14"></app-icon>
-            <span>Xem Đỉnh (Peek)</span>
+            <span>Peek()</span>
           </button>
 
-          <!-- Thêm Ngẫu Nhiên -->
+          <!-- Push Random -->
           <button
             class="btn-deck btn-secondary"
             (click)="pushRandom()"
             [disabled]="stackItems.length >= maxStackCapacity"
-            title="Thêm số ngẫu nhiên vào ngăn xếp"
+            title="Push random integer"
           >
             <app-icon name="sparkles" [size]="13"></app-icon>
-            <span>Ngẫu Nhiên</span>
+            <span>Random</span>
           </button>
 
-          <!-- Xóa Sạch (Clear) -->
+          <!-- Clear Stack -->
           <button
             class="btn-deck btn-ghost"
             (click)="clearStack()"
             [disabled]="stackItems.length === 0"
-            title="Xóa toàn bộ phần tử"
+            title="Clear all elements"
           >
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
-            <span>Xóa Hết</span>
+            <span>Clear</span>
           </button>
         </div>
 
         <div class="deck-right">
           <div class="capacity-meter">
             <span class="capacity-text">
-              Dung lượng: <strong>{{ stackItems.length }}</strong> / {{ maxStackCapacity }}
+              Capacity: <strong>{{ stackItems.length }}</strong> / {{ maxStackCapacity }} slots
             </span>
             <div class="capacity-track">
               <div
@@ -182,17 +182,17 @@
         </div>
       </div>
 
-      <!-- Main Visual Stage: Beaker + Code Inspector -->
+      <!-- Main Visual Stage: Beaker + Pseudocode -->
       <div class="stage-grid">
         <!-- Visual Stage Left: The Stack Beaker -->
         <div class="beaker-stage-card">
           <div class="stage-header">
             <div class="stage-title-wrap">
-              <h3 class="stage-heading">Mô Hình Ngăn Xếp (LIFO)</h3>
-              <span class="stage-subheading">Thao tác thêm, xóa và sửa chỉ diễn ra tại cửa vào duy nhất: Đỉnh (TOP).</span>
+              <h3 class="stage-heading">LIFO Stack Memory Model</h3>
+              <span class="stage-subheading">Insertions, deletions, and updates occur exclusively at the single access point: TOP.</span>
             </div>
             <div class="top-tag" *ngIf="stackTopItem">
-              <span>Đỉnh hiện tại: <strong>'{{ stackTopItem.value }}'</strong></span>
+              <span>Current TOP: <strong>'{{ stackTopItem.value }}'</strong></span>
             </div>
           </div>
 
@@ -200,10 +200,10 @@
           <div class="beaker-outer">
             <!-- Beaker Open Mouth Indicator -->
             <div class="beaker-mouth">
-              <span class="mouth-label">Cửa Vào / Ra Duy Nhất (TOP)</span>
+              <span class="mouth-label">Single Access Boundary (TOP)</span>
               <div class="mouth-arrow-group">
-                <span class="arrow-down">↓ PUSH (Thêm)</span>
-                <span class="arrow-up">↑ POP (Xóa)</span>
+                <span class="arrow-down">↓ PUSH (Insert)</span>
+                <span class="arrow-up">↑ POP (Delete)</span>
               </div>
             </div>
 
@@ -212,8 +212,8 @@
               <!-- Empty State Overlay -->
               <div *ngIf="stackItems.length === 0" class="beaker-empty-state">
                 <app-icon name="layers" [size]="36" customClass="text-muted"></app-icon>
-                <div class="empty-title">Ngăn Xếp Đang Rỗng</div>
-                <div class="empty-subtitle">Nhập giá trị và nhấn nút Thêm (Push) để đưa phần tử vào.</div>
+                <div class="empty-title">Stack is Empty</div>
+                <div class="empty-subtitle">Enter a value and click Push to insert elements.</div>
               </div>
 
               <!-- Stacking Items (Flex column-reverse: index 0 at bottom, top at top) -->
@@ -236,7 +236,7 @@
                       <app-icon name="chevron-left" [size]="12"></app-icon>
                       <span>TOP</span>
                     </span>
-                    <span *ngIf="!isLast" class="block-tag">trong ngăn</span>
+                    <span *ngIf="!isLast" class="block-tag">in-stack</span>
                   </div>
                 </div>
               </div>
@@ -244,199 +244,107 @@
 
             <!-- Beaker Solid Base -->
             <div class="beaker-base">
-              <span>Đáy Ngăn Xếp (Index 0 - Vào đầu tiên, ra sau cùng)</span>
+              <span>Closed Base (Index 0 — First In, Last Out)</span>
             </div>
           </div>
 
           <!-- Invariant Explanatory Footnote -->
           <div class="stage-footer-note">
             <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-            <span><strong>Nguyên lý LIFO:</strong> Last-In, First-Out (Vào sau ra trước). Thêm (Push), Xóa (Pop), Xem (Peek), Sửa đỉnh (Update) đều đạt độ phức tạp <code>O(1)</code>.</span>
+            <span><strong>LIFO Principle:</strong> Last-In, First-Out. Push, Pop, Peek, and Update Top operate in strict constant <code>O(1)</code> time without memory shifting.</span>
           </div>
         </div>
 
-        <!-- Visual Stage Right: Metrics & Code Implementations (C++, Java, Python) -->
+        <!-- Visual Stage Right: Metrics & Universal Pseudocode -->
         <div class="inspector-column">
           <!-- Metric Cards Grid -->
           <div class="metrics-subgrid">
             <div class="stat-box">
-              <span class="stat-box-label">SỐ LƯỢNG (SIZE)</span>
+              <span class="stat-box-label">CURRENT SIZE</span>
               <span class="stat-box-value">{{ stackItems.length }}</span>
             </div>
             <div class="stat-box">
-              <span class="stat-box-label">PHẦN TỬ ĐỈNH</span>
+              <span class="stat-box-label">TOP ELEMENT</span>
               <span class="stat-box-value mono">{{ stackTopItem ? stackTopItem.value : 'null' }}</span>
             </div>
             <div class="stat-box">
-              <span class="stat-box-label">THỜI GIAN (TIME)</span>
+              <span class="stat-box-label">TIME COMPLEXITY</span>
               <span class="stat-box-value text-easy">O(1)</span>
             </div>
             <div class="stat-box">
-              <span class="stat-box-label">BỘ NHỚ (SPACE)</span>
+              <span class="stat-box-label">SPACE COMPLEXITY</span>
               <span class="stat-box-value">O(N)</span>
             </div>
           </div>
 
-          <!-- Code Architecture & Implementation in C++, Java, Python -->
+          <!-- Universal Pseudocode Specification -->
           <div class="code-snippet-card">
             <div class="code-card-header">
               <div class="code-tab-group">
-                <button
-                  class="code-tab"
-                  [class.active]="activeCodeLang === 'cpp'"
-                  (click)="activeCodeLang = 'cpp'"
-                >
-                  C++
-                </button>
-                <button
-                  class="code-tab"
-                  [class.active]="activeCodeLang === 'java'"
-                  (click)="activeCodeLang = 'java'"
-                >
-                  Java
-                </button>
-                <button
-                  class="code-tab"
-                  [class.active]="activeCodeLang === 'python'"
-                  (click)="activeCodeLang = 'python'"
-                >
-                  Python
-                </button>
+                <span class="pseudocode-badge">ALGORITHM PSEUDOCODE</span>
               </div>
-              <span class="code-title">Cấu Trúc Stack Chuẩn</span>
+              <span class="code-title">Stack Abstract Data Type (ADT)</span>
             </div>
 
-            <!-- C++ Code Block -->
-            <pre class="code-block" *ngIf="activeCodeLang === 'cpp'"><code><span class="k">#include</span> <span class="t">&lt;iostream&gt;</span>
-<span class="k">#include</span> <span class="t">&lt;vector&gt;</span>
+            <!-- Pseudocode Block -->
+            <pre class="code-block"><code><span class="k">class</span> <span class="t">Stack</span>:
+    <span class="f">constructor</span>():
+        items = []
 
-<span class="k">template</span> &lt;<span class="k">typename</span> <span class="t">T</span>&gt;
-<span class="k">class</span> <span class="t">Stack</span> &#123;
-<span class="k">private</span>:
-    std::vector&lt;<span class="t">T</span>&gt; data;
+    <span class="c">// Insert element at TOP — O(1)</span>
+    <span class="k">procedure</span> <span class="f">push</span>(value):
+        items.append(value)
 
-<span class="k">public</span>:
-    <span class="c">// Thêm phần tử vào đỉnh - O(1)</span>
-    <span class="k">void</span> <span class="f">push</span>(<span class="k">const</span> <span class="t">T</span>& val) &#123;
-        data.push_back(val);
-    &#125;
+    <span class="c">// Delete and return element from TOP — O(1)</span>
+    <span class="k">procedure</span> <span class="f">pop</span>():
+        <span class="k">if not</span> isEmpty():
+            <span class="k">return</span> items.removeLast()
+        <span class="k">raise</span> <span class="t">UnderflowError</span>
 
-    <span class="c">// Xóa phần tử ở đỉnh - O(1)</span>
-    <span class="k">void</span> <span class="f">pop</span>() &#123;
-        <span class="k">if</span> (!empty()) &#123;
-            data.pop_back();
-        &#125;
-    &#125;
+    <span class="c">// Read element at TOP without removal — O(1)</span>
+    <span class="k">procedure</span> <span class="f">peek</span>():
+        <span class="k">if not</span> isEmpty():
+            <span class="k">return</span> items.last()
+        <span class="k">return</span> <span class="k">null</span>
 
-    <span class="c">// Xem phần tử ở đỉnh - O(1)</span>
-    <span class="t">T</span> <span class="f">top</span>() <span class="k">const</span> &#123;
-        <span class="k">return</span> data.back();
-    &#125;
+    <span class="c">// Mutate value of element at TOP — O(1)</span>
+    <span class="k">procedure</span> <span class="f">updateTop</span>(value):
+        <span class="k">if not</span> isEmpty():
+            items[lastIndex] = value
 
-    <span class="c">// Sửa phần tử ở đỉnh - O(1)</span>
-    <span class="k">void</span> <span class="f">updateTop</span>(<span class="k">const</span> <span class="t">T</span>& val) &#123;
-        <span class="k">if</span> (!empty()) &#123;
-            data.back() = val;
-        &#125;
-    &#125;
+    <span class="k">function</span> <span class="f">isEmpty</span>():
+        <span class="k">return</span> length(items) == 0
 
-    <span class="k">bool</span> <span class="f">empty</span>() <span class="k">const</span> &#123; <span class="k">return</span> data.empty(); &#125;
-    <span class="t">size_t</span> <span class="f">size</span>() <span class="k">const</span> &#123; <span class="k">return</span> data.size(); &#125;
-&#125;;</code></pre>
-
-            <!-- Java Code Block -->
-            <pre class="code-block" *ngIf="activeCodeLang === 'java'"><code><span class="k">import</span> <span class="t">java.util.ArrayDeque</span>;
-<span class="k">import</span> <span class="t">java.util.Deque</span>;
-
-<span class="k">public class</span> <span class="t">Stack</span>&lt;<span class="t">T</span>&gt; &#123;
-    <span class="k">private</span> <span class="t">Deque</span>&lt;<span class="t">T</span>&gt; data = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
-
-    <span class="c">// Thêm phần tử vào đỉnh - O(1)</span>
-    <span class="k">public void</span> <span class="f">push</span>(<span class="t">T</span> val) &#123;
-        data.push(val);
-    &#125;
-
-    <span class="c">// Xóa phần tử ở đỉnh - O(1)</span>
-    <span class="k">public</span> <span class="t">T</span> <span class="f">pop</span>() &#123;
-        <span class="k">return</span> data.pop();
-    &#125;
-
-    <span class="c">// Xem phần tử ở đỉnh - O(1)</span>
-    <span class="k">public</span> <span class="t">T</span> <span class="f">peek</span>() &#123;
-        <span class="k">return</span> data.peek();
-    &#125;
-
-    <span class="c">// Sửa phần tử ở đỉnh - O(1)</span>
-    <span class="k">public void</span> <span class="f">updateTop</span>(<span class="t">T</span> val) &#123;
-        <span class="k">if</span> (!data.isEmpty()) &#123;
-            data.pop();
-            data.push(val);
-        &#125;
-    &#125;
-
-    <span class="k">public boolean</span> <span class="f">isEmpty</span>() &#123; <span class="k">return</span> data.isEmpty(); &#125;
-    <span class="k">public int</span> <span class="f">size</span>() &#123; <span class="k">return</span> data.size(); &#125;
-&#125;</code></pre>
-
-            <!-- Python Code Block -->
-            <pre class="code-block" *ngIf="activeCodeLang === 'python'"><code><span class="k">class</span> <span class="t">Stack</span>:
-    <span class="k">def</span> <span class="f">__init__</span>(self):
-        self._data = []
-
-    <span class="c"># Thêm phần tử vào đỉnh - O(1)</span>
-    <span class="k">def</span> <span class="f">push</span>(self, val):
-        self._data.append(val)
-
-    <span class="c"># Xóa phần tử ở đỉnh - O(1)</span>
-    <span class="k">def</span> <span class="f">pop</span>(self):
-        <span class="k">if not</span> self.is_empty():
-            <span class="k">return</span> self._data.pop()
-        <span class="k">raise</span> <span class="t">IndexError</span>(<span class="f">"pop from empty stack"</span>)
-
-    <span class="c"># Xem phần tử ở đỉnh - O(1)</span>
-    <span class="k">def</span> <span class="f">peek</span>(self):
-        <span class="k">if not</span> self.is_empty():
-            <span class="k">return</span> self._data[-1]
-        <span class="k">return None</span>
-
-    <span class="c"># Sửa phần tử ở đỉnh - O(1)</span>
-    <span class="k">def</span> <span class="f">update_top</span>(self, val):
-        <span class="k">if not</span> self.is_empty():
-            self._data[-1] = val
-
-    <span class="k">def</span> <span class="f">is_empty</span>(self):
-        <span class="k">return</span> len(self._data) == 0
-
-    <span class="k">def</span> <span class="f">size</span>(self):
-        <span class="k">return</span> len(self._data)</code></pre>
+    <span class="k">function</span> <span class="f">size</span>():
+        <span class="k">return</span> length(items)</code></pre>
           </div>
 
-          <!-- Complexity Cheat Sheet -->
+          <!-- Complexity & Operations Cheat Sheet -->
           <div class="summary-card">
-            <h4 class="card-mini-title">Bảng Tóm Tắt Thao Tác</h4>
+            <h4 class="card-mini-title">Primitive Operations Summary</h4>
             <div class="summary-rows">
               <div class="summary-row">
-                <span class="op-badge op-push">THÊM</span>
+                <span class="op-badge op-push">INSERT</span>
                 <span class="op-name"><code>push(x)</code></span>
-                <span class="op-desc">Đưa <code>x</code> vào đỉnh</span>
+                <span class="op-desc">Appends element <code>x</code> to TOP</span>
                 <span class="op-comp">O(1)</span>
               </div>
               <div class="summary-row">
-                <span class="op-badge op-pop">XÓA</span>
+                <span class="op-badge op-pop">DELETE</span>
                 <span class="op-name"><code>pop()</code></span>
-                <span class="op-desc">Lấy phần tử đỉnh ra ngoài</span>
+                <span class="op-desc">Removes element from TOP</span>
                 <span class="op-comp">O(1)</span>
               </div>
               <div class="summary-row">
-                <span class="op-badge op-peek">XEM</span>
-                <span class="op-name"><code>top() / peek()</code></span>
-                <span class="op-desc">Đọc giá trị ở đỉnh</span>
+                <span class="op-badge op-peek">READ</span>
+                <span class="op-name"><code>peek() / top()</code></span>
+                <span class="op-desc">Inspects element at TOP</span>
                 <span class="op-comp">O(1)</span>
               </div>
               <div class="summary-row">
-                <span class="op-badge op-update">SỬA</span>
-                <span class="op-name"><code>top() = x</code></span>
-                <span class="op-desc">Cập nhật giá trị đỉnh</span>
+                <span class="op-badge op-update">UPDATE</span>
+                <span class="op-name"><code>updateTop(x)</code></span>
+                <span class="op-desc">Mutates value of TOP element</span>
                 <span class="op-comp">O(1)</span>
               </div>
             </div>
@@ -456,7 +364,7 @@
               type="text"
               [(ngModel)]="enqueueInput"
               (keyup.enter)="enqueue()"
-              placeholder="Nhập giá trị..."
+              placeholder="Enter value..."
               class="deck-input"
               maxlength="10"
             />
@@ -466,7 +374,7 @@
               [disabled]="queueItems.length >= maxQueueCapacity"
             >
               <app-icon name="chevron-right" [size]="14"></app-icon>
-              <span>Thêm (Enqueue Rear)</span>
+              <span>Enqueue (Insert Rear)</span>
             </button>
           </div>
 
@@ -476,17 +384,17 @@
             [disabled]="queueItems.length === 0"
           >
             <app-icon name="chevron-left" [size]="14"></app-icon>
-            <span>Xóa (Dequeue Front)</span>
+            <span>Dequeue (Delete Front)</span>
           </button>
 
           <button class="btn-deck btn-ghost" (click)="clearQueue()" [disabled]="queueItems.length === 0">
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
-            <span>Xóa Hết</span>
+            <span>Clear</span>
           </button>
         </div>
 
         <div class="deck-right">
-          <span class="capacity-text">Độ dài: <strong>{{ queueItems.length }}</strong> / {{ maxQueueCapacity }}</span>
+          <span class="capacity-text">Length: <strong>{{ queueItems.length }}</strong> / {{ maxQueueCapacity }} slots</span>
         </div>
       </div>
 
@@ -494,21 +402,21 @@
       <div class="beaker-stage-card">
         <div class="stage-header">
           <div class="stage-title-wrap">
-            <h3 class="stage-heading">Mô Hình Hàng Đợi (FIFO Pipeline)</h3>
-            <span class="stage-subheading">Phần tử thêm vào ở Đuôi (REAR) và xóa tuần tự ở Đầu (FRONT).</span>
+            <h3 class="stage-heading">FIFO Queue Pipeline Model</h3>
+            <span class="stage-subheading">Elements enter sequentially at the REAR and exit sequentially at the FRONT.</span>
           </div>
         </div>
 
         <div class="queue-pipeline-container">
           <div class="queue-pointer front-pointer">
-            <span class="pointer-label">FRONT (Đầu)</span>
-            <span class="pointer-sub">Xóa (Dequeue)</span>
+            <span class="pointer-label">FRONT</span>
+            <span class="pointer-sub">Dequeue exit</span>
             <app-icon name="chevron-left" [size]="18" customClass="text-accent"></app-icon>
           </div>
 
           <div class="queue-track">
             <div *ngIf="queueItems.length === 0" class="beaker-empty-state">
-              <div class="empty-title">Hàng Đợi Đang Rỗng</div>
+              <div class="empty-title">Queue is Empty</div>
             </div>
 
             <div *ngFor="let q of queueItems; let idx = index" class="queue-element">
@@ -519,8 +427,8 @@
 
           <div class="queue-pointer rear-pointer">
             <app-icon name="chevron-right" [size]="18" customClass="text-accent"></app-icon>
-            <span class="pointer-label">REAR (Đuôi)</span>
-            <span class="pointer-sub">Thêm (Enqueue)</span>
+            <span class="pointer-label">REAR</span>
+            <span class="pointer-sub">Enqueue entry</span>
           </div>
         </div>
       </div>
@@ -534,21 +442,21 @@
         <div class="deck-left">
           <button class="btn-deck btn-push" (click)="stepTwoPointers()" [disabled]="twoPointerDone">
             <app-icon name="play" [size]="14"></app-icon>
-            <span>Dịch Con Trỏ</span>
+            <span>Step Pointers</span>
           </button>
           <button class="btn-deck btn-secondary" (click)="resetTwoPointers()">
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
-            <span>Khởi Tạo Lại</span>
+            <span>Reset</span>
           </button>
         </div>
         <div class="deck-right">
-          <span class="capacity-text">Kỹ thuật: Thu Hẹp 2 Con Trỏ Trực Tiếp (In-Place)</span>
+          <span class="capacity-text">Pattern: In-Place Convergence (Two Pointers)</span>
         </div>
       </div>
 
       <div class="beaker-stage-card">
         <div class="stage-header">
-          <h3 class="stage-heading">Hội Tụ 2 Con Trỏ: Chuỗi 'racecar'</h3>
+          <h3 class="stage-heading">Two Pointers Convergence: String 'racecar'</h3>
           <span class="stage-subheading">{{ twoPointerMessage }}</span>
         </div>
 
@@ -601,7 +509,7 @@
         <!-- Overall Path Progress -->
         <div class="path-progress-box">
           <div class="progress-info">
-            <span>Tiến độ: <strong>{{ path.completedModules }}</strong> / {{ path.totalModules }} modules hoàn thành</span>
+            <span>Progress: <strong>{{ path.completedModules }}</strong> of {{ path.totalModules }} modules complete</span>
             <span class="percentage-val">{{ Math.round((path.completedModules / path.totalModules) * 100) }}%</span>
           </div>
           <div class="progress-bar-track">
@@ -625,7 +533,7 @@
               </div>
             </div>
             <div class="module-stat">
-              <span>{{ topic.completedCount }} / {{ topic.problemsCount }} Đã giải</span>
+              <span>{{ topic.completedCount }} / {{ topic.problemsCount }} Solved</span>
             </div>
           </div>
 
@@ -646,7 +554,7 @@
               <div class="prob-right">
                 <app-badge [difficulty]="p.difficulty"></app-badge>
                 <a [routerLink]="['/problems', p.slug]" class="solve-action-btn">
-                  <span>{{ p.solved ? 'Review' : 'Luyện Tập' }}</span>
+                  <span>{{ p.solved ? 'Review' : 'Practice' }}</span>
                   <app-icon name="chevron-right" [size]="12"></app-icon>
                 </a>
               </div>

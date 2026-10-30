@@ -46,8 +46,7 @@ export class LearnComponent implements OnInit {
     { id: 2, value: '15' },
     { id: 3, value: '88' }
   ];
-  activeCodeLang: 'cpp' | 'java' | 'python' = 'cpp';
-  statusMessage = 'Trạng thái: Ngăn xếp đang có 3 phần tử. Đỉnh hiện tại là 88.';
+  statusMessage = 'Status: Stack initialized with 3 elements. Current TOP element is 88.';
 
   // --- QUEUE VISUALIZER STATE ---
   maxQueueCapacity = 6;
@@ -62,7 +61,7 @@ export class LearnComponent implements OnInit {
   twoPointerArray: string[] = ['r', 'a', 'c', 'e', 'c', 'a', 'r'];
   leftPointer = 0;
   rightPointer = 6;
-  twoPointerMessage = "Khởi tạo: Con trỏ L tại 0 ('r'), con trỏ R tại 6 ('r').";
+  twoPointerMessage = "Initial state: Left pointer at index 0 ('r'), Right pointer at index 6 ('r').";
   twoPointerDone = false;
 
   ngOnInit(): void {
@@ -77,13 +76,13 @@ export class LearnComponent implements OnInit {
   }
 
   // ==========================================
-  // STACK OPERATIONS: Thêm, Sửa, Xóa, Xem
+  // STACK OPERATIONS: Insert, Delete, Update, Read
   // ==========================================
 
-  // Thêm phần tử vào đỉnh (Push)
+  // Insert element at TOP (Push)
   pushStack(customVal?: string): void {
     if (this.stackItems.length >= this.maxStackCapacity) {
-      this.statusMessage = `Stack Overflow: Đã đầy dung lượng bộ nhớ mô phỏng (${this.maxStackCapacity} phần tử).`;
+      this.statusMessage = `Stack Overflow: Container capacity (${this.maxStackCapacity} elements) reached.`;
       return;
     }
 
@@ -95,13 +94,13 @@ export class LearnComponent implements OnInit {
 
     this.stackItems.push(newItem);
     this.pushInput = '';
-    this.statusMessage = `Push('${val}'): Đã thêm phần tử '${val}' vào đỉnh ngăn xếp.`;
+    this.statusMessage = `push('${val}'): Element '${val}' inserted at TOP (index ${this.stackItems.length - 1}).`;
   }
 
-  // Xóa phần tử khỏi đỉnh (Pop)
+  // Delete element from TOP (Pop)
   popStack(): void {
     if (this.stackItems.length === 0) {
-      this.statusMessage = 'Stack Underflow: Ngăn xếp đang rỗng, không thể xóa phần tử.';
+      this.statusMessage = 'Stack Underflow: Stack is empty, cannot pop element.';
       return;
     }
 
@@ -110,36 +109,36 @@ export class LearnComponent implements OnInit {
 
     setTimeout(() => {
       this.stackItems.pop();
-      const newTop = this.stackItems.length > 0 ? `'${this.stackItems[this.stackItems.length - 1].value}'` : 'null (rỗng)';
-      this.statusMessage = `Pop(): Đã xóa phần tử '${popped.value}' khỏi đỉnh. Đỉnh mới là ${newTop}.`;
+      const newTop = this.stackItems.length > 0 ? `'${this.stackItems[this.stackItems.length - 1].value}'` : 'null (empty)';
+      this.statusMessage = `pop(): Removed '${popped.value}' from TOP. New TOP is ${newTop}.`;
     }, 180);
   }
 
-  // Xem phần tử ở đỉnh (Peek / Top)
+  // Read element at TOP (Peek / Top)
   peekStack(): void {
     if (this.stackItems.length === 0) {
-      this.statusMessage = 'Peek(): Ngăn xếp đang rỗng.';
+      this.statusMessage = 'peek(): Stack is currently empty.';
       return;
     }
 
     const topItem = this.stackItems[this.stackItems.length - 1];
     topItem.isPeeking = true;
-    this.statusMessage = `Peek(): Phần tử ở đỉnh hiện tại là '${topItem.value}' (O(1)).`;
+    this.statusMessage = `peek(): TOP element is '${topItem.value}' (O(1) time complexity, stack unmodified).`;
 
     setTimeout(() => {
       topItem.isPeeking = false;
     }, 1200);
   }
 
-  // Sửa giá trị phần tử ở đỉnh
+  // Update value of element at TOP
   updateTopStack(): void {
     if (this.stackItems.length === 0) {
-      this.statusMessage = 'Không thể sửa: Ngăn xếp đang rỗng.';
+      this.statusMessage = 'Cannot update: Stack is empty.';
       return;
     }
     const val = this.pushInput.trim();
     if (!val) {
-      this.statusMessage = 'Vui lòng nhập giá trị vào ô để sửa phần tử đỉnh.';
+      this.statusMessage = 'Please enter a value in the input field to update the TOP element.';
       return;
     }
 
@@ -148,20 +147,20 @@ export class LearnComponent implements OnInit {
     topItem.value = val;
     topItem.isUpdated = true;
     this.pushInput = '';
-    this.statusMessage = `Sửa đỉnh: Đã cập nhật phần tử đỉnh từ '${oldVal}' thành '${val}'.`;
+    this.statusMessage = `updateTop('${val}'): Updated TOP element from '${oldVal}' to '${val}'.`;
 
     setTimeout(() => {
       topItem.isUpdated = false;
     }, 1000);
   }
 
-  // Xóa toàn bộ phần tử
+  // Clear all elements
   clearStack(): void {
     this.stackItems = [];
-    this.statusMessage = 'Clear(): Đã xóa toàn bộ phần tử trong ngăn xếp.';
+    this.statusMessage = 'clear(): All elements removed. Stack reset to empty.';
   }
 
-  // Thêm phần tử ngẫu nhiên
+  // Push random integer
   pushRandom(): void {
     const randoms = ['42', '15', '99', '7', '108', '24', '63', '80'];
     const chosen = randoms[Math.floor(Math.random() * randoms.length)];
@@ -169,7 +168,7 @@ export class LearnComponent implements OnInit {
   }
 
   // ==========================================
-  // QUEUE OPERATIONS (Thêm, Xóa, Xóa sạch)
+  // QUEUE OPERATIONS (Enqueue, Dequeue, Clear)
   // ==========================================
   enqueue(): void {
     if (this.queueItems.length >= this.maxQueueCapacity) {
@@ -197,7 +196,7 @@ export class LearnComponent implements OnInit {
   stepTwoPointers(): void {
     if (this.leftPointer >= this.rightPointer) {
       this.twoPointerDone = true;
-      this.twoPointerMessage = `Hai con trỏ đã gặp nhau tại index ${this.leftPointer}. Chuỗi đối xứng hợp lệ (Palindrome)!`;
+      this.twoPointerMessage = `Pointers met at index ${this.leftPointer}. String is a valid Palindrome!`;
       return;
     }
 
@@ -208,14 +207,14 @@ export class LearnComponent implements OnInit {
       this.leftPointer++;
       this.rightPointer--;
       if (this.leftPointer < this.rightPointer) {
-        this.twoPointerMessage = `Trùng khớp '${leftChar}' == '${rightChar}'. Con trỏ L dịch sang ${this.leftPointer}, R dịch sang ${this.rightPointer}.`;
+        this.twoPointerMessage = `Matched '${leftChar}' == '${rightChar}'. Left pointer moved to ${this.leftPointer}, Right pointer moved to ${this.rightPointer}.`;
       } else {
         this.twoPointerDone = true;
-        this.twoPointerMessage = `Tất cả ký tự đối xứng khớp nhau! Chuỗi 'racecar' là Palindrome (O(N) thời gian, O(1) không gian).`;
+        this.twoPointerMessage = `All boundary characters matched! String 'racecar' is a valid Palindrome (O(N) Time, O(1) Space).`;
       }
     } else {
       this.twoPointerDone = true;
-      this.twoPointerMessage = `Không khớp: '${leftChar}' != '${rightChar}'.`;
+      this.twoPointerMessage = `Mismatch: '${leftChar}' != '${rightChar}'.`;
     }
   }
 
@@ -223,7 +222,7 @@ export class LearnComponent implements OnInit {
     this.leftPointer = 0;
     this.rightPointer = 6;
     this.twoPointerDone = false;
-    this.twoPointerMessage = "Khởi tạo: Con trỏ L tại 0 ('r'), con trỏ R tại 6 ('r').";
+    this.twoPointerMessage = "Initial state: Left pointer at index 0 ('r'), Right pointer at index 6 ('r').";
   }
 
   get stackTopItem(): StackItem | null {
