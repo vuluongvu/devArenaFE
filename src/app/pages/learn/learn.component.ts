@@ -77,7 +77,8 @@ import { LearningPath } from '../../core/models/progress.model';
                       [customClass]="p.solved ? 'text-easy' : 'text-muted'"
                     ></app-icon>
                     <a [routerLink]="['/problems', p.slug]" class="prob-link">
-                      {{ p.title }}
+                      <span *ngIf="p.id" class="prob-id">{{ p.id }}. </span>
+                      <span>{{ p.title }}</span>
                     </a>
                   </div>
                   <div class="prob-right">

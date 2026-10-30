@@ -32,7 +32,7 @@ export class ProblemsComponent implements OnInit {
   selectedDifficulty: Difficulty | 'ALL' = 'ALL';
   selectedCategory: string | 'ALL' = 'ALL';
   selectedStatus: UserSolveStatus | 'ALL' = 'ALL';
-  sortBy: 'title' | 'difficulty' | 'acceptance' = 'title';
+  sortBy: 'id' | 'title' | 'difficulty' | 'acceptance' = 'id';
   sortOrder: 'asc' | 'desc' = 'asc';
 
   viewMode: 'table' | 'grouped' = 'table';
@@ -87,12 +87,12 @@ export class ProblemsComponent implements OnInit {
     this.selectedDifficulty = 'ALL';
     this.selectedCategory = 'ALL';
     this.selectedStatus = 'ALL';
-    this.sortBy = 'title';
+    this.sortBy = 'id';
     this.sortOrder = 'asc';
     this.fetchProblems();
   }
 
-  toggleSort(field: 'title' | 'difficulty' | 'acceptance'): void {
+  toggleSort(field: 'id' | 'title' | 'difficulty' | 'acceptance'): void {
     if (this.sortBy === field) {
       this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
     } else {

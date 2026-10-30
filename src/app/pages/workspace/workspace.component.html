@@ -12,7 +12,7 @@
 
       <!-- Problem Title & Status -->
       <div class="problem-meta" *ngIf="problem">
-        <span class="meta-title">{{ problem.title }}</span>
+        <span class="meta-title">{{ problem.id }}. {{ problem.title }}</span>
         <app-badge [difficulty]="problem.difficulty"></app-badge>
         <app-badge *ngIf="problem.userStatus === 'SOLVED'" status="SOLVED"></app-badge>
       </div>
@@ -128,7 +128,7 @@
         <!-- DESCRIPTION TAB -->
         <article *ngIf="activeLeftTab === 'description'" class="statement-article">
           <header class="statement-header">
-            <h1 class="statement-title">{{ problem.title }}</h1>
+            <h1 class="statement-title">{{ problem.id }}. {{ problem.title }}</h1>
             <div class="statement-tags">
               <app-badge [difficulty]="problem.difficulty"></app-badge>
               <span class="meta-pill">Category: {{ problem.category }}</span>

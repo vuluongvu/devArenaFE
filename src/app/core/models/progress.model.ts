@@ -39,6 +39,7 @@ export interface LearningPath {
     problemsCount: number;
     completedCount: number;
     problems: {
+      id?: number;
       slug: string;
       title: string;
       difficulty: Difficulty;

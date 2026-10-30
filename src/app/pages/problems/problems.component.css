@@ -282,6 +282,19 @@
   text-align: center;
   padding-right: 0 !important;
 }
+.col-id {
+  width: 54px;
+  padding-left: 6px !important;
+  padding-right: 12px !important;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+.problem-id-num {
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+}
 .status-indicator {
   display: inline-flex;
   align-items: center;
@@ -467,9 +480,18 @@
   gap: 12px;
 }
 .group-title-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 14.5px;
   font-weight: 500;
   color: var(--color-text-primary);
+}
+.group-prob-num {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
 }
 .group-title-link:hover {
   color: var(--color-accent);

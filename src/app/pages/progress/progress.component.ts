@@ -132,7 +132,8 @@ import { SubmissionService } from '../../core/services/submission.service';
                   </td>
                   <td>
                     <a [routerLink]="['/problems', sub.problemSlug]" class="sub-prob-link">
-                      {{ sub.problemTitle }}
+                      <span *ngIf="sub.problemId">{{ sub.problemId }}. </span>
+                      <span>{{ sub.problemTitle }}</span>
                     </a>
                   </td>
                   <td>{{ sub.executionTimeMs }} ms</td>

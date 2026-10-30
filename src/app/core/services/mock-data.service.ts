@@ -1377,9 +1377,9 @@ class Solution {
           problemsCount: 4,
           completedCount: 3,
           problems: [
-            { slug: 'two-sum', title: 'Two Sum', difficulty: 'EASY', solved: true },
-            { slug: 'valid-anagram', title: 'Valid Anagram', difficulty: 'EASY', solved: true },
-            { slug: 'group-anagrams', title: 'Group Anagrams', difficulty: 'MEDIUM', solved: false }
+            { id: 1, slug: 'two-sum', title: 'Two Sum', difficulty: 'EASY', solved: true },
+            { id: 2, slug: 'valid-anagram', title: 'Valid Anagram', difficulty: 'EASY', solved: true },
+            { id: 3, slug: 'group-anagrams', title: 'Group Anagrams', difficulty: 'MEDIUM', solved: false }
           ]
         },
         {
@@ -1388,9 +1388,9 @@ class Solution {
           problemsCount: 3,
           completedCount: 1,
           problems: [
-            { slug: 'valid-palindrome', title: 'Valid Palindrome', difficulty: 'EASY', solved: true },
-            { slug: '3sum', title: '3Sum', difficulty: 'MEDIUM', solved: false },
-            { slug: 'trapping-rain-water', title: 'Trapping Rain Water', difficulty: 'HARD', solved: false }
+            { id: 4, slug: 'valid-palindrome', title: 'Valid Palindrome', difficulty: 'EASY', solved: true },
+            { id: 5, slug: '3sum', title: '3Sum', difficulty: 'MEDIUM', solved: false },
+            { id: 6, slug: 'trapping-rain-water', title: 'Trapping Rain Water', difficulty: 'HARD', solved: false }
           ]
         },
         {
@@ -1399,7 +1399,7 @@ class Solution {
           problemsCount: 2,
           completedCount: 0,
           problems: [
-            { slug: 'longest-substring-without-repeating-characters', title: 'Longest Substring Without Repeating Characters', difficulty: 'MEDIUM', solved: false }
+            { id: 7, slug: 'longest-substring-without-repeating-characters', title: 'Longest Substring Without Repeating Characters', difficulty: 'MEDIUM', solved: false }
           ]
         },
         {
@@ -1408,7 +1408,7 @@ class Solution {
           problemsCount: 2,
           completedCount: 1,
           problems: [
-            { slug: 'valid-parentheses', title: 'Valid Parentheses', difficulty: 'EASY', solved: true }
+            { id: 8, slug: 'valid-parentheses', title: 'Valid Parentheses', difficulty: 'EASY', solved: true }
           ]
         }
       ]
@@ -1430,7 +1430,7 @@ class Solution {
           problemsCount: 3,
           completedCount: 1,
           problems: [
-            { slug: 'binary-search', title: 'Binary Search', difficulty: 'EASY', solved: true }
+            { id: 9, slug: 'binary-search', title: 'Binary Search', difficulty: 'EASY', solved: true }
           ]
         },
         {
@@ -1439,7 +1439,7 @@ class Solution {
           problemsCount: 4,
           completedCount: 0,
           problems: [
-            { slug: 'coin-change', title: 'Coin Change', difficulty: 'MEDIUM', solved: false }
+            { id: 10, slug: 'coin-change', title: 'Coin Change', difficulty: 'MEDIUM', solved: false }
           ]
         }
       ]

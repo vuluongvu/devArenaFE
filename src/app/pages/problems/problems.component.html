@@ -149,11 +149,21 @@
       <thead>
         <tr>
           <th class="col-status">Status</th>
+          <th class="col-id sortable" (click)="toggleSort('id')">
+            <div class="th-content">
+              <span>#</span>
+              <app-icon
+                [name]="sortBy === 'id' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-up') : 'chevron-down'"
+                [size]="13"
+                [customClass]="sortBy === 'id' ? 'sort-active' : 'sort-inactive'"
+              ></app-icon>
+            </div>
+          </th>
           <th class="col-title sortable" (click)="toggleSort('title')">
             <div class="th-content">
               <span>Title</span>
               <app-icon
-                [name]="sortBy === 'title' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-left') : 'chevron-down'"
+                [name]="sortBy === 'title' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-up') : 'chevron-down'"
                 [size]="13"
                 [customClass]="sortBy === 'title' ? 'sort-active' : 'sort-inactive'"
               ></app-icon>
@@ -163,7 +173,7 @@
             <div class="th-content">
               <span>Difficulty</span>
               <app-icon
-                [name]="sortBy === 'difficulty' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-left') : 'chevron-down'"
+                [name]="sortBy === 'difficulty' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-up') : 'chevron-down'"
                 [size]="13"
                 [customClass]="sortBy === 'difficulty' ? 'sort-active' : 'sort-inactive'"
               ></app-icon>
@@ -174,7 +184,7 @@
             <div class="th-content">
               <span>Acceptance</span>
               <app-icon
-                [name]="sortBy === 'acceptance' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-left') : 'chevron-down'"
+                [name]="sortBy === 'acceptance' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-up') : 'chevron-down'"
                 [size]="13"
                 [customClass]="sortBy === 'acceptance' ? 'sort-active' : 'sort-inactive'"
               ></app-icon>
@@ -208,6 +218,11 @@
               ></app-icon>
               <span *ngIf="!problem.userStatus || problem.userStatus === 'TODO'" class="todo-dot"></span>
             </span>
+          </td>
+
+          <!-- Order / ID -->
+          <td class="col-id">
+            <span class="problem-id-num">{{ problem.id }}</span>
           </td>
 
           <!-- Title & Tags -->
@@ -291,7 +306,8 @@
             <span *ngIf="!p.userStatus || p.userStatus === 'TODO'" class="todo-dot"></span>
             
             <a [routerLink]="['/problems', p.slug]" class="group-title-link">
-              {{ p.title }}
+              <span class="group-prob-num">{{ p.id }}.</span>
+              <span>{{ p.title }}</span>
             </a>
           </div>
           <div class="group-right">

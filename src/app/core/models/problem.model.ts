@@ -47,6 +47,6 @@ export interface ProblemFilter {
   difficulty?: Difficulty | 'ALL';
   category?: string | 'ALL';
   status?: UserSolveStatus | 'ALL';
-  sortBy?: 'title' | 'difficulty' | 'acceptance';
+  sortBy?: 'id' | 'title' | 'difficulty' | 'acceptance';
   sortOrder?: 'asc' | 'desc';
 }

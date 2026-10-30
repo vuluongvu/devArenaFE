@@ -49,7 +49,7 @@ import { ProgressService } from '../../core/services/progress.service';
 
         <div class="pick-body">
           <div class="pick-info">
-            <h2 class="pick-title">{{ p.title }}</h2>
+            <h2 class="pick-title">{{ p.id }}. {{ p.title }}</h2>
             <div class="pick-desc markdown-body" [innerHTML]="p.statement.split('\\n\\n')[0] | markdown"></div>
             <div class="pick-tags">
               <span class="category-pill">{{ p.category }}</span>

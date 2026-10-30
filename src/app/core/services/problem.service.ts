@@ -77,7 +77,11 @@ export class ProblemService {
 
     if (filter.search && filter.search.trim() !== '') {
       const q = filter.search.toLowerCase().trim();
+      const numQuery = parseInt(q.replace('#', ''), 10);
       result = result.filter(p =>
+        (!isNaN(numQuery) && p.id === numQuery) ||
+        p.id.toString() === q ||
+        `#${p.id}` === q ||
         p.title.toLowerCase().includes(q) ||
         p.slug.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
@@ -100,6 +104,9 @@ export class ProblemService {
     if (filter.sortBy) {
       const order = filter.sortOrder === 'desc' ? -1 : 1;
       result.sort((a, b) => {
+        if (filter.sortBy === 'id') {
+          return (a.id - b.id) * order;
+        }
         if (filter.sortBy === 'title') {
           return a.title.localeCompare(b.title) * order;
         }

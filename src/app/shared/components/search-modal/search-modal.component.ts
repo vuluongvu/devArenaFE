@@ -54,6 +54,7 @@ import { Problem } from '../../../core/models/problem.model';
                   [size]="15"
                   [customClass]="prob.userStatus === 'SOLVED' ? 'text-easy' : 'text-muted'"
                 ></app-icon>
+                <span class="problem-num-badge">#{{ prob.id }}</span>
                 <span class="problem-title">{{ prob.title }}</span>
                 <span class="problem-category">{{ prob.category }}</span>
               </div>
@@ -161,6 +162,16 @@ import { Problem } from '../../../core/models/problem.model';
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+    .problem-num-badge {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      background-color: var(--color-sidebar);
+      border: 1px solid var(--color-border);
+      padding: 1px 6px;
+      border-radius: var(--radius-xs);
     }
     .problem-title {
       font-size: 14.5px;
@@ -279,7 +290,11 @@ export class SearchModalComponent {
     if (!q) {
       this.filteredProblems = all.slice(0, 7);
     } else {
+      const numQuery = parseInt(q.replace('#', ''), 10);
       this.filteredProblems = all.filter(p =>
+        (!isNaN(numQuery) && p.id === numQuery) ||
+        p.id.toString() === q ||
+        `#${p.id}` === q ||
         p.title.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
         p.tags.some(t => t.toLowerCase().includes(q))
