@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
@@ -56,7 +56,7 @@ export type TopicId =
   templateUrl: './learn.component.html',
   styleUrls: ['./learn.component.css']
 })
-export class LearnComponent implements OnInit {
+export class LearnComponent implements OnInit, OnDestroy {
   private progressService = inject(ProgressService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -68,6 +68,19 @@ export class LearnComponent implements OnInit {
   activeMainTab: 'visualizer' | 'curricula' = 'visualizer';
   activeCategory: VisualizerCategory = 'data-structures';
   activeTopic: TopicId = 'stack';
+
+  // BST Connecting Edges state
+  bstActiveEdges = new Set<string>();
+
+  // Algorithm Auto Run states
+  bsAutoRunning = false;
+  bsInterval: any = null;
+
+  tpAutoRunning = false;
+  tpInterval: any = null;
+
+  swAutoRunning = false;
+  swInterval: any = null;
 
   // ==========================================
   // 1. STACK STATE
@@ -175,6 +188,16 @@ export class LearnComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.stopAllAutoRuns();
+  }
+
+  stopAllAutoRuns(): void {
+    this.stopAutoBinarySearch();
+    this.stopAutoTwoPointers();
+    this.stopAutoSlidingWindow();
+  }
+
   setMainTab(tab: 'visualizer' | 'curricula'): void {
     this.activeMainTab = tab;
   }
@@ -193,6 +216,7 @@ export class LearnComponent implements OnInit {
   }
 
   setTopic(id: TopicId): void {
+    this.stopAllAutoRuns();
     this.activeTopic = id;
     if (['stack', 'queue', 'linked-list', 'bst'].includes(id)) {
       this.activeCategory = 'data-structures';
@@ -406,24 +430,68 @@ export class LearnComponent implements OnInit {
     this.bstStatus = `insert(${val}): Placed node ${val} in BST following left < root < right invariant.`;
   }
 
-  searchBST(): void {
-    const val = parseInt(this.bstInput.trim(), 10);
+  searchBST(customVal?: number): void {
+    const val = customVal !== undefined ? customVal : parseInt(this.bstInput.trim(), 10);
     if (isNaN(val)) {
       this.bstStatus = 'Please enter an integer to search.';
       return;
     }
     this.bstNodes.forEach(n => n.highlight = false);
-    const target = this.bstNodes.find(n => n.val === val);
-    if (target) {
-      target.highlight = true;
-      this.bstStatus = `search(${val}): Node ${val} FOUND in BST! (O(log N) average search time).`;
-      setTimeout(() => { target.highlight = false; }, 2000);
-    } else {
-      this.bstStatus = `search(${val}): Node ${val} NOT found in BST.`;
+    this.bstActiveEdges.clear();
+
+    // Determine path from root 50
+    const pathNodes: number[] = [50];
+    const pathEdges: string[] = [];
+
+    if (val < 50) {
+      pathEdges.push('50-30');
+      pathNodes.push(30);
+      if (val < 30) {
+        pathEdges.push('30-20');
+        pathNodes.push(20);
+      } else if (val > 30) {
+        pathEdges.push('30-40');
+        pathNodes.push(40);
+      }
+    } else if (val > 50) {
+      pathEdges.push('50-70');
+      pathNodes.push(70);
+      if (val < 70) {
+        pathEdges.push('70-60');
+        pathNodes.push(60);
+      } else if (val > 70) {
+        pathEdges.push('70-80');
+        pathNodes.push(80);
+      }
     }
+
+    // Step-by-step path animation down the branches
+    let step = 0;
+    const interval = setInterval(() => {
+      if (step < pathNodes.length) {
+        const currNodeVal = pathNodes[step];
+        const node = this.bstNodes.find(n => n.val === currNodeVal);
+        if (node) node.highlight = true;
+        if (step > 0) {
+          this.bstActiveEdges.add(pathEdges[step - 1]);
+        }
+        step++;
+      } else {
+        clearInterval(interval);
+        const found = pathNodes[pathNodes.length - 1] === val;
+        this.bstStatus = found
+          ? `search(${val}): Node ${val} FOUND in BST following branch traversal in O(log N)!`
+          : `search(${val}): Traversal completed. Value ${val} NOT found in BST.`;
+        setTimeout(() => {
+          this.bstNodes.forEach(n => n.highlight = false);
+          this.bstActiveEdges.clear();
+        }, 3000);
+      }
+    }, 450);
   }
 
   resetBST(): void {
+    this.bstActiveEdges.clear();
     this.bstNodes = [
       { id: 1, val: 50, level: 0, pos: 50 },
       { id: 2, val: 30, level: 1, pos: 25 },
@@ -439,11 +507,41 @@ export class LearnComponent implements OnInit {
   // ==========================================
   // BINARY SEARCH METHODS
   // ==========================================
+  toggleAutoBinarySearch(): void {
+    if (this.bsAutoRunning) {
+      this.stopAutoBinarySearch();
+    } else {
+      if (this.bsFound || this.bsLeft > this.bsRight) {
+        this.resetBinarySearch(this.bsTarget);
+      }
+      this.bsAutoRunning = true;
+      this.bsInterval = setInterval(() => {
+        if (this.bsFound || this.bsLeft > this.bsRight) {
+          this.stopAutoBinarySearch();
+        } else {
+          this.stepBinarySearch();
+          if (this.bsFound || this.bsLeft > this.bsRight) {
+            this.stopAutoBinarySearch();
+          }
+        }
+      }, 950);
+    }
+  }
+
+  stopAutoBinarySearch(): void {
+    this.bsAutoRunning = false;
+    if (this.bsInterval) {
+      clearInterval(this.bsInterval);
+      this.bsInterval = null;
+    }
+  }
+
   stepBinarySearch(): void {
     if (this.bsFound || this.bsLeft > this.bsRight) {
       this.bsStatus = this.bsFound
         ? `Target ${this.bsTarget} found at index ${this.bsMid}!`
         : `Target ${this.bsTarget} not found in array.`;
+      this.stopAutoBinarySearch();
       return;
     }
 
@@ -454,6 +552,7 @@ export class LearnComponent implements OnInit {
     if (midVal === this.bsTarget) {
       this.bsFound = true;
       this.bsStatus = `Step ${this.bsStepIndex}: arr[mid=${this.bsMid}] == ${this.bsTarget}. MATCH FOUND in O(log N) time!`;
+      this.stopAutoBinarySearch();
     } else if (midVal < this.bsTarget) {
       this.bsStatus = `Step ${this.bsStepIndex}: arr[mid=${this.bsMid}] = ${midVal} < ${this.bsTarget}. Discard left half, move Left to ${this.bsMid + 1}.`;
       this.bsLeft = this.bsMid + 1;
@@ -464,22 +563,53 @@ export class LearnComponent implements OnInit {
   }
 
   resetBinarySearch(target = 42): void {
+    this.stopAutoBinarySearch();
     this.bsTarget = target;
     this.bsLeft = 0;
     this.bsRight = this.bsArray.length - 1;
     this.bsMid = Math.floor((this.bsLeft + this.bsRight) / 2);
     this.bsStepIndex = 0;
     this.bsFound = false;
-    this.bsStatus = `Reset: Searching for target ${target} across range [0..${this.bsArray.length - 1}]. Click Step.`;
+    this.bsStatus = `Reset: Searching for target ${target} across range [0..${this.bsArray.length - 1}]. Click Step or Auto Run.`;
   }
 
   // ==========================================
   // TWO POINTERS METHODS
   // ==========================================
+  toggleAutoTwoPointers(): void {
+    if (this.tpAutoRunning) {
+      this.stopAutoTwoPointers();
+    } else {
+      if (this.tpDone) {
+        this.resetTwoPointers();
+      }
+      this.tpAutoRunning = true;
+      this.tpInterval = setInterval(() => {
+        if (this.tpDone) {
+          this.stopAutoTwoPointers();
+        } else {
+          this.stepTwoPointers();
+          if (this.tpDone) {
+            this.stopAutoTwoPointers();
+          }
+        }
+      }, 950);
+    }
+  }
+
+  stopAutoTwoPointers(): void {
+    this.tpAutoRunning = false;
+    if (this.tpInterval) {
+      clearInterval(this.tpInterval);
+      this.tpInterval = null;
+    }
+  }
+
   stepTwoPointers(): void {
     if (this.tpLeft >= this.tpRight) {
       this.tpDone = true;
       this.tpStatus = `Pointers converged at index ${this.tpLeft}. String 'racecar' is a valid PALINDROME!`;
+      this.stopAutoTwoPointers();
       return;
     }
     const leftChar = this.tpArray[this.tpLeft];
@@ -493,27 +623,62 @@ export class LearnComponent implements OnInit {
       } else {
         this.tpDone = true;
         this.tpStatus = `All boundary characters matched! String 'racecar' is a valid Palindrome (O(N) Time, O(1) Space).`;
+        this.stopAutoTwoPointers();
       }
     } else {
       this.tpDone = true;
       this.tpStatus = `Mismatch: '${leftChar}' != '${rightChar}'.`;
+      this.stopAutoTwoPointers();
     }
   }
 
   resetTwoPointers(): void {
+    this.stopAutoTwoPointers();
     this.tpLeft = 0;
     this.tpRight = 6;
     this.tpDone = false;
-    this.tpStatus = "Initial state: Left pointer at index 0 ('r'), Right pointer at index 6 ('r').";
+    this.tpStatus = "Initial state: Left pointer at index 0 ('r'), Right pointer at index 6 ('r'). Click Step or Auto Run.";
   }
 
   // ==========================================
   // SLIDING WINDOW METHODS
   // ==========================================
+  toggleAutoSlidingWindow(): void {
+    if (this.swAutoRunning) {
+      this.stopAutoSlidingWindow();
+    } else {
+      const maxStart = this.swArray.length - this.swWindowSize;
+      if (this.swStart >= maxStart) {
+        this.resetSlidingWindow();
+      }
+      this.swAutoRunning = true;
+      this.swInterval = setInterval(() => {
+        const endReached = this.swStart >= this.swArray.length - this.swWindowSize;
+        if (endReached) {
+          this.stopAutoSlidingWindow();
+        } else {
+          this.stepSlidingWindow();
+          if (this.swStart >= this.swArray.length - this.swWindowSize) {
+            this.stopAutoSlidingWindow();
+          }
+        }
+      }, 950);
+    }
+  }
+
+  stopAutoSlidingWindow(): void {
+    this.swAutoRunning = false;
+    if (this.swInterval) {
+      clearInterval(this.swInterval);
+      this.swInterval = null;
+    }
+  }
+
   stepSlidingWindow(): void {
     const maxStart = this.swArray.length - this.swWindowSize;
     if (this.swStart >= maxStart) {
       this.swStatus = `Sliding complete! Maximum subarray sum of window size ${this.swWindowSize} is ${this.swMaxSum}.`;
+      this.stopAutoSlidingWindow();
       return;
     }
     this.swStart++;
@@ -526,9 +691,13 @@ export class LearnComponent implements OnInit {
       this.swMaxSum = this.swCurrentSum;
     }
     this.swStatus = `Window slid to [${this.swStart}..${end}]. Current Sum = ${this.swCurrentSum}. Max Sum = ${this.swMaxSum}.`;
+    if (this.swStart >= maxStart) {
+      this.stopAutoSlidingWindow();
+    }
   }
 
   resetSlidingWindow(): void {
+    this.stopAutoSlidingWindow();
     this.swStart = 0;
     this.swCurrentSum = 8;
     this.swMaxSum = 8;

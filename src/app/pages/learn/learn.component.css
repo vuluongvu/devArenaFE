@@ -221,6 +221,20 @@
 .btn-update { color: var(--color-medium); }
 .btn-peek { color: var(--color-info); }
 .btn-ghost { color: var(--color-text-muted); }
+.btn-auto {
+  background-color: var(--color-accent-subtle);
+  border: 1px solid var(--color-accent-border);
+  color: var(--color-accent);
+}
+.btn-auto:hover:not(:disabled) {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+.btn-auto.is-running {
+  background-color: var(--color-accent);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(224, 35, 78, 0.45);
+}
 .btn-deck:hover:not(:disabled) {
   background-color: var(--color-surface-hover);
 }
@@ -699,18 +713,43 @@
 
 /* BST Graph */
 .bst-tree-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
+  justify-content: space-between;
+  height: 280px;
   padding: 30px 10px;
 }
+.bst-edges-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.bst-edge-line {
+  stroke: var(--color-border);
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  transition: stroke 0.35s ease, stroke-width 0.35s ease;
+}
+.bst-edge-line.active-edge {
+  stroke: var(--color-easy);
+  stroke-width: 3.5px;
+}
 .bst-tree-level {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: space-around;
   width: 100%;
 }
 .bst-circle {
+  position: relative;
+  z-index: 2;
   width: 44px;
   height: 44px;
   border-radius: 50%;

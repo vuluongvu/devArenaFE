@@ -621,6 +621,11 @@
             <span>Search(x)</span>
           </button>
 
+          <button class="btn-deck btn-ghost" (click)="searchBST(20)"><span>Search: 20</span></button>
+          <button class="btn-deck btn-ghost" (click)="searchBST(40)"><span>Search: 40</span></button>
+          <button class="btn-deck btn-ghost" (click)="searchBST(70)"><span>Search: 70</span></button>
+          <button class="btn-deck btn-ghost" (click)="searchBST(80)"><span>Search: 80</span></button>
+
           <button class="btn-deck btn-ghost" (click)="resetBST()">
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
             <span>Reset Tree</span>
@@ -642,6 +647,22 @@
           </div>
 
           <div class="bst-tree-container">
+            <!-- Connecting Branches ("Dây nối cây BST") -->
+            <svg class="bst-edges-svg" viewBox="0 0 800 280" preserveAspectRatio="none">
+              <!-- Edge 50 -> 30 -->
+              <line x1="400" y1="52" x2="200" y2="140" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('50-30')" />
+              <!-- Edge 50 -> 70 -->
+              <line x1="400" y1="52" x2="600" y2="140" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('50-70')" />
+              <!-- Edge 30 -> 20 -->
+              <line x1="200" y1="140" x2="100" y2="228" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('30-20')" />
+              <!-- Edge 30 -> 40 -->
+              <line x1="200" y1="140" x2="300" y2="228" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('30-40')" />
+              <!-- Edge 70 -> 60 -->
+              <line x1="600" y1="140" x2="500" y2="228" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('70-60')" />
+              <!-- Edge 70 -> 80 -->
+              <line x1="600" y1="140" x2="700" y2="228" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('70-80')" />
+            </svg>
+
             <!-- Level 0: Root -->
             <div class="bst-tree-level">
               <div class="bst-circle is-root" [class.highlight]="bstNodes[0].highlight">50</div>
@@ -721,6 +742,14 @@
           <button class="btn-deck btn-push" (click)="stepBinarySearch()" [disabled]="bsFound">
             <app-icon name="play" [size]="14"></app-icon>
             <span>Step Search</span>
+          </button>
+          <button
+            class="btn-deck btn-auto"
+            [class.is-running]="bsAutoRunning"
+            (click)="toggleAutoBinarySearch()"
+          >
+            <app-icon [name]="bsAutoRunning ? 'x' : 'play'" [size]="14"></app-icon>
+            <span>{{ bsAutoRunning ? 'Pause' : 'Auto Run' }}</span>
           </button>
           <button class="btn-deck btn-secondary" (click)="resetBinarySearch(42)">
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
@@ -824,6 +853,14 @@
             <app-icon name="play" [size]="14"></app-icon>
             <span>Step Pointers</span>
           </button>
+          <button
+            class="btn-deck btn-auto"
+            [class.is-running]="tpAutoRunning"
+            (click)="toggleAutoTwoPointers()"
+          >
+            <app-icon [name]="tpAutoRunning ? 'x' : 'play'" [size]="14"></app-icon>
+            <span>{{ tpAutoRunning ? 'Pause' : 'Auto Run' }}</span>
+          </button>
           <button class="btn-deck btn-secondary" (click)="resetTwoPointers()">
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
             <span>Reset</span>
@@ -913,9 +950,17 @@
 
       <div class="control-deck-card">
         <div class="deck-left">
-          <button class="btn-deck btn-push" (click)="stepSlidingWindow()">
+          <button class="btn-deck btn-push" (click)="stepSlidingWindow()" [disabled]="swStart >= swArray.length - swWindowSize">
             <app-icon name="play" [size]="14"></app-icon>
             <span>Slide Window (Next)</span>
+          </button>
+          <button
+            class="btn-deck btn-auto"
+            [class.is-running]="swAutoRunning"
+            (click)="toggleAutoSlidingWindow()"
+          >
+            <app-icon [name]="swAutoRunning ? 'x' : 'play'" [size]="14"></app-icon>
+            <span>{{ swAutoRunning ? 'Pause' : 'Auto Run' }}</span>
           </button>
           <button class="btn-deck btn-secondary" (click)="resetSlidingWindow()">
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
