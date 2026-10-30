@@ -187,14 +187,19 @@
         <!-- Visual Stage Left: The Stack Beaker -->
         <div class="beaker-stage-card">
           <div class="stage-header">
-            <div class="stage-title-wrap">
-              <h3 class="stage-heading">LIFO Stack Memory Model</h3>
-              <span class="stage-subheading">Insertions, deletions, and updates occur exclusively at the single access point: TOP.</span>
+            <div class="stage-header-main">
+              <div class="ds-badge-box">
+                <app-icon name="layers" [size]="16" customClass="ds-badge-icon"></app-icon>
+              </div>
+              <h3 class="stage-heading">Stack</h3>
             </div>
             <div class="top-tag" *ngIf="stackTopItem">
               <span>Current TOP: <strong>'{{ stackTopItem.value }}'</strong></span>
             </div>
           </div>
+          <p class="stage-subheading">
+            LIFO memory model where insertions, deletions, and updates occur exclusively at the TOP.
+          </p>
 
           <!-- Glass Beaker Canvas -->
           <div class="beaker-outer">
@@ -280,10 +285,11 @@
           <!-- Universal Pseudocode Specification -->
           <div class="code-snippet-card">
             <div class="code-card-header">
-              <div class="code-tab-group">
-                <span class="pseudocode-badge">PSEUDOCODE</span>
+              <div class="code-header-left">
+                <app-icon name="code" [size]="15" customClass="text-accent"></app-icon>
+                <span class="code-title">Pseudocode (Methods)</span>
               </div>
-              <span class="code-title">Core Methods</span>
+              <span class="pseudocode-badge">PSEUDOCODE</span>
             </div>
 
             <!-- Pseudocode Block -->
@@ -305,7 +311,10 @@
 
           <!-- Complexity & Operations Cheat Sheet -->
           <div class="summary-card">
-            <h4 class="card-mini-title">Primitive Operations Summary</h4>
+            <div class="summary-card-header">
+              <app-icon name="terminal" [size]="15" customClass="text-accent"></app-icon>
+              <h4 class="card-mini-title">Primitive Operations Summary</h4>
+            </div>
             <div class="summary-rows">
               <div class="summary-row">
                 <span class="op-badge op-push">INSERT</span>
@@ -385,11 +394,14 @@
       <!-- Pipeline Visualization -->
       <div class="beaker-stage-card">
         <div class="stage-header">
-          <div class="stage-title-wrap">
-            <h3 class="stage-heading">FIFO Queue Pipeline Model</h3>
-            <span class="stage-subheading">Elements enter sequentially at the REAR and exit sequentially at the FRONT.</span>
+          <div class="stage-header-main">
+            <app-icon name="sliders" [size]="18" customClass="text-accent"></app-icon>
+            <h3 class="stage-heading">Queue</h3>
           </div>
         </div>
+        <p class="stage-subheading">
+          FIFO pipeline where elements enter sequentially at the REAR and exit sequentially at the FRONT.
+        </p>
 
         <div class="queue-pipeline-container">
           <div class="queue-pointer front-pointer">
@@ -440,9 +452,12 @@
 
       <div class="beaker-stage-card">
         <div class="stage-header">
-          <h3 class="stage-heading">Two Pointers Convergence: String 'racecar'</h3>
-          <span class="stage-subheading">{{ twoPointerMessage }}</span>
+          <div class="stage-header-main">
+            <app-icon name="compass" [size]="18" customClass="text-accent"></app-icon>
+            <h3 class="stage-heading">Two Pointers</h3>
+          </div>
         </div>
+        <p class="stage-subheading">{{ twoPointerMessage }}</p>
 
         <div class="two-pointers-display">
           <div class="pointers-row">
