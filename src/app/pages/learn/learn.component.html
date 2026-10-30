@@ -11,7 +11,7 @@
         </p>
       </div>
 
-      <!-- Segmented Button: Data Structures vs Algorithms (User's Exact Specification) -->
+      <!-- Segmented Button: Data Structures vs Algorithms -->
       <div class="main-tab-toggle" role="tablist" aria-label="Visualizer Category Switcher">
         <button
           type="button"
@@ -34,11 +34,11 @@
       </div>
     </header>
 
-    <!-- Topic Navigation Bar (Filtered by active category: Data Structures or Algorithms) -->
+    <!-- Topic Navigation Bar -->
     <div class="topic-nav-card">
       <div class="topic-nav-label">
         <app-icon [name]="activeCategory === 'data-structures' ? 'database' : 'cpu'" [size]="13"></app-icon>
-        <span>{{ activeCategory === 'data-structures' ? 'DATA STRUCTURE TOPICS' : 'ALGORITHM TOPICS' }}</span>
+        <span>{{ activeCategory === 'data-structures' ? 'DATA STRUCTURE TOPICS (7)' : 'ALGORITHM TOPICS (8)' }}</span>
       </div>
 
       <div class="topic-pills">
@@ -87,6 +87,39 @@
             <span>Binary Search Tree</span>
             <span class="pill-badge">Tree</span>
           </button>
+
+          <button
+            type="button"
+            class="topic-btn"
+            [class.active]="activeTopic === 'min-heap'"
+            (click)="setTopic('min-heap')"
+          >
+            <app-icon name="filter" [size]="14"></app-icon>
+            <span>Min Heap</span>
+            <span class="pill-badge">Priority</span>
+          </button>
+
+          <button
+            type="button"
+            class="topic-btn"
+            [class.active]="activeTopic === 'hash-table'"
+            (click)="setTopic('hash-table')"
+          >
+            <app-icon name="database" [size]="14"></app-icon>
+            <span>Hash Table</span>
+            <span class="pill-badge">O(1) Map</span>
+          </button>
+
+          <button
+            type="button"
+            class="topic-btn"
+            [class.active]="activeTopic === 'graph'"
+            (click)="setTopic('graph')"
+          >
+            <app-icon name="compass" [size]="14"></app-icon>
+            <span>Graph</span>
+            <span class="pill-badge">V &amp; E</span>
+          </button>
         </ng-container>
 
         <!-- 2. ALGORITHMS TOPICS -->
@@ -122,6 +155,61 @@
             <app-icon name="sliders" [size]="14"></app-icon>
             <span>Sliding Window</span>
             <span class="pill-badge">O(N)</span>
+          </button>
+
+          <button
+            type="button"
+            class="topic-btn"
+            [class.active]="activeTopic === 'bubble-sort'"
+            (click)="setTopic('bubble-sort')"
+          >
+            <app-icon name="bar-chart" [size]="14"></app-icon>
+            <span>Bubble Sort</span>
+            <span class="pill-badge">O(N²)</span>
+          </button>
+
+          <button
+            type="button"
+            class="topic-btn"
+            [class.active]="activeTopic === 'quick-sort'"
+            (click)="setTopic('quick-sort')"
+          >
+            <app-icon name="flame" [size]="14"></app-icon>
+            <span>Quick Sort</span>
+            <span class="pill-badge">O(N log N)</span>
+          </button>
+
+          <button
+            type="button"
+            class="topic-btn"
+            [class.active]="activeTopic === 'bfs'"
+            (click)="setTopic('bfs')"
+          >
+            <app-icon name="layers" [size]="14"></app-icon>
+            <span>BFS</span>
+            <span class="pill-badge">Level Order</span>
+          </button>
+
+          <button
+            type="button"
+            class="topic-btn"
+            [class.active]="activeTopic === 'dfs'"
+            (click)="setTopic('dfs')"
+          >
+            <app-icon name="git-branch" [size]="14"></app-icon>
+            <span>DFS</span>
+            <span class="pill-badge">Backtrack</span>
+          </button>
+
+          <button
+            type="button"
+            class="topic-btn"
+            [class.active]="activeTopic === 'dp'"
+            (click)="setTopic('dp')"
+          >
+            <app-icon name="sparkles" [size]="14"></app-icon>
+            <span>Dynamic Prog</span>
+            <span class="pill-badge">Tabulation</span>
           </button>
         </ng-container>
       </div>
@@ -209,7 +297,6 @@
       </div>
 
       <div class="stage-grid">
-        <!-- Stage Left: Beaker -->
         <div class="beaker-stage-card">
           <div class="stage-header">
             <div>
@@ -264,7 +351,6 @@
           </div>
         </div>
 
-        <!-- Stage Right: Pseudocode & Complexity -->
         <div class="inspector-column">
           <div class="metrics-subgrid">
             <div class="stat-box">
@@ -646,12 +732,11 @@
           <div class="stage-header">
             <div>
               <h3 class="stage-heading">Binary Search Tree (BST) Graph</h3>
-              <span class="stage-subheading">Hierarchical tree maintaining logarithmic ordering on all subtrees.</span>
+              <span class="stage-subheading">Hierarchical tree maintaining logarithmic ordering up to 5 levels deep.</span>
             </div>
           </div>
 
           <div class="bst-tree-container">
-            <!-- Dynamic Connecting Branches ("Dây nối cây BST") -->
             <svg class="bst-edges-svg" viewBox="0 0 800 380" preserveAspectRatio="none">
               <line
                 *ngFor="let edge of bstEdges"
@@ -664,7 +749,6 @@
               />
             </svg>
 
-            <!-- Dynamic BST Nodes positioned by tree coordinates -->
             <div
               *ngFor="let node of bstNodes"
               class="bst-circle"
@@ -727,7 +811,439 @@
     </div>
 
     <!-- ============================================================= -->
-    <!-- 5. BINARY SEARCH ALGORITHM VISUALIZER -->
+    <!-- 5. MIN HEAP (PRIORITY QUEUE) VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'min-heap'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ heapStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <div class="input-action-group">
+            <input
+              type="text"
+              inputmode="numeric"
+              [(ngModel)]="heapInput"
+              (keyup.enter)="insertHeap()"
+              placeholder="Priority int (e.g. 5)..."
+              class="deck-input"
+            />
+            <button class="btn-deck btn-push" (click)="insertHeap()">
+              <span>Insert(x)</span>
+            </button>
+          </div>
+
+          <button class="btn-deck btn-pop" (click)="extractMinHeap()" [disabled]="heapArray.length === 0">
+            <span>ExtractMin()</span>
+          </button>
+
+          <button class="btn-deck btn-peek" (click)="peekMinHeap()" [disabled]="heapArray.length === 0">
+            <app-icon name="eye" [size]="14"></app-icon>
+            <span>PeekMin()</span>
+          </button>
+
+          <button class="btn-deck btn-secondary" (click)="insertRandomHeap()">
+            <app-icon name="sparkles" [size]="13"></app-icon>
+            <span>+ Random</span>
+          </button>
+
+          <button class="btn-deck btn-ghost" (click)="resetHeap()">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Min Root: <strong>{{ heapArray.length > 0 ? heapArray[0] : 'null' }}</strong> | Parent &lt;= Children</span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Min-Heap Tree &amp; Array Representation</h3>
+              <span class="stage-subheading">Complete binary tree where every parent is smaller than or equal to its children.</span>
+            </div>
+          </div>
+
+          <div class="bst-tree-container heap-tree-box">
+            <svg class="bst-edges-svg" viewBox="0 0 800 300" preserveAspectRatio="none">
+              <line
+                *ngFor="let edge of heapEdges"
+                [attr.x1]="edge.x1"
+                [attr.y1]="edge.y1"
+                [attr.x2]="edge.x2"
+                [attr.y2]="edge.y2"
+                class="bst-edge-line"
+                [class.active-edge]="edge.active"
+              />
+            </svg>
+
+            <div
+              *ngFor="let node of heapNodes"
+              class="bst-circle"
+              [class.is-root]="node.isRoot"
+              [class.is-deep]="node.level >= 3"
+              [class.highlight]="node.highlight"
+              [class.is-new]="node.isNew"
+              [style.left.%]="(node.x / 800) * 100"
+              [style.top.%]="(node.y / 300) * 100"
+            >
+              {{ node.val }}
+            </div>
+          </div>
+
+          <div class="heap-array-strip">
+            <span class="strip-label">BACKING ARRAY:</span>
+            <div class="strip-cells">
+              <div
+                *ngFor="let val of heapArray; let idx = index"
+                class="strip-cell"
+                [class.is-root]="idx === 0"
+                [class.is-swapped]="heapSwappedIdx.has(idx)"
+              >
+                <span class="strip-idx">[{{ idx }}]</span>
+                <span class="strip-val">{{ val }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">SIZE</span>
+              <span class="stat-box-value">{{ heapArray.length }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">MIN ELEMENT</span>
+              <span class="stat-box-value mono text-easy">{{ heapArray.length > 0 ? heapArray[0] : 'null' }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">PEEK MIN</span>
+              <span class="stat-box-value text-easy">O(1)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">PUSH / POP</span>
+              <span class="stat-box-value text-easy">O(log N)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Core Methods</span>
+            </div>
+            <pre class="code-block"><code><span class="f">insert</span>(x):
+    heap.append(x)
+    bubbleUp(size - 1)
+
+<span class="f">bubbleUp</span>(i):
+    <span class="k">while</span> i &gt; 0 and heap[parent(i)] &gt; heap[i]:
+        swap(heap[i], heap[parent(i)])
+        i = parent(i)
+
+<span class="f">extractMin</span>():
+    min = heap[0]
+    heap[0] = heap.pop()
+    sinkDown(0)
+    <span class="k">return</span> min</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 6. HASH TABLE VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'hash-table'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ hashStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <div class="input-action-group">
+            <input
+              type="text"
+              [(ngModel)]="hashKeyInput"
+              placeholder="Key (e.g. role)..."
+              class="deck-input deck-input-sm"
+              maxlength="10"
+            />
+            <input
+              type="text"
+              [(ngModel)]="hashValInput"
+              (keyup.enter)="putHash()"
+              placeholder="Value..."
+              class="deck-input deck-input-sm"
+              maxlength="12"
+            />
+            <button class="btn-deck btn-push" (click)="putHash()">
+              <span>Put(k, v)</span>
+            </button>
+          </div>
+
+          <button class="btn-deck btn-peek" (click)="getHash()">
+            <app-icon name="search" [size]="14"></app-icon>
+            <span>Get(k)</span>
+          </button>
+
+          <button class="btn-deck btn-pop" (click)="removeHash()">
+            <span>Remove(k)</span>
+          </button>
+
+          <button class="btn-deck btn-secondary" (click)="putRandomHash()">
+            <app-icon name="sparkles" [size]="13"></app-icon>
+            <span>+ Random Pair</span>
+          </button>
+
+          <button class="btn-deck btn-ghost" (click)="clearHash()">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Clear</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Hash Function: <strong>sum(ASCII) % 6</strong> | Total Keys: <strong>{{ hashTotalKeys }}</strong></span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Hash Table Buckets (Separate Chaining)</h3>
+              <span class="stage-subheading">Keys map to bucket indices via hash(key) % 6; collisions chain horizontally.</span>
+            </div>
+          </div>
+
+          <div class="hash-buckets-list">
+            <div
+              *ngFor="let bucket of hashBuckets; let bIdx = index"
+              class="hash-bucket-row"
+              [class.active-bucket]="hashActiveBucket === bIdx"
+            >
+              <div class="bucket-index-box">
+                <span class="bucket-idx-label">BUCKET</span>
+                <span class="bucket-idx-num">[{{ bIdx }}]</span>
+              </div>
+
+              <span class="bucket-arrow">→</span>
+
+              <div class="bucket-chain">
+                <span *ngIf="bucket.length === 0" class="null-box">null</span>
+
+                <div
+                  *ngFor="let entry of bucket; let lastEntry = last"
+                  class="hash-entry-item"
+                >
+                  <div
+                    class="hash-kv-chip"
+                    [class.is-highlight]="entry.highlight"
+                    [class.is-new]="entry.isNew"
+                  >
+                    <span class="kv-key">{{ entry.key }}</span>
+                    <span class="kv-sep">:</span>
+                    <span class="kv-val">{{ entry.value }}</span>
+                  </div>
+                  <span *ngIf="!lastEntry" class="bucket-arrow">→</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">BUCKETS</span>
+              <span class="stat-box-value">{{ hashBucketCount }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">TOTAL KEYS</span>
+              <span class="stat-box-value mono">{{ hashTotalKeys }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">AVG LOOKUP</span>
+              <span class="stat-box-value text-easy">O(1)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">LOAD FACTOR</span>
+              <span class="stat-box-value">{{ (hashTotalKeys / hashBucketCount).toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Core Methods</span>
+            </div>
+            <pre class="code-block"><code><span class="f">hash</span>(key):
+    <span class="k">return</span> sum(charCodes(key)) % buckets.len
+
+<span class="f">put</span>(key, val):
+    idx = hash(key)
+    <span class="k">for</span> node <span class="k">in</span> buckets[idx]:
+        <span class="k">if</span> node.key == key:
+            node.val = val; <span class="k">return</span>
+    buckets[idx].append((key, val))
+
+<span class="f">get</span>(key):
+    idx = hash(key)
+    <span class="k">return</span> buckets[idx].find(key)</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 7. GRAPH (ADJACENCY LIST) VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'graph'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ graphStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <div class="input-action-group">
+            <input
+              type="text"
+              inputmode="numeric"
+              [(ngModel)]="graphUInput"
+              placeholder="u (0..5)"
+              class="deck-input deck-input-xs"
+            />
+            <input
+              type="text"
+              inputmode="numeric"
+              [(ngModel)]="graphVInput"
+              (keyup.enter)="addGraphEdge()"
+              placeholder="v (0..5)"
+              class="deck-input deck-input-xs"
+            />
+            <button class="btn-deck btn-push" (click)="addGraphEdge()">
+              <span>Add Edge(u, v)</span>
+            </button>
+          </div>
+
+          <button class="btn-deck btn-pop" (click)="removeGraphEdge()">
+            <span>Remove Edge</span>
+          </button>
+
+          <button class="btn-deck btn-secondary" (click)="addRandomGraphEdge()">
+            <app-icon name="sparkles" [size]="13"></app-icon>
+            <span>+ Random Edge</span>
+          </button>
+
+          <button class="btn-deck btn-ghost" (click)="resetGraph()">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset Graph</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Vertices |V| = <strong>{{ graphVertices.length }}</strong> | Edges |E| = <strong>{{ graphEdges.length }}</strong></span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Undirected Graph &amp; Adjacency List</h3>
+              <span class="stage-subheading">Click any vertex circle (0..5) to inspect its incident edges and neighbors.</span>
+            </div>
+          </div>
+
+          <div class="bst-tree-container graph-canvas-box">
+            <svg class="bst-edges-svg" viewBox="0 0 800 320" preserveAspectRatio="none">
+              <line
+                *ngFor="let edge of graphEdges"
+                [attr.x1]="edge.x1"
+                [attr.y1]="edge.y1"
+                [attr.x2]="edge.x2"
+                [attr.y2]="edge.y2"
+                class="bst-edge-line"
+                [class.active-edge]="edge.active"
+              />
+            </svg>
+
+            <button
+              type="button"
+              *ngFor="let v of graphVertices"
+              class="bst-circle graph-vertex-btn"
+              [class.is-root]="graphSelectedNode === v.id"
+              [class.is-found]="graphHighlightedNodes.has(v.id)"
+              [style.left.%]="(v.x / 800) * 100"
+              [style.top.%]="(v.y / 320) * 100"
+              (click)="selectGraphVertex(v.id)"
+            >
+              {{ v.id }}
+            </button>
+          </div>
+
+          <div class="adj-list-grid">
+            <div
+              *ngFor="let v of graphVertices"
+              class="adj-row-chip"
+              [class.active-adj]="graphSelectedNode === v.id"
+              (click)="selectGraphVertex(v.id)"
+            >
+              <span class="adj-vertex">adj[{{ v.id }}]:</span>
+              <span class="adj-neighbors">[{{ getNeighbors(v.id).join(', ') }}]</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">VERTICES (V)</span>
+              <span class="stat-box-value">{{ graphVertices.length }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">EDGES (E)</span>
+              <span class="stat-box-value mono">{{ graphEdges.length }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">ADD EDGE</span>
+              <span class="stat-box-value text-easy">O(1)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SPACE</span>
+              <span class="stat-box-value">O(V + E)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Core Methods</span>
+            </div>
+            <pre class="code-block"><code><span class="f">addEdge</span>(u, v):
+    adj[u].append(v)
+    adj[v].append(u)
+
+<span class="f">removeEdge</span>(u, v):
+    adj[u].remove(v)
+    adj[v].remove(u)
+
+<span class="f">neighbors</span>(u):
+    <span class="k">return</span> adj[u]</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 8. BINARY SEARCH ALGORITHM VISUALIZER -->
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'binary-search'" class="topic-content-wrapper">
       <div class="status-bar">
@@ -837,7 +1353,7 @@
     </div>
 
     <!-- ============================================================= -->
-    <!-- 6. TWO POINTERS ALGORITHM VISUALIZER -->
+    <!-- 9. TWO POINTERS ALGORITHM VISUALIZER -->
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'two-pointers'" class="topic-content-wrapper">
       <div class="status-bar">
@@ -938,7 +1454,7 @@
     </div>
 
     <!-- ============================================================= -->
-    <!-- 7. SLIDING WINDOW ALGORITHM VISUALIZER -->
+    <!-- 10. SLIDING WINDOW ALGORITHM VISUALIZER -->
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'sliding-window'" class="topic-content-wrapper">
       <div class="status-bar">
@@ -1029,6 +1545,562 @@
         windowSum += arr[i] - arr[i - k]
         maxSum = max(maxSum, windowSum)
     <span class="k">return</span> maxSum</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 11. BUBBLE SORT ALGORITHM VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'bubble-sort'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ bsortStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <button class="btn-deck btn-push" (click)="stepBubbleSort()" [disabled]="bsortDone">
+            <app-icon name="play" [size]="14"></app-icon>
+            <span>Step Sort</span>
+          </button>
+          <button
+            class="btn-deck btn-auto"
+            [class.is-running]="bsortAutoRunning"
+            (click)="toggleAutoBubbleSort()"
+          >
+            <app-icon [name]="bsortAutoRunning ? 'x' : 'play'" [size]="14"></app-icon>
+            <span>{{ bsortAutoRunning ? 'Pause' : 'Auto Run' }}</span>
+          </button>
+          <button class="btn-deck btn-secondary" (click)="shuffleBubbleSort()">
+            <app-icon name="sparkles" [size]="13"></app-icon>
+            <span>Shuffle</span>
+          </button>
+          <button class="btn-deck btn-ghost" (click)="resetBubbleSort()">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Comparisons: <strong>{{ bsortComparisons }}</strong> | Swaps: <strong>{{ bsortSwaps }}</strong></span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Bubble Sort (Adjacent Swap Pass)</h3>
+              <span class="stage-subheading">Repeatedly compares arr[j] and arr[j+1], bubbling the largest unsorted element to the right.</span>
+            </div>
+          </div>
+
+          <div class="sort-bars-stage">
+            <div *ngFor="let val of bsortArray; let idx = index" class="sort-bar-column">
+              <span class="sort-bar-val">{{ val }}</span>
+              <div
+                class="sort-bar-pill"
+                [class.is-comparing]="!bsortDone && (idx === bsortJ || idx === bsortJ + 1)"
+                [class.is-sorted]="bsortDone || idx >= bsortSortedBound"
+                [style.height.px]="val * 3.4 + 24"
+              ></div>
+              <span class="sort-bar-idx">[{{ idx }}]</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">PASS (i)</span>
+              <span class="stat-box-value">{{ bsortI }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SWAPS</span>
+              <span class="stat-box-value mono">{{ bsortSwaps }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">TIME</span>
+              <span class="stat-box-value">O(N²)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SPACE</span>
+              <span class="stat-box-value text-easy">O(1)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Algorithm Specification</span>
+            </div>
+            <pre class="code-block"><code><span class="f">bubbleSort</span>(arr):
+    <span class="k">for</span> i <span class="k">from</span> 0 <span class="k">to</span> n - 2:
+        <span class="k">for</span> j <span class="k">from</span> 0 <span class="k">to</span> n - i - 2:
+            <span class="k">if</span> arr[j] &gt; arr[j + 1]:
+                swap(arr[j], arr[j + 1])</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 12. QUICK SORT ALGORITHM VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'quick-sort'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ qsortStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <button class="btn-deck btn-push" (click)="stepQuickSort()" [disabled]="qsortDone">
+            <app-icon name="play" [size]="14"></app-icon>
+            <span>Step Partition</span>
+          </button>
+          <button
+            class="btn-deck btn-auto"
+            [class.is-running]="qsortAutoRunning"
+            (click)="toggleAutoQuickSort()"
+          >
+            <app-icon [name]="qsortAutoRunning ? 'x' : 'play'" [size]="14"></app-icon>
+            <span>{{ qsortAutoRunning ? 'Pause' : 'Auto Run' }}</span>
+          </button>
+          <button class="btn-deck btn-secondary" (click)="shuffleQuickSort()">
+            <app-icon name="sparkles" [size]="13"></app-icon>
+            <span>Shuffle</span>
+          </button>
+          <button class="btn-deck btn-ghost" (click)="resetQuickSort()">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Range: <strong>[{{ qsortLow }}..{{ qsortHigh }}]</strong> | Pivot: <strong>{{ qsortArray[qsortPivotIdx] }}</strong></span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Quick Sort (Divide &amp; Conquer Partitioning)</h3>
+              <span class="stage-subheading">Partitions elements smaller than the pivot to the left and larger elements to the right.</span>
+            </div>
+          </div>
+
+          <div class="sort-bars-stage">
+            <div *ngFor="let val of qsortArray; let idx = index" class="sort-bar-column">
+              <div class="pointer-top-indicator">
+                <span *ngIf="!qsortDone && idx === qsortPivotIdx" class="ptr-badge ptr-right">PIVOT</span>
+                <span *ngIf="!qsortDone && idx === qsortJ && idx !== qsortPivotIdx" class="ptr-badge ptr-mid">j</span>
+              </div>
+              <span class="sort-bar-val">{{ val }}</span>
+              <div
+                class="sort-bar-pill"
+                [class.is-pivot]="!qsortDone && idx === qsortPivotIdx"
+                [class.is-comparing]="!qsortDone && (idx === qsortI || idx === qsortJ) && idx !== qsortPivotIdx"
+                [class.is-sorted]="qsortSortedIndices.has(idx)"
+                [style.height.px]="val * 3.3 + 24"
+              ></div>
+              <span class="sort-bar-idx">[{{ idx }}]</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">SUBARRAY</span>
+              <span class="stat-box-value mono">[{{ qsortLow }}..{{ qsortHigh }}]</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">PIVOT VAL</span>
+              <span class="stat-box-value mono">{{ qsortArray[qsortPivotIdx] }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">AVG TIME</span>
+              <span class="stat-box-value text-easy">O(N log N)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SPACE</span>
+              <span class="stat-box-value text-easy">O(log N)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Algorithm Specification</span>
+            </div>
+            <pre class="code-block"><code><span class="f">quickSort</span>(arr, low, high):
+    <span class="k">if</span> low &lt; high:
+        p = partition(arr, low, high)
+        quickSort(arr, low, p - 1)
+        quickSort(arr, p + 1, high)
+
+<span class="f">partition</span>(arr, low, high):
+    pivot = arr[high], i = low
+    <span class="k">for</span> j <span class="k">from</span> low <span class="k">to</span> high - 1:
+        <span class="k">if</span> arr[j] &lt; pivot:
+            swap(arr[i++], arr[j])
+    swap(arr[i], arr[high])
+    <span class="k">return</span> i</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 13. BREADTH-FIRST SEARCH (BFS) VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'bfs'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ bfsStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <button class="btn-deck btn-push" (click)="stepBFS()" [disabled]="bfsDone">
+            <app-icon name="play" [size]="14"></app-icon>
+            <span>Step BFS</span>
+          </button>
+          <button
+            class="btn-deck btn-auto"
+            [class.is-running]="bfsAutoRunning"
+            (click)="toggleAutoBFS()"
+          >
+            <app-icon [name]="bfsAutoRunning ? 'x' : 'play'" [size]="14"></app-icon>
+            <span>{{ bfsAutoRunning ? 'Pause' : 'Auto Run' }}</span>
+          </button>
+          <button class="btn-deck btn-ghost" (click)="resetBFS(0)">
+            <span>Start: Node 0</span>
+          </button>
+          <button class="btn-deck btn-ghost" (click)="resetBFS(2)">
+            <span>Start: Node 2</span>
+          </button>
+          <button class="btn-deck btn-secondary" (click)="resetBFS(bfsStartNode)">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Queue: <strong>[{{ bfsQueue.join(', ') }}]</strong> | Visited: <strong>{{ bfsVisited.length }}</strong> / {{ graphVertices.length }}</span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Breadth-First Search (Level-Order Traversal)</h3>
+              <span class="stage-subheading">Explores graph vertices layer by layer using a FIFO Queue.</span>
+            </div>
+          </div>
+
+          <div class="bst-tree-container graph-canvas-box">
+            <svg class="bst-edges-svg" viewBox="0 0 800 320" preserveAspectRatio="none">
+              <line
+                *ngFor="let edge of graphEdges"
+                [attr.x1]="edge.x1"
+                [attr.y1]="edge.y1"
+                [attr.x2]="edge.x2"
+                [attr.y2]="edge.y2"
+                class="bst-edge-line"
+                [class.active-edge]="bfsActiveEdgeSet.has(edge.id)"
+              />
+            </svg>
+
+            <div
+              *ngFor="let v of graphVertices"
+              class="bst-circle"
+              [class.is-root]="bfsCurrent === v.id"
+              [class.highlight]="bfsQueue.includes(v.id) && bfsCurrent !== v.id"
+              [class.is-found]="bfsVisited.includes(v.id) && bfsCurrent !== v.id"
+              [style.left.%]="(v.x / 800) * 100"
+              [style.top.%]="(v.y / 320) * 100"
+            >
+              {{ v.id }}
+            </div>
+          </div>
+
+          <div class="heap-array-strip">
+            <span class="strip-label">VISITED ORDER:</span>
+            <div class="strip-cells">
+              <span *ngIf="bfsVisited.length === 0" class="null-box">empty</span>
+              <div *ngFor="let node of bfsVisited; let idx = index" class="strip-cell is-swapped">
+                <span class="strip-idx">#{{ idx + 1 }}</span>
+                <span class="strip-val">Node {{ node }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">CURRENT</span>
+              <span class="stat-box-value mono">{{ bfsCurrent ?? 'null' }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">FIFO QUEUE</span>
+              <span class="stat-box-value mono">[{{ bfsQueue.join(', ') }}]</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">TIME</span>
+              <span class="stat-box-value text-easy">O(V + E)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SPACE</span>
+              <span class="stat-box-value">O(V)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Algorithm Specification</span>
+            </div>
+            <pre class="code-block"><code><span class="f">bfs</span>(start):
+    queue.enqueue(start)
+    visited.add(start)
+    <span class="k">while</span> not queue.isEmpty():
+        u = queue.dequeue()
+        <span class="k">for</span> v <span class="k">in</span> adj[u]:
+            <span class="k">if</span> v not <span class="k">in</span> visited:
+                visited.add(v)
+                queue.enqueue(v)</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 14. DEPTH-FIRST SEARCH (DFS) VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'dfs'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ dfsStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <button class="btn-deck btn-push" (click)="stepDFS()" [disabled]="dfsDone">
+            <app-icon name="play" [size]="14"></app-icon>
+            <span>Step DFS</span>
+          </button>
+          <button
+            class="btn-deck btn-auto"
+            [class.is-running]="dfsAutoRunning"
+            (click)="toggleAutoDFS()"
+          >
+            <app-icon [name]="dfsAutoRunning ? 'x' : 'play'" [size]="14"></app-icon>
+            <span>{{ dfsAutoRunning ? 'Pause' : 'Auto Run' }}</span>
+          </button>
+          <button class="btn-deck btn-ghost" (click)="resetDFS(0)">
+            <span>Start: Node 0</span>
+          </button>
+          <button class="btn-deck btn-ghost" (click)="resetDFS(2)">
+            <span>Start: Node 2</span>
+          </button>
+          <button class="btn-deck btn-secondary" (click)="resetDFS(dfsStartNode)">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Call Stack: <strong>[{{ dfsStack.join(', ') }}]</strong> | Visited: <strong>{{ dfsVisited.length }}</strong> / {{ graphVertices.length }}</span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">Depth-First Search (Recursive Backtracking)</h3>
+              <span class="stage-subheading">Plunges deep along each branch before backtracking via the Call Stack.</span>
+            </div>
+          </div>
+
+          <div class="bst-tree-container graph-canvas-box">
+            <svg class="bst-edges-svg" viewBox="0 0 800 320" preserveAspectRatio="none">
+              <line
+                *ngFor="let edge of graphEdges"
+                [attr.x1]="edge.x1"
+                [attr.y1]="edge.y1"
+                [attr.x2]="edge.x2"
+                [attr.y2]="edge.y2"
+                class="bst-edge-line"
+                [class.active-edge]="dfsActiveEdgeSet.has(edge.id)"
+              />
+            </svg>
+
+            <div
+              *ngFor="let v of graphVertices"
+              class="bst-circle"
+              [class.is-root]="dfsCurrent === v.id"
+              [class.highlight]="dfsStack.includes(v.id) && dfsCurrent !== v.id"
+              [class.is-found]="dfsVisited.includes(v.id) && dfsCurrent !== v.id"
+              [style.left.%]="(v.x / 800) * 100"
+              [style.top.%]="(v.y / 320) * 100"
+            >
+              {{ v.id }}
+            </div>
+          </div>
+
+          <div class="heap-array-strip">
+            <span class="strip-label">VISITED ORDER:</span>
+            <div class="strip-cells">
+              <span *ngIf="dfsVisited.length === 0" class="null-box">empty</span>
+              <div *ngFor="let node of dfsVisited; let idx = index" class="strip-cell is-swapped">
+                <span class="strip-idx">#{{ idx + 1 }}</span>
+                <span class="strip-val">Node {{ node }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">ACTIVE NODE</span>
+              <span class="stat-box-value mono">{{ dfsCurrent ?? 'null' }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">CALL STACK</span>
+              <span class="stat-box-value mono">[{{ dfsStack.join(', ') }}]</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">TIME</span>
+              <span class="stat-box-value text-easy">O(V + E)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SPACE</span>
+              <span class="stat-box-value">O(V)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Algorithm Specification</span>
+            </div>
+            <pre class="code-block"><code><span class="f">dfs</span>(u):
+    visited.add(u)
+    <span class="k">for</span> v <span class="k">in</span> adj[u]:
+        <span class="k">if</span> v not <span class="k">in</span> visited:
+            dfs(v)</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- 15. DYNAMIC PROGRAMMING (1D TABULATION) VISUALIZER -->
+    <!-- ============================================================= -->
+    <div *ngIf="activeTopic === 'dp'" class="topic-content-wrapper">
+      <div class="status-bar">
+        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
+        <span class="status-text">{{ dpStatus }}</span>
+      </div>
+
+      <div class="control-deck-card">
+        <div class="deck-left">
+          <button class="btn-deck btn-push" (click)="stepDP()" [disabled]="dpDone">
+            <app-icon name="play" [size]="14"></app-icon>
+            <span>Step DP</span>
+          </button>
+          <button
+            class="btn-deck btn-auto"
+            [class.is-running]="dpAutoRunning"
+            (click)="toggleAutoDP()"
+          >
+            <app-icon [name]="dpAutoRunning ? 'x' : 'play'" [size]="14"></app-icon>
+            <span>{{ dpAutoRunning ? 'Pause' : 'Auto Run' }}</span>
+          </button>
+          <button class="btn-deck btn-secondary" (click)="resetDP()">
+            <app-icon name="rotate-ccw" [size]="13"></app-icon>
+            <span>Reset</span>
+          </button>
+        </div>
+
+        <div class="deck-right">
+          <span class="capacity-text">Recurrence: <strong>dp[i] = dp[i - 1] + dp[i - 2]</strong></span>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="beaker-stage-card">
+          <div class="stage-header">
+            <div>
+              <h3 class="stage-heading">1D Dynamic Programming (Bottom-Up Tabulation)</h3>
+              <span class="stage-subheading">Caches overlapping subproblem solutions in a table from i = 0 up to N = 7.</span>
+            </div>
+          </div>
+
+          <div class="array-visual-row">
+            <div *ngFor="let val of dpTable; let idx = index" class="array-cell-unit">
+              <div class="pointer-top-indicator">
+                <span *ngIf="!dpDone && idx === dpCurrIdx" class="ptr-badge ptr-right">i ({{ idx }})</span>
+                <span *ngIf="!dpDone && idx === dpCurrIdx - 1" class="ptr-badge ptr-left">i - 1</span>
+                <span *ngIf="!dpDone && idx === dpCurrIdx - 2" class="ptr-badge ptr-mid">i - 2</span>
+              </div>
+              <div
+                class="array-cell"
+                [class.is-right]="!dpDone && idx === dpCurrIdx"
+                [class.is-left]="!dpDone && (idx === dpCurrIdx - 1 || idx === dpCurrIdx - 2)"
+                [class.is-match]="val !== null && (dpDone || idx < dpCurrIdx)"
+              >
+                {{ val !== null ? val : '?' }}
+              </div>
+              <div class="pointer-bottom-index">dp[{{ idx }}]</div>
+            </div>
+          </div>
+
+          <div class="heap-array-strip">
+            <span class="strip-label">TRANSITION:</span>
+            <span class="dp-formula-pill">{{ dpFormulaText }}</span>
+          </div>
+        </div>
+
+        <div class="inspector-column">
+          <div class="metrics-subgrid">
+            <div class="stat-box">
+              <span class="stat-box-label">TARGET (N)</span>
+              <span class="stat-box-value">{{ dpN }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">RESULT dp[N]</span>
+              <span class="stat-box-value mono text-easy">{{ dpTable[dpN] ?? 'pending' }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">TIME</span>
+              <span class="stat-box-value text-easy">O(N)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">SPACE</span>
+              <span class="stat-box-value">O(N)</span>
+            </div>
+          </div>
+
+          <div class="code-snippet-card">
+            <div class="code-card-header">
+              <span class="pseudocode-badge">PSEUDOCODE</span>
+              <span class="code-title">Algorithm Specification</span>
+            </div>
+            <pre class="code-block"><code><span class="f">climbStairs</span>(n):
+    dp[0] = 1, dp[1] = 1
+    <span class="k">for</span> i <span class="k">from</span> 2 <span class="k">to</span> n:
+        dp[i] = dp[i - 1] + dp[i - 2]
+    <span class="k">return</span> dp[n]</code></pre>
           </div>
         </div>
       </div>
