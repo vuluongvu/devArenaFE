@@ -1,52 +1,87 @@
 <div class="learn-page">
-  <!-- Top Editorial Header & Main Switcher -->
-  <header class="page-header-row">
-    <div class="header-text-block">
-      <div class="header-pill">
-        <app-icon name="layers" [size]="13" customClass="text-accent"></app-icon>
-        <span>INTERACTIVE CS LAB</span>
+  <!-- Parent Hierarchy Banner: ALGORITHMS CORE -->
+  <div class="core-header-banner">
+    <div class="core-breadcrumbs">
+      <div class="parent-pill">
+        <app-icon name="cpu" [size]="13" customClass="text-accent"></app-icon>
+        <span>ALGORITHMS CORE</span>
       </div>
-      <h1 class="page-title">Data Structures & Algorithms Visualizer</h1>
-      <p class="page-subtitle">
-        Interactive memory representations and standard operations (Insert, Delete, Update, Read) with concise algorithm pseudocode.
-      </p>
+      <span class="core-sep">/</span>
+      <span class="core-current-view">
+        {{ activeMainTab === 'visualizer' ? 'Visualizer Studio' : 'Curricula & Paths' }}
+      </span>
     </div>
 
-    <!-- Main Mode Toggle -->
-    <div class="main-tab-toggle">
+    <!-- Quick switch between Visualizer Studio and Curricula (Documentation) -->
+    <div class="core-view-switch">
       <button
-        class="tab-toggle-btn"
+        type="button"
+        class="core-view-btn"
         [class.active]="activeMainTab === 'visualizer'"
-        (click)="activeMainTab = 'visualizer'"
+        (click)="setMainTab('visualizer')"
       >
-        <app-icon name="layers" [size]="15"></app-icon>
+        <app-icon name="layers" [size]="14"></app-icon>
         <span>Visualizer Studio</span>
       </button>
       <button
-        class="tab-toggle-btn"
+        type="button"
+        class="core-view-btn"
         [class.active]="activeMainTab === 'curricula'"
-        (click)="activeMainTab = 'curricula'"
+        (click)="setMainTab('curricula')"
       >
-        <app-icon name="book" [size]="15"></app-icon>
-        <span>Learning Paths</span>
+        <app-icon name="book" [size]="14"></app-icon>
+        <span>Curricula & Paths</span>
       </button>
     </div>
-  </header>
+  </div>
 
   <!-- =================================================================== -->
   <!-- 1. DATA STRUCTURES & ALGORITHMS VISUALIZER STUDIO -->
   <!-- =================================================================== -->
   <div *ngIf="activeMainTab === 'visualizer'" class="visualizer-container">
-    <!-- Category & Topic Selector Bar (Data Structures vs Algorithms) -->
-    <div class="category-nav-card">
-      <!-- Group 1: DATA STRUCTURES -->
-      <div class="category-group">
-        <div class="group-label">
-          <app-icon name="database" [size]="12"></app-icon>
-          <span>DATA STRUCTURES</span>
-        </div>
-        <div class="topic-pills">
+    <header class="page-header-row">
+      <div class="header-text-block">
+        <h1 class="page-title">Visualizer Studio</h1>
+        <p class="page-subtitle">
+          Interactive memory representations and standard operations (Insert, Delete, Update, Read) with concise algorithm pseudocode.
+        </p>
+      </div>
+
+      <!-- Segmented Button: Data Structures vs Algorithms (User's Exact Specification) -->
+      <div class="main-tab-toggle" role="tablist" aria-label="Visualizer Category Switcher">
+        <button
+          type="button"
+          class="tab-toggle-btn"
+          [class.active]="activeCategory === 'data-structures'"
+          (click)="setCategory('data-structures')"
+        >
+          <app-icon name="database" [size]="15"></app-icon>
+          <span>Data Structures</span>
+        </button>
+        <button
+          type="button"
+          class="tab-toggle-btn"
+          [class.active]="activeCategory === 'algorithms'"
+          (click)="setCategory('algorithms')"
+        >
+          <app-icon name="cpu" [size]="15"></app-icon>
+          <span>Algorithms</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Topic Navigation Bar (Filtered by active category: Data Structures or Algorithms) -->
+    <div class="topic-nav-card">
+      <div class="topic-nav-label">
+        <app-icon [name]="activeCategory === 'data-structures' ? 'database' : 'cpu'" [size]="13"></app-icon>
+        <span>{{ activeCategory === 'data-structures' ? 'DATA STRUCTURE TOPICS' : 'ALGORITHM TOPICS' }}</span>
+      </div>
+
+      <div class="topic-pills">
+        <!-- 1. DATA STRUCTURES TOPICS -->
+        <ng-container *ngIf="activeCategory === 'data-structures'">
           <button
+            type="button"
             class="topic-btn"
             [class.active]="activeTopic === 'stack'"
             (click)="setTopic('stack')"
@@ -57,6 +92,7 @@
           </button>
 
           <button
+            type="button"
             class="topic-btn"
             [class.active]="activeTopic === 'queue'"
             (click)="setTopic('queue')"
@@ -67,6 +103,7 @@
           </button>
 
           <button
+            type="button"
             class="topic-btn"
             [class.active]="activeTopic === 'linked-list'"
             (click)="setTopic('linked-list')"
@@ -77,27 +114,21 @@
           </button>
 
           <button
+            type="button"
             class="topic-btn"
             [class.active]="activeTopic === 'bst'"
             (click)="setTopic('bst')"
           >
             <app-icon name="terminal" [size]="14"></app-icon>
-            <span>BST</span>
+            <span>Binary Search Tree</span>
             <span class="pill-badge">Tree</span>
           </button>
-        </div>
-      </div>
+        </ng-container>
 
-      <div class="group-separator"></div>
-
-      <!-- Group 2: ALGORITHMS -->
-      <div class="category-group">
-        <div class="group-label">
-          <app-icon name="play" [size]="12"></app-icon>
-          <span>ALGORITHMS</span>
-        </div>
-        <div class="topic-pills">
+        <!-- 2. ALGORITHMS TOPICS -->
+        <ng-container *ngIf="activeCategory === 'algorithms'">
           <button
+            type="button"
             class="topic-btn"
             [class.active]="activeTopic === 'binary-search'"
             (click)="setTopic('binary-search')"
@@ -108,6 +139,7 @@
           </button>
 
           <button
+            type="button"
             class="topic-btn"
             [class.active]="activeTopic === 'two-pointers'"
             (click)="setTopic('two-pointers')"
@@ -118,6 +150,7 @@
           </button>
 
           <button
+            type="button"
             class="topic-btn"
             [class.active]="activeTopic === 'sliding-window'"
             (click)="setTopic('sliding-window')"
@@ -126,7 +159,7 @@
             <span>Sliding Window</span>
             <span class="pill-badge">O(N)</span>
           </button>
-        </div>
+        </ng-container>
       </div>
     </div>
 
@@ -307,36 +340,6 @@
 
 <span class="f">isEmpty</span>():
     <span class="k">return</span> size == 0</code></pre>
-          </div>
-
-          <div class="summary-card">
-            <h4 class="card-mini-title">Operations Summary</h4>
-            <div class="summary-rows">
-              <div class="summary-row">
-                <span class="op-badge op-push">INSERT</span>
-                <span class="op-name"><code>push(x)</code></span>
-                <span class="op-desc">Appends element <code>x</code> to TOP</span>
-                <span class="op-comp">O(1)</span>
-              </div>
-              <div class="summary-row">
-                <span class="op-badge op-pop">DELETE</span>
-                <span class="op-name"><code>pop()</code></span>
-                <span class="op-desc">Removes element from TOP</span>
-                <span class="op-comp">O(1)</span>
-              </div>
-              <div class="summary-row">
-                <span class="op-badge op-peek">READ</span>
-                <span class="op-name"><code>peek()</code></span>
-                <span class="op-desc">Inspects element at TOP</span>
-                <span class="op-comp">O(1)</span>
-              </div>
-              <div class="summary-row">
-                <span class="op-badge op-update">UPDATE</span>
-                <span class="op-name"><code>updateTop(x)</code></span>
-                <span class="op-desc">Mutates value of TOP element</span>
-                <span class="op-comp">O(1)</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -1026,146 +1029,88 @@
   </div>
 
   <!-- =================================================================== -->
-  <!-- 2. STRUCTURED LEARNING PATHS (EXPANDABLE & CATEGORIZED) -->
+  <!-- 2. STRUCTURED LEARNING PATHS (CURRICULA) -->
   <!-- =================================================================== -->
-  <div *ngIf="activeMainTab === 'curricula'" class="paths-wrapper">
-    <!-- Sub-navigation: Data Structures vs Algorithms -->
-    <div class="paths-subnav-card">
-      <div class="paths-subnav-pills">
-        <button
-          type="button"
-          class="subnav-pill"
-          [class.active]="pathCategory === 'data-structures'"
-          (click)="setPathCategory('data-structures')"
-        >
-          <app-icon name="database" [size]="14"></app-icon>
-          <span>Data Structures</span>
-          <span class="subnav-count-badge">{{ dsPathsCount }}</span>
-        </button>
-
-        <button
-          type="button"
-          class="subnav-pill"
-          [class.active]="pathCategory === 'algorithms'"
-          (click)="setPathCategory('algorithms')"
-        >
-          <app-icon name="cpu" [size]="14"></app-icon>
-          <span>Algorithms</span>
-          <span class="subnav-count-badge">{{ algPathsCount }}</span>
-        </button>
-
-        <button
-          type="button"
-          class="subnav-pill"
-          [class.active]="pathCategory === 'all'"
-          (click)="setPathCategory('all')"
-        >
-          <span>All Paths</span>
-          <span class="subnav-count-badge">{{ totalPathsCount }}</span>
-        </button>
+  <div *ngIf="activeMainTab === 'curricula'" class="paths-container">
+    <header class="page-header-row">
+      <div class="header-text-block">
+        <h1 class="page-title">Curricula & Paths</h1>
+        <p class="page-subtitle">
+          Structured engineering roadmaps from core algorithm fundamentals to advanced dynamic programming and graph theory.
+        </p>
       </div>
 
-      <div class="paths-subnav-actions">
-        <button type="button" class="expand-collapse-all-btn" (click)="toggleAllPaths()">
-          <app-icon [name]="allExpanded ? 'chevron-up' : 'chevron-down'" [size]="13"></app-icon>
-          <span>{{ allExpanded ? 'Collapse All' : 'Expand All' }}</span>
-        </button>
-      </div>
-    </div>
+      <button
+        type="button"
+        class="curricula-switch-btn"
+        (click)="setMainTab('visualizer')"
+      >
+        <app-icon name="layers" [size]="15"></app-icon>
+        <span>Open Visualizer Studio</span>
+      </button>
+    </header>
 
-    <!-- Paths Container -->
-    <div class="paths-container">
-      <div *ngFor="let path of filteredLearningPaths" class="path-card">
-        <!-- Interactive Path Header (Clickable to Expand/Collapse) -->
-        <div class="path-header" (click)="togglePath(path.id)">
-          <div class="path-header-top">
-            <div class="path-meta-row">
-              <span class="path-level-tag">{{ path.level }}</span>
-              <app-badge [difficulty]="path.difficulty"></app-badge>
-              <span class="path-duration">
-                <app-icon name="clock" [size]="12"></app-icon>
-                <span>~{{ path.estimatedHours }} hours</span>
-              </span>
-              <span class="path-category-pill" [class.is-ds]="path.category === 'data-structures'">
-                <app-icon [name]="path.category === 'data-structures' ? 'database' : 'cpu'" [size]="11"></app-icon>
-                <span>{{ path.category === 'data-structures' ? 'Data Structure' : 'Algorithm' }}</span>
-              </span>
-            </div>
+    <div *ngFor="let path of learningPaths()" class="path-card">
+      <div class="path-header">
+        <div class="path-meta-row">
+          <span class="path-level-tag">{{ path.level }}</span>
+          <app-badge [difficulty]="path.difficulty"></app-badge>
+          <span class="path-duration">
+            <app-icon name="clock" [size]="12"></app-icon>
+            <span>~{{ path.estimatedHours }} hours</span>
+          </span>
+        </div>
+        <h2 class="path-title">{{ path.title }}</h2>
+        <p class="path-desc">{{ path.description }}</p>
 
-            <button
-              type="button"
-              class="path-expand-btn"
-              (click)="togglePath(path.id); $event.stopPropagation()"
-            >
-              <span>{{ isPathExpanded(path.id) ? 'Collapse' : 'Expand' }}</span>
-              <app-icon [name]="isPathExpanded(path.id) ? 'chevron-up' : 'chevron-down'" [size]="14"></app-icon>
-            </button>
+        <div class="path-progress-box">
+          <div class="progress-info">
+            <span>Progress: <strong>{{ path.completedModules }}</strong> of {{ path.totalModules }} modules complete</span>
+            <span class="percentage-val">{{ Math.round((path.completedModules / path.totalModules) * 100) }}%</span>
           </div>
-
-          <h2 class="path-title">{{ path.title }}</h2>
-          <p class="path-desc">{{ path.description }}</p>
-
-          <div class="path-progress-box">
-            <div class="progress-info">
-              <span>Progress: <strong>{{ path.completedModules }}</strong> of {{ path.totalModules }} modules complete</span>
-              <span class="percentage-val">{{ Math.round((path.completedModules / path.totalModules) * 100) }}%</span>
-            </div>
-            <div class="progress-bar-track">
-              <div
-                class="progress-bar-fill"
-                [style.width.%]="(path.completedModules / path.totalModules) * 100"
-              ></div>
-            </div>
+          <div class="progress-bar-track">
+            <div
+              class="progress-bar-fill"
+              [style.width.%]="(path.completedModules / path.totalModules) * 100"
+            ></div>
           </div>
         </div>
+      </div>
 
-        <!-- Modules List (Accordion Body) -->
-        <div *ngIf="isPathExpanded(path.id)" class="path-modules-list">
-          <div *ngFor="let topic of path.topics; let modIdx = index" class="module-item">
-            <!-- Module Header (Click to expand/collapse topics) -->
-            <div class="module-header" (click)="toggleTopic(path.id, modIdx)">
-              <div class="module-title-group">
-                <span class="module-index">0{{ modIdx + 1 }}</span>
-                <div>
-                  <h3 class="module-name">{{ topic.name }}</h3>
-                  <p class="module-desc">{{ topic.description }}</p>
-                </div>
-              </div>
-              <div class="module-stat-group">
-                <span class="module-stat">{{ topic.completedCount }} / {{ topic.problemsCount }} Solved</span>
-                <span class="module-toggle-pill" [class.is-open]="isTopicExpanded(path.id, modIdx)">
-                  <app-icon [name]="isTopicExpanded(path.id, modIdx) ? 'chevron-up' : 'chevron-down'" [size]="13"></app-icon>
-                </span>
+      <div class="path-modules-list">
+        <div *ngFor="let topic of path.topics; let modIdx = index" class="module-item">
+          <div class="module-header">
+            <div class="module-title-group">
+              <span class="module-index">0{{ modIdx + 1 }}</span>
+              <div>
+                <h3 class="module-name">{{ topic.name }}</h3>
+                <p class="module-desc">{{ topic.description }}</p>
               </div>
             </div>
+            <div class="module-stat">
+              <span>{{ topic.completedCount }} / {{ topic.problemsCount }} Solved</span>
+            </div>
+          </div>
 
-            <!-- Problem list under Module (Expandable) -->
-            <div *ngIf="isTopicExpanded(path.id, modIdx)" class="module-problems-list">
-              <div *ngFor="let p of topic.problems" class="module-prob-row">
-                <div class="prob-left">
-                  <app-icon
-                    [name]="p.solved ? 'check-circle' : 'code'"
-                    [size]="14"
-                    [customClass]="p.solved ? 'text-easy' : 'text-muted'"
-                  ></app-icon>
-                  <a [routerLink]="['/problems', p.slug]" class="prob-link">
-                    <span *ngIf="p.id" class="prob-id">{{ p.id }}. </span>
-                    <span>{{ p.title }}</span>
-                  </a>
-                </div>
-                <div class="prob-right">
-                  <app-badge [difficulty]="p.difficulty"></app-badge>
-                  <a [routerLink]="['/problems', p.slug]" class="solve-action-btn">
-                    <span>{{ p.solved ? 'Review' : 'Practice' }}</span>
-                    <app-icon name="chevron-right" [size]="12"></app-icon>
-                  </a>
-                </div>
+          <div class="module-problems-list">
+            <div *ngFor="let p of topic.problems" class="module-prob-row">
+              <div class="prob-left">
+                <app-icon
+                  [name]="p.solved ? 'check-circle' : 'code'"
+                  [size]="14"
+                  [customClass]="p.solved ? 'text-easy' : 'text-muted'"
+                ></app-icon>
+                <a [routerLink]="['/problems', p.slug]" class="prob-link">
+                  <span *ngIf="p.id" class="prob-id">{{ p.id }}. </span>
+                  <span>{{ p.title }}</span>
+                </a>
               </div>
-
-              <!-- Supplementary info if topic has no specific LeetCode problem assigned -->
-              <div *ngIf="topic.problems.length === 0" class="module-empty-note">
-                <app-icon name="info" [size]="13" customClass="text-muted"></app-icon>
-                <span>Interactive conceptual sandbox and step-by-step visualizations available in Visualizer Studio.</span>
+              <div class="prob-right">
+                <app-badge [difficulty]="p.difficulty"></app-badge>
+                <a [routerLink]="['/problems', p.slug]" class="solve-action-btn">
+                  <span>{{ p.solved ? 'Review' : 'Practice' }}</span>
+                  <app-icon name="chevron-right" [size]="12"></app-icon>
+                </a>
               </div>
             </div>
           </div>

@@ -241,6 +241,20 @@ import { CommonModule } from '@angular/common';
         <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
       </g>
 
+      <!-- CPU -->
+      <g *ngSwitchCase="'cpu'">
+        <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+        <rect x="9" y="9" width="6" height="6"></rect>
+        <path d="M15 2v2"></path>
+        <path d="M15 20v2"></path>
+        <path d="M2 15h2"></path>
+        <path d="M2 9h2"></path>
+        <path d="M20 15h2"></path>
+        <path d="M20 9h2"></path>
+        <path d="M9 2v2"></path>
+        <path d="M9 20v2"></path>
+      </g>
+
       <!-- Git Branch -->
       <g *ngSwitchCase="'git-branch'">
         <line x1="6" y1="3" x2="6" y2="15"></line>

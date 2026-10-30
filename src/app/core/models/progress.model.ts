@@ -28,7 +28,6 @@ export interface LearningPath {
   title: string;
   slug: string;
   description: string;
-  category?: 'data-structures' | 'algorithms';
   level: 'Beginner' | 'Intermediate' | 'Advanced';
   difficulty: Difficulty;
   totalModules: number;

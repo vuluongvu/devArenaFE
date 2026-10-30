@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { ProblemService } from '../../core/services/problem.service';
 
@@ -55,7 +55,8 @@ interface NavGroup {
               <a
                 [routerLink]="item.route"
                 [queryParams]="item.queryParams"
-                routerLinkActive="active"
+                [routerLinkActive]="item.route !== '/learn' ? 'active' : ''"
+                [class.active]="item.route === '/learn' ? isItemActive(item) : false"
                 [routerLinkActiveOptions]="{ exact: !item.queryParams && item.route !== '/problems' }"
                 (click)="onItemClick()"
                 class="nav-link"
@@ -421,6 +422,7 @@ export class SidebarComponent {
   @Output() toggleCollapse = new EventEmitter<void>();
 
   problemService = inject(ProblemService);
+  router = inject(Router);
   isTopicsCollapsed = false;
 
   readonly navGroups: NavGroup[] = [
@@ -432,10 +434,10 @@ export class SidebarComponent {
       ]
     },
     {
-      title: 'LEARNING & TRACKS',
+      title: 'ALGORITHMS CORE',
       items: [
-        { label: 'Learning Paths', route: '/learn', icon: 'book' },
-        { label: 'Algorithms Core', route: '/learn', queryParams: { track: 'algorithm-fundamentals' }, icon: 'layers' }
+        { label: 'Visualizer Studio', route: '/learn', icon: 'layers' },
+        { label: 'Curricula & Paths', route: '/learn', queryParams: { tab: 'curricula' }, icon: 'book' }
       ]
     },
     {
@@ -446,6 +448,17 @@ export class SidebarComponent {
       ]
     }
   ];
+
+  isItemActive(item: NavGroup['items'][0]): boolean {
+    if (item.route === '/learn') {
+      const isCurricula = this.router.url.includes('tab=curricula');
+      if (item.queryParams && item.queryParams['tab'] === 'curricula') {
+        return isCurricula;
+      }
+      return this.router.url.startsWith('/learn') && !isCurricula;
+    }
+    return false;
+  }
 
   onItemClick(): void {
     if (window.innerWidth <= 860) {

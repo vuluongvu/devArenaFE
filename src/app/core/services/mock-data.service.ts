@@ -1361,22 +1361,21 @@ class Solution {
 
   readonly learningPaths: LearningPath[] = [
     {
-      id: 'ds-core-linear',
-      slug: 'core-linear-data-structures',
-      title: 'Core Linear Structures & Hash Tables',
-      description: 'Master contiguous and hash-based storage: dynamic arrays, hash maps for O(1) lookups, and stack LIFO invariants.',
-      category: 'data-structures',
+      id: 'alg-fundamentals',
+      slug: 'algorithm-fundamentals',
+      title: 'Algorithmic Problem-Solving Core',
+      description: 'Master the fundamental algorithmic patterns used in FAANG interviews and competitive programming.',
       level: 'Beginner',
       difficulty: 'EASY',
-      totalModules: 2,
-      completedModules: 2,
-      estimatedHours: 14,
+      totalModules: 4,
+      completedModules: 3,
+      estimatedHours: 18,
       topics: [
         {
           name: 'Hash Maps & Fast Lookups',
-          description: 'Convert O(N^2) brute force scans into O(N) linear time using hash tables, sets, and frequency mapping.',
-          problemsCount: 3,
-          completedCount: 2,
+          description: 'Convert O(N^2) brute forces into O(N) linear solutions with hash sets and key-value mapping.',
+          problemsCount: 4,
+          completedCount: 3,
           problems: [
             { id: 1, slug: 'two-sum', title: 'Two Sum', difficulty: 'EASY', solved: true },
             { id: 2, slug: 'valid-anagram', title: 'Valid Anagram', difficulty: 'EASY', solved: true },
@@ -1384,59 +1383,8 @@ class Solution {
           ]
         },
         {
-          name: 'Stack Invariants & Monotonic Structures',
-          description: 'LIFO parsing, parenthesis and bracket delimiter validation, and monotonic boundary tracking.',
-          problemsCount: 1,
-          completedCount: 1,
-          problems: [
-            { id: 8, slug: 'valid-parentheses', title: 'Valid Parentheses', difficulty: 'EASY', solved: true }
-          ]
-        }
-      ]
-    },
-    {
-      id: 'ds-hierarchical-trees',
-      slug: 'hierarchical-trees-linked-structures',
-      title: 'Linked Lists & Hierarchical Tree Structures',
-      description: 'Explore pointer-linked node sequences, binary search tree logarithmic invariants, and balanced tree representations.',
-      category: 'data-structures',
-      level: 'Intermediate',
-      difficulty: 'MEDIUM',
-      totalModules: 2,
-      completedModules: 1,
-      estimatedHours: 18,
-      topics: [
-        {
-          name: 'Singly & Doubly Linked Lists',
-          description: 'Dynamic heap allocation, head & tail pointers, node insertion, and pointer reversal.',
-          problemsCount: 2,
-          completedCount: 1,
-          problems: []
-        },
-        {
-          name: 'Binary Search Trees (BST)',
-          description: 'Hierarchical node partitioning, in-order traversal, and balanced subtree search in O(log N).',
-          problemsCount: 2,
-          completedCount: 0,
-          problems: []
-        }
-      ]
-    },
-    {
-      id: 'alg-pointers-window',
-      slug: 'two-pointers-and-sliding-window',
-      title: 'Two Pointers & Sliding Window Patterns',
-      description: 'Master linear-time two-index scans, opposite-end convergence, boundary shrinking, and contiguous subarray optimization.',
-      category: 'algorithms',
-      level: 'Beginner',
-      difficulty: 'MEDIUM',
-      totalModules: 2,
-      completedModules: 1,
-      estimatedHours: 16,
-      topics: [
-        {
           name: 'Two Pointers & In-Place Processing',
-          description: 'Converging boundaries, opposite-end scans for sorted pairs, and trapped rainwater computation.',
+          description: 'Techniques for sorted arrays, palindrome checking, and boundary shrinking.',
           problemsCount: 3,
           completedCount: 1,
           problems: [
@@ -1446,32 +1394,40 @@ class Solution {
           ]
         },
         {
-          name: 'Sliding Window Technique',
-          description: 'Dynamic length window adjustments for contiguous substrings and subarrays without nested rescans.',
-          problemsCount: 1,
+          name: 'Sliding Window',
+          description: 'Fixed and dynamic length window strategies to solve substring and subarray problems.',
+          problemsCount: 2,
           completedCount: 0,
           problems: [
             { id: 7, slug: 'longest-substring-without-repeating-characters', title: 'Longest Substring Without Repeating Characters', difficulty: 'MEDIUM', solved: false }
+          ]
+        },
+        {
+          name: 'Stack Invariants & Monotonic Structures',
+          description: 'LIFO parsing, matching delimiters, and monotonic stack algorithms.',
+          problemsCount: 2,
+          completedCount: 1,
+          problems: [
+            { id: 8, slug: 'valid-parentheses', title: 'Valid Parentheses', difficulty: 'EASY', solved: true }
           ]
         }
       ]
     },
     {
-      id: 'alg-search-dp',
-      slug: 'binary-search-and-dynamic-programming',
-      title: 'Search Space Reduction & Dynamic Programming',
-      description: 'Logarithmic divide-and-conquer on sorted ranges, overlapping subproblems, memoization, and optimal substructure tabulation.',
-      category: 'algorithms',
+      id: 'data-structures',
+      slug: 'essential-data-structures',
+      title: 'Data Structures Mastery',
+      description: 'In-depth mastery of linear and non-linear memory representations, recursion, and tree traversals.',
       level: 'Intermediate',
       difficulty: 'MEDIUM',
-      totalModules: 2,
+      totalModules: 5,
       completedModules: 1,
-      estimatedHours: 22,
+      estimatedHours: 24,
       topics: [
         {
           name: 'Binary Search & Monotonic Predicates',
           description: 'Divide-and-conquer on sorted ranges and search-space reduction.',
-          problemsCount: 1,
+          problemsCount: 3,
           completedCount: 1,
           problems: [
             { id: 9, slug: 'binary-search', title: 'Binary Search', difficulty: 'EASY', solved: true }
@@ -1480,7 +1436,7 @@ class Solution {
         {
           name: 'Dynamic Programming Foundations',
           description: 'Subproblems, recurrence relations, memoization, and bottom-up tabulation.',
-          problemsCount: 1,
+          problemsCount: 4,
           completedCount: 0,
           problems: [
             { id: 10, slug: 'coin-change', title: 'Coin Change', difficulty: 'MEDIUM', solved: false }
