@@ -30,11 +30,18 @@ import { AuthService } from '../../core/services/auth.service';
               Problems
             </a>
             <a
-              routerLink="/learn"
+              routerLink="/visualizer"
               routerLinkActive="active"
               class="nav-item"
             >
-              Learn
+              Visualizer
+            </a>
+            <a
+              routerLink="/curricula"
+              routerLinkActive="active"
+              class="nav-item"
+            >
+              Curricula
             </a>
             <a
               routerLink="/progress"

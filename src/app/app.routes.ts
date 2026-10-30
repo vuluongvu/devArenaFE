@@ -32,9 +32,21 @@ export const routes: Routes = [
         title: 'DevArena — Problem Archive'
       },
       {
-        path: 'learn',
+        path: 'visualizer',
         component: LearnComponent,
-        title: 'DevArena — Learning Paths'
+        data: { tab: 'visualizer' },
+        title: 'DevArena — Visualizer Studio'
+      },
+      {
+        path: 'curricula',
+        component: LearnComponent,
+        data: { tab: 'curricula' },
+        title: 'DevArena — Curricula & Paths'
+      },
+      {
+        path: 'learn',
+        redirectTo: 'visualizer',
+        pathMatch: 'full'
       },
       {
         path: 'progress',

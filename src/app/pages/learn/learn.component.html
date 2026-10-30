@@ -1,40 +1,4 @@
 <div class="learn-page">
-  <!-- Parent Hierarchy Banner: ALGORITHMS CORE -->
-  <div class="core-header-banner">
-    <div class="core-breadcrumbs">
-      <div class="parent-pill">
-        <app-icon name="cpu" [size]="13" customClass="text-accent"></app-icon>
-        <span>ALGORITHMS CORE</span>
-      </div>
-      <span class="core-sep">/</span>
-      <span class="core-current-view">
-        {{ activeMainTab === 'visualizer' ? 'Visualizer Studio' : 'Curricula & Paths' }}
-      </span>
-    </div>
-
-    <!-- Quick switch between Visualizer Studio and Curricula (Documentation) -->
-    <div class="core-view-switch">
-      <button
-        type="button"
-        class="core-view-btn"
-        [class.active]="activeMainTab === 'visualizer'"
-        (click)="setMainTab('visualizer')"
-      >
-        <app-icon name="layers" [size]="14"></app-icon>
-        <span>Visualizer Studio</span>
-      </button>
-      <button
-        type="button"
-        class="core-view-btn"
-        [class.active]="activeMainTab === 'curricula'"
-        (click)="setMainTab('curricula')"
-      >
-        <app-icon name="book" [size]="14"></app-icon>
-        <span>Curricula & Paths</span>
-      </button>
-    </div>
-  </div>
-
   <!-- =================================================================== -->
   <!-- 1. DATA STRUCTURES & ALGORITHMS VISUALIZER STUDIO -->
   <!-- =================================================================== -->
@@ -1039,15 +1003,6 @@
           Structured engineering roadmaps from core algorithm fundamentals to advanced dynamic programming and graph theory.
         </p>
       </div>
-
-      <button
-        type="button"
-        class="curricula-switch-btn"
-        (click)="setMainTab('visualizer')"
-      >
-        <app-icon name="layers" [size]="15"></app-icon>
-        <span>Open Visualizer Studio</span>
-      </button>
     </header>
 
     <div *ngFor="let path of learningPaths()" class="path-card">

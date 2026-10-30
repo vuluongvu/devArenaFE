@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { ProgressService } from '../../core/services/progress.service';
@@ -59,6 +59,7 @@ export type TopicId =
 export class LearnComponent implements OnInit {
   private progressService = inject(ProgressService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   learningPaths = this.progressService.learningPaths;
   Math = Math;
@@ -150,6 +151,15 @@ export class LearnComponent implements OnInit {
   swStatus = 'Status: Window of size 3 at indices [0..2]. Sum = 2 + 1 + 5 = 8. Max = 8.';
 
   ngOnInit(): void {
+    const routeTab = this.route.snapshot.data['tab'];
+    if (routeTab) {
+      this.activeMainTab = routeTab as 'visualizer' | 'curricula';
+    } else if (this.router.url.includes('/curricula')) {
+      this.activeMainTab = 'curricula';
+    } else if (this.router.url.includes('/visualizer')) {
+      this.activeMainTab = 'visualizer';
+    }
+
     this.route.queryParams.subscribe(params => {
       if (params['tab'] === 'curricula') {
         this.activeMainTab = 'curricula';
