@@ -490,7 +490,7 @@ export class LearnComponent implements OnInit, OnDestroy {
         isNew: this.bstNewVal === node.val
       });
 
-      const nextY = y + 80;
+      const nextY = y + 76;
       const nextDx = dx / 2;
 
       if (node.left) {
@@ -522,7 +522,7 @@ export class LearnComponent implements OnInit, OnDestroy {
       }
     };
 
-    traverse(this.bstRoot, 400, 42, 190, 0);
+    traverse(this.bstRoot, 400, 36, 196, 0);
     this.bstNodes = nodes;
     this.bstEdges = edges;
     this.bstHeight = this.bstRoot ? maxDepth + 1 : 0;
@@ -602,8 +602,8 @@ export class LearnComponent implements OnInit, OnDestroy {
       depth++;
     }
 
-    if (depth > 3) {
-      this.bstStatus = `Cannot insert ${val}: Maximum visual tree depth (4 levels) reached under node ${parent.val}.`;
+    if (depth > 4) {
+      this.bstStatus = `Cannot insert ${val}: Maximum visual tree depth (5 levels) reached under node ${parent.val}.`;
       return;
     }
 
@@ -642,7 +642,10 @@ export class LearnComponent implements OnInit, OnDestroy {
   }
 
   insertRandomBST(): void {
-    const candidates = [10, 25, 35, 45, 55, 65, 75, 90, 15, 32, 48, 62, 85];
+    const candidates = [
+      10, 25, 35, 45, 55, 65, 75, 90,
+      5, 15, 22, 28, 32, 38, 42, 48, 52, 58, 62, 68, 72, 78, 85, 95
+    ];
     const existing = new Set(this.bstNodes.map(n => n.val));
     const available = candidates.filter(c => !existing.has(c));
     if (available.length === 0) {

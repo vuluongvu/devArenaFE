@@ -652,7 +652,7 @@
 
           <div class="bst-tree-container">
             <!-- Dynamic Connecting Branches ("Dây nối cây BST") -->
-            <svg class="bst-edges-svg" viewBox="0 0 800 320" preserveAspectRatio="none">
+            <svg class="bst-edges-svg" viewBox="0 0 800 380" preserveAspectRatio="none">
               <line
                 *ngFor="let edge of bstEdges"
                 [attr.x1]="edge.x1"
@@ -669,11 +669,13 @@
               *ngFor="let node of bstNodes"
               class="bst-circle"
               [class.is-root]="node.isRoot"
+              [class.is-deep]="node.level === 3"
+              [class.is-deepest]="node.level >= 4"
               [class.highlight]="node.highlight"
               [class.is-found]="node.isFound"
               [class.is-new]="node.isNew"
               [style.left.%]="(node.x / 800) * 100"
-              [style.top.%]="(node.y / 320) * 100"
+              [style.top.%]="(node.y / 380) * 100"
             >
               {{ node.val }}
             </div>
