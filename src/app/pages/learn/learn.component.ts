@@ -157,6 +157,62 @@ export class LearnComponent implements OnInit, OnDestroy {
   activeMainTab: 'visualizer' | 'curricula' = 'visualizer';
   activeCategory: VisualizerCategory = 'data-structures';
   activeTopic: TopicId = 'stack';
+  speedMode: 'slow' | 'normal' | 'fast' = 'normal';
+
+  get stepDelayMs(): number {
+    if (this.speedMode === 'slow') return 2100;
+    if (this.speedMode === 'fast') return 750;
+    return 1350;
+  }
+
+  get bstDelayMs(): number {
+    if (this.speedMode === 'slow') return 1150;
+    if (this.speedMode === 'fast') return 480;
+    return 800;
+  }
+
+  setSpeedMode(mode: 'slow' | 'normal' | 'fast'): void {
+    this.speedMode = mode;
+    // Live-adjust any active auto-run interval without resetting progress
+    if (this.bsAutoRunning) {
+      this.stopAutoBinarySearch();
+      this.toggleAutoBinarySearch();
+    } else if (this.tpAutoRunning) {
+      this.stopAutoTwoPointers();
+      this.toggleAutoTwoPointers();
+    } else if (this.swAutoRunning) {
+      this.stopAutoSlidingWindow();
+      this.toggleAutoSlidingWindow();
+    } else if (this.bsortAutoRunning) {
+      this.stopAutoBubbleSort();
+      this.toggleAutoBubbleSort();
+    } else if (this.qsortAutoRunning) {
+      this.stopAutoQuickSort();
+      this.toggleAutoQuickSort();
+    } else if (this.bfsAutoRunning) {
+      this.stopAutoBFS();
+      this.toggleAutoBFS();
+    } else if (this.dfsAutoRunning) {
+      this.stopAutoDFS();
+      this.toggleAutoDFS();
+    } else if (this.dpAutoRunning) {
+      this.stopAutoDP();
+      this.toggleAutoDP();
+    }
+  }
+
+  // Angular ngFor TrackBy helpers for 60fps DOM reuse & smooth CSS transitions
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackById(_: number, item: { id: string | number }): string | number {
+    return item.id;
+  }
+
+  trackByNodeVal(_: number, node: BSTNodeVisual): number {
+    return node.val;
+  }
 
   // BST state & animation trackers
   bstActiveEdges = new Set<string>();
@@ -850,7 +906,7 @@ export class LearnComponent implements OnInit, OnDestroy {
           this.rebuildBSTVisuals();
         }, 2800);
       }
-    }, 850);
+    }, this.bstDelayMs);
   }
 
   insertRandomBST(): void {
@@ -944,7 +1000,7 @@ export class LearnComponent implements OnInit, OnDestroy {
           this.rebuildBSTVisuals();
         }, 3000);
       }
-    }, 850);
+    }, this.bstDelayMs);
   }
 
   resetBST(): void {
@@ -1410,7 +1466,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoBinarySearch();
           }
         }
-      }, 1600);
+      }, this.stepDelayMs);
     }
   }
 
@@ -1479,7 +1535,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoTwoPointers();
           }
         }
-      }, 1600);
+      }, this.stepDelayMs);
     }
   }
 
@@ -1548,7 +1604,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoSlidingWindow();
           }
         }
-      }, 1600);
+      }, this.stepDelayMs);
     }
   }
 
@@ -1610,7 +1666,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoBubbleSort();
           }
         }
-      }, 1400);
+      }, this.stepDelayMs);
     }
   }
 
@@ -1770,7 +1826,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoQuickSort();
           }
         }
-      }, 1500);
+      }, this.stepDelayMs);
     }
   }
 
@@ -1891,7 +1947,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoBFS();
           }
         }
-      }, 1500);
+      }, this.stepDelayMs);
     }
   }
 
@@ -2002,7 +2058,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoDFS();
           }
         }
-      }, 1500);
+      }, this.stepDelayMs);
     }
   }
 
@@ -2063,7 +2119,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoDP();
           }
         }
-      }, 1500);
+      }, this.stepDelayMs);
     }
   }
 

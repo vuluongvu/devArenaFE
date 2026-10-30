@@ -11,26 +11,56 @@
         </p>
       </div>
 
-      <!-- Segmented Button: Data Structures vs Algorithms -->
-      <div class="main-tab-toggle" role="tablist" aria-label="Visualizer Category Switcher">
-        <button
-          type="button"
-          class="tab-toggle-btn"
-          [class.active]="activeCategory === 'data-structures'"
-          (click)="setCategory('data-structures')"
-        >
-          <app-icon name="database" [size]="15"></app-icon>
-          <span>Data Structures</span>
-        </button>
-        <button
-          type="button"
-          class="tab-toggle-btn"
-          [class.active]="activeCategory === 'algorithms'"
-          (click)="setCategory('algorithms')"
-        >
-          <app-icon name="cpu" [size]="15"></app-icon>
-          <span>Algorithms</span>
-        </button>
+      <!-- Right Controls: Speed Switcher + Segmented Category Switcher -->
+      <div class="header-controls-group">
+        <div class="speed-control-pill" title="Animation Playback Speed">
+          <span class="speed-label">SPEED</span>
+          <button
+            type="button"
+            class="speed-btn"
+            [class.active]="speedMode === 'slow'"
+            (click)="setSpeedMode('slow')"
+          >
+            0.5x
+          </button>
+          <button
+            type="button"
+            class="speed-btn"
+            [class.active]="speedMode === 'normal'"
+            (click)="setSpeedMode('normal')"
+          >
+            1x
+          </button>
+          <button
+            type="button"
+            class="speed-btn"
+            [class.active]="speedMode === 'fast'"
+            (click)="setSpeedMode('fast')"
+          >
+            2x
+          </button>
+        </div>
+
+        <div class="main-tab-toggle" role="tablist" aria-label="Visualizer Category Switcher">
+          <button
+            type="button"
+            class="tab-toggle-btn"
+            [class.active]="activeCategory === 'data-structures'"
+            (click)="setCategory('data-structures')"
+          >
+            <app-icon name="database" [size]="15"></app-icon>
+            <span>Data Structures</span>
+          </button>
+          <button
+            type="button"
+            class="tab-toggle-btn"
+            [class.active]="activeCategory === 'algorithms'"
+            (click)="setCategory('algorithms')"
+          >
+            <app-icon name="cpu" [size]="15"></app-icon>
+            <span>Algorithms</span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -739,7 +769,7 @@
           <div class="bst-tree-container">
             <svg class="bst-edges-svg" viewBox="0 0 800 380" preserveAspectRatio="none">
               <line
-                *ngFor="let edge of bstEdges"
+                *ngFor="let edge of bstEdges; trackBy: trackById"
                 [attr.x1]="edge.x1"
                 [attr.y1]="edge.y1"
                 [attr.x2]="edge.x2"
@@ -750,7 +780,7 @@
             </svg>
 
             <div
-              *ngFor="let node of bstNodes"
+              *ngFor="let node of bstNodes; trackBy: trackByNodeVal"
               class="bst-circle"
               [class.is-root]="node.isRoot"
               [class.is-deep]="node.level === 3"
@@ -872,7 +902,7 @@
           <div class="bst-tree-container heap-tree-box">
             <svg class="bst-edges-svg" viewBox="0 0 800 300" preserveAspectRatio="none">
               <line
-                *ngFor="let edge of heapEdges"
+                *ngFor="let edge of heapEdges; trackBy: trackById"
                 [attr.x1]="edge.x1"
                 [attr.y1]="edge.y1"
                 [attr.x2]="edge.x2"
@@ -883,7 +913,7 @@
             </svg>
 
             <div
-              *ngFor="let node of heapNodes"
+              *ngFor="let node of heapNodes; trackBy: trackByIndex"
               class="bst-circle"
               [class.is-root]="node.isRoot"
               [class.is-deep]="node.level >= 3"
@@ -1165,7 +1195,7 @@
           <div class="bst-tree-container graph-canvas-box">
             <svg class="bst-edges-svg" viewBox="0 0 800 320" preserveAspectRatio="none">
               <line
-                *ngFor="let edge of graphEdges"
+                *ngFor="let edge of graphEdges; trackBy: trackById"
                 [attr.x1]="edge.x1"
                 [attr.y1]="edge.y1"
                 [attr.x2]="edge.x2"
@@ -1177,7 +1207,7 @@
 
             <button
               type="button"
-              *ngFor="let v of graphVertices"
+              *ngFor="let v of graphVertices; trackBy: trackById"
               class="bst-circle graph-vertex-btn"
               [class.is-root]="graphSelectedNode === v.id"
               [class.is-found]="graphHighlightedNodes.has(v.id)"
@@ -1292,7 +1322,7 @@
           </div>
 
           <div class="array-visual-row">
-            <div *ngFor="let val of bsArray; let i = index" class="array-cell-unit">
+            <div *ngFor="let val of bsArray; let i = index; trackBy: trackByIndex" class="array-cell-unit">
               <div class="pointer-top-indicator">
                 <span *ngIf="i === bsLeft" class="ptr-badge ptr-left">L ({{ i }})</span>
                 <span *ngIf="i === bsMid" class="ptr-badge ptr-mid">MID ({{ i }})</span>
@@ -1396,7 +1426,7 @@
 
           <div class="two-pointers-display">
             <div class="pointers-row">
-              <div *ngFor="let char of tpArray; let i = index" class="pointer-cell-wrap">
+              <div *ngFor="let char of tpArray; let i = index; trackBy: trackByIndex" class="pointer-cell-wrap">
                 <div class="pointer-top-indicator">
                   <span *ngIf="i === tpLeft" class="ptr-badge ptr-left">L ({{ i }})</span>
                   <span *ngIf="i === tpRight" class="ptr-badge ptr-right">R ({{ i }})</span>
@@ -1497,7 +1527,7 @@
 
           <div class="two-pointers-display">
             <div class="pointers-row">
-              <div *ngFor="let num of swArray; let i = index" class="pointer-cell-wrap">
+              <div *ngFor="let num of swArray; let i = index; trackBy: trackByIndex" class="pointer-cell-wrap">
                 <div class="pointer-top-indicator">
                   <span *ngIf="i >= swStart && i < swStart + swWindowSize" class="ptr-badge ptr-mid">WINDOW</span>
                 </div>
@@ -1598,7 +1628,7 @@
           </div>
 
           <div class="sort-bars-stage">
-            <div *ngFor="let val of bsortArray; let idx = index" class="sort-bar-column">
+            <div *ngFor="let val of bsortArray; let idx = index; trackBy: trackByIndex" class="sort-bar-column">
               <span class="sort-bar-val">{{ val }}</span>
               <div
                 class="sort-bar-pill"
@@ -1694,7 +1724,7 @@
           </div>
 
           <div class="sort-bars-stage">
-            <div *ngFor="let val of qsortArray; let idx = index" class="sort-bar-column">
+            <div *ngFor="let val of qsortArray; let idx = index; trackBy: trackByIndex" class="sort-bar-column">
               <div class="pointer-top-indicator">
                 <span *ngIf="!qsortDone && idx === qsortPivotIdx" class="ptr-badge ptr-right">PIVOT</span>
                 <span *ngIf="!qsortDone && idx === qsortJ && idx !== qsortPivotIdx" class="ptr-badge ptr-mid">j</span>
@@ -1807,7 +1837,7 @@
           <div class="bst-tree-container graph-canvas-box">
             <svg class="bst-edges-svg" viewBox="0 0 800 320" preserveAspectRatio="none">
               <line
-                *ngFor="let edge of graphEdges"
+                *ngFor="let edge of graphEdges; trackBy: trackById"
                 [attr.x1]="edge.x1"
                 [attr.y1]="edge.y1"
                 [attr.x2]="edge.x2"
@@ -1818,7 +1848,7 @@
             </svg>
 
             <div
-              *ngFor="let v of graphVertices"
+              *ngFor="let v of graphVertices; trackBy: trackById"
               class="bst-circle"
               [class.is-root]="bfsCurrent === v.id"
               [class.highlight]="bfsQueue.includes(v.id) && bfsCurrent !== v.id"
@@ -1933,7 +1963,7 @@
           <div class="bst-tree-container graph-canvas-box">
             <svg class="bst-edges-svg" viewBox="0 0 800 320" preserveAspectRatio="none">
               <line
-                *ngFor="let edge of graphEdges"
+                *ngFor="let edge of graphEdges; trackBy: trackById"
                 [attr.x1]="edge.x1"
                 [attr.y1]="edge.y1"
                 [attr.x2]="edge.x2"
@@ -1944,7 +1974,7 @@
             </svg>
 
             <div
-              *ngFor="let v of graphVertices"
+              *ngFor="let v of graphVertices; trackBy: trackById"
               class="bst-circle"
               [class.is-root]="dfsCurrent === v.id"
               [class.highlight]="dfsStack.includes(v.id) && dfsCurrent !== v.id"
@@ -2047,7 +2077,7 @@
           </div>
 
           <div class="array-visual-row">
-            <div *ngFor="let val of dpTable; let idx = index" class="array-cell-unit">
+            <div *ngFor="let val of dpTable; let idx = index; trackBy: trackByIndex" class="array-cell-unit">
               <div class="pointer-top-indicator">
                 <span *ngIf="!dpDone && idx === dpCurrIdx" class="ptr-badge ptr-right">i ({{ idx }})</span>
                 <span *ngIf="!dpDone && idx === dpCurrIdx - 1" class="ptr-badge ptr-left">i - 1</span>
