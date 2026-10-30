@@ -1,0 +1,510 @@
+<div class="workspace-viewport">
+  <!-- Top Workspace Toolbar -->
+  <header class="workspace-nav">
+    <div class="nav-left">
+      <!-- Back to problems hub -->
+      <a routerLink="/problems" class="back-link" title="Back to Problems Hub">
+        <app-icon name="chevron-left" [size]="17"></app-icon>
+        <span class="back-text">Problems</span>
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <!-- Problem Title & Status -->
+      <div class="problem-meta" *ngIf="problem">
+        <span class="meta-title">{{ problem.title }}</span>
+        <app-badge [difficulty]="problem.difficulty"></app-badge>
+        <app-badge *ngIf="problem.userStatus === 'SOLVED'" status="SOLVED"></app-badge>
+      </div>
+    </div>
+
+    <!-- Right Controls: Language Selector, Run & Submit -->
+    <div class="nav-right">
+      <!-- Language Selector -->
+      <div class="lang-selector-wrapper">
+        <select
+          [(ngModel)]="selectedLanguage"
+          (ngModelChange)="onLanguageChange()"
+          class="lang-select"
+          aria-label="Select Programming Language"
+        >
+          <option *ngFor="let lang of supportedLanguages" [value]="lang">
+            {{ lang }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Reset Code Button -->
+      <button class="tool-btn" (click)="resetCode()" title="Reset to Starter Code">
+        <app-icon name="rotate-ccw" [size]="15"></app-icon>
+      </button>
+
+      <!-- Theme Toggle inside workspace -->
+      <button
+        class="tool-btn"
+        (click)="themeService.toggleTheme()"
+        [title]="themeService.isDark() ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+      >
+        <app-icon [name]="themeService.isDark() ? 'sun' : 'moon'" [size]="15"></app-icon>
+      </button>
+
+      <div class="nav-divider"></div>
+
+      <!-- Run Code Button -->
+      <button
+        class="action-btn btn-run"
+        (click)="runCode()"
+        [disabled]="isRunning || isSubmitting"
+        title="Run current testcase (Ctrl + ')"
+      >
+        <app-icon *ngIf="!isRunning" name="play" [size]="14"></app-icon>
+        <div *ngIf="isRunning" class="spinner-sm"></div>
+        <span class="btn-text">{{ isRunning ? 'Running...' : 'Run' }}</span>
+        <span class="btn-kbd">Ctrl+'</span>
+      </button>
+
+      <!-- Submit Code Button -->
+      <button
+        class="action-btn btn-submit"
+        (click)="submitCode()"
+        [disabled]="isRunning || isSubmitting"
+        title="Submit Solution for Full Evaluation (Ctrl + Enter)"
+      >
+        <app-icon *ngIf="!isSubmitting" name="send" [size]="14"></app-icon>
+        <div *ngIf="isSubmitting" class="spinner-sm light"></div>
+        <span class="btn-text">{{ isSubmitting ? 'Evaluating...' : 'Submit' }}</span>
+        <span class="btn-kbd">Ctrl+↵</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="workspace-loading">
+    <div class="spinner"></div>
+    <span>Loading coding workspace...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="workspace-error">
+    <app-icon name="alert-circle" [size]="36" customClass="text-warning"></app-icon>
+    <h3>{{ errorMessage }}</h3>
+    <a routerLink="/problems" class="btn-outline">Return to Problems Hub</a>
+  </div>
+
+  <!-- Main Split-Pane Workspace -->
+  <main *ngIf="!isLoading && problem" class="workspace-split" [class.is-resizing]="isResizingSplit || isResizingConsole">
+    <!-- LEFT PANEL: Problem Description, Editorial, Submissions -->
+    <section class="pane left-pane" [style.width.%]="splitRatio">
+      <!-- Left Panel Tab Header -->
+      <div class="pane-tab-header">
+        <button
+          class="pane-tab-btn"
+          [class.active]="activeLeftTab === 'description'"
+          (click)="activeLeftTab = 'description'"
+        >
+          <app-icon name="book" [size]="14"></app-icon>
+          <span>Description</span>
+        </button>
+        <button
+          class="pane-tab-btn"
+          [class.active]="activeLeftTab === 'editorial'"
+          (click)="activeLeftTab = 'editorial'"
+        >
+          <app-icon name="sparkles" [size]="14"></app-icon>
+          <span>Editorial</span>
+        </button>
+        <button
+          class="pane-tab-btn"
+          [class.active]="activeLeftTab === 'submissions'"
+          (click)="activeLeftTab = 'submissions'"
+        >
+          <app-icon name="clock" [size]="14"></app-icon>
+          <span>Submissions ({{ submissionsList.length }})</span>
+        </button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="pane-scroll-content">
+        <!-- DESCRIPTION TAB -->
+        <article *ngIf="activeLeftTab === 'description'" class="statement-article">
+          <header class="statement-header">
+            <h1 class="statement-title">{{ problem.title }}</h1>
+            <div class="statement-tags">
+              <app-badge [difficulty]="problem.difficulty"></app-badge>
+              <span class="meta-pill">Category: {{ problem.category }}</span>
+              <span class="meta-pill">Time Limit: {{ problem.timeLimitMs }}ms</span>
+              <span class="meta-pill">Memory: {{ problem.memoryLimitMb }}MB</span>
+            </div>
+          </header>
+
+          <!-- Problem Statement Body -->
+          <div class="markdown-body">
+            <p class="statement-text">{{ problem.statement }}</p>
+          </div>
+
+          <!-- Sample Test Cases -->
+          <div class="sample-cases-section">
+            <h2 class="sub-heading">Examples</h2>
+            <div *ngFor="let sample of problem.sampleTestCases; let idx = index" class="example-box">
+              <div class="example-title">Example {{ idx + 1 }}</div>
+              <div class="example-row">
+                <span class="example-label">Input:</span>
+                <code class="example-code">{{ sample.input }}</code>
+              </div>
+              <div class="example-row">
+                <span class="example-label">Output:</span>
+                <code class="example-code">{{ sample.expectedOutput }}</code>
+              </div>
+              <div *ngIf="sample.explanation" class="example-row">
+                <span class="example-label">Explanation:</span>
+                <span class="example-explanation">{{ sample.explanation }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Related Topic Tags -->
+          <div class="topics-section">
+            <h2 class="sub-heading">Related Topics</h2>
+            <div class="tag-list">
+              <app-badge *ngFor="let tag of problem.tags" [tag]="tag"></app-badge>
+            </div>
+          </div>
+        </article>
+
+        <!-- EDITORIAL TAB -->
+        <article *ngIf="activeLeftTab === 'editorial'" class="editorial-article">
+          <div *ngIf="problem.solutionEditorial as ed; else noEditorial">
+            <h2 class="editorial-title">Algorithmic Approach & Walkthrough</h2>
+            <p class="editorial-summary">{{ ed.summary }}</p>
+
+            <!-- Complexity Cards -->
+            <div class="complexity-grid">
+              <div class="complexity-card">
+                <div class="complexity-label">Time Complexity</div>
+                <div class="complexity-value">{{ ed.timeComplexity }}</div>
+              </div>
+              <div class="complexity-card">
+                <div class="complexity-label">Space Complexity</div>
+                <div class="complexity-value">{{ ed.spaceComplexity }}</div>
+              </div>
+            </div>
+
+            <!-- Approach Detail -->
+            <div class="approach-box">
+              <h3 class="approach-heading">Detailed Invariant & Logic</h3>
+              <p class="approach-text">{{ ed.approach }}</p>
+            </div>
+
+            <!-- Reference Solution Code -->
+            <div class="editorial-code-section">
+              <div class="code-box-header">
+                <span>Verified Solution ({{ selectedLanguage }})</span>
+                <button class="copy-code-btn" (click)="copyEditorialCode()">
+                  <app-icon name="copy" [size]="13"></app-icon>
+                  <span>Copy Solution</span>
+                </button>
+              </div>
+              <pre class="editorial-pre"><code>{{ getEditorialCode() }}</code></pre>
+            </div>
+          </div>
+
+          <ng-template #noEditorial>
+            <div class="empty-editorial">
+              <app-icon name="book" [size]="32" customClass="text-muted"></app-icon>
+              <p>Editorial solution will be published soon. Try solving it independently first!</p>
+            </div>
+          </ng-template>
+        </article>
+
+        <!-- SUBMISSIONS TAB -->
+        <article *ngIf="activeLeftTab === 'submissions'" class="submissions-article">
+          <h2 class="editorial-title">Evaluation History</h2>
+          <div *ngIf="submissionsList.length === 0" class="empty-submissions">
+            <app-icon name="clock" [size]="28" customClass="text-muted"></app-icon>
+            <p>No submissions recorded for this problem yet.</p>
+            <span>Write your solution in the editor and click "Submit" to run all testcases.</span>
+          </div>
+
+          <div *ngIf="submissionsList.length > 0" class="submissions-table-wrap">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Language</th>
+                  <th>Runtime</th>
+                  <th>Memory</th>
+                  <th>Passed</th>
+                  <th>Submitted</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let s of submissionsList">
+                  <td>
+                    <span
+                      class="sub-verdict-badge"
+                      [class.verdict-pass]="s.status === 'ACCEPTED'"
+                      [class.verdict-fail]="s.status !== 'ACCEPTED'"
+                    >
+                      {{ s.status }}
+                    </span>
+                  </td>
+                  <td><code class="mini-code">{{ s.language }}</code></td>
+                  <td>{{ s.executionTimeMs }} ms</td>
+                  <td>{{ (s.memoryUsedKb / 1024).toFixed(1) }} MB</td>
+                  <td>{{ s.passedTestCases }} / {{ s.totalTestCases }}</td>
+                  <td class="text-muted">{{ s.submittedAt }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Resizable Horizontal Split Handle -->
+    <div
+      class="split-drag-bar"
+      (mousedown)="startResizeSplit($event)"
+      title="Drag horizontally to resize panes"
+    >
+      <div class="drag-bar-line"></div>
+    </div>
+
+    <!-- RIGHT PANEL: Code Editor & Bottom Console -->
+    <section class="pane right-pane" [style.width.%]="100 - splitRatio">
+      <!-- TOP: Code Editor Box -->
+      <div class="code-editor-wrapper">
+        <div class="editor-header">
+          <div class="editor-meta">
+            <span class="editor-filename">
+              <app-icon name="code" [size]="13" customClass="text-muted"></app-icon>
+              solution.{{ getFileExtension() }}
+            </span>
+          </div>
+          <div class="editor-stats">
+            <span>Ln {{ activeLineNumber }}, Col {{ activeColNumber }}</span>
+            <span>Spaces: 4</span>
+            <span>UTF-8</span>
+            <span class="lang-tag">{{ selectedLanguage }}</span>
+          </div>
+        </div>
+
+        <!-- Professional Monaco Editor Canvas -->
+        <div class="editor-workspace-area">
+          <div #monacoContainer class="monaco-editor-container"></div>
+        </div>
+      </div>
+
+      <!-- Resizable Console Vertical Drag Handle -->
+      <div
+        *ngIf="!isConsoleCollapsed"
+        class="console-drag-handle"
+        (mousedown)="startResizeConsole($event)"
+        title="Drag vertically to resize console"
+      >
+        <div class="console-handle-pill"></div>
+      </div>
+
+      <!-- BOTTOM: Testcases & Execution Console -->
+      <div
+        class="console-wrapper"
+        [class.collapsed]="isConsoleCollapsed"
+        [style.height.px]="isConsoleCollapsed ? 42 : consoleHeight"
+      >
+        <!-- Console Tab Header -->
+        <div class="console-header">
+          <div class="console-tabs">
+            <button
+              class="console-tab-btn"
+              [class.active]="activeConsoleTab === 'testcases'"
+              (click)="activeConsoleTab = 'testcases'; isConsoleCollapsed = false"
+            >
+              <app-icon name="sliders" [size]="14"></app-icon>
+              <span>Testcases</span>
+            </button>
+            <button
+              class="console-tab-btn"
+              [class.active]="activeConsoleTab === 'output'"
+              (click)="activeConsoleTab = 'output'; isConsoleCollapsed = false"
+            >
+              <app-icon name="terminal" [size]="14"></app-icon>
+              <span>Execution Output</span>
+              <span *ngIf="runResult" class="output-status-indicator" [class.dot-pass]="runResult.status === 'ACCEPTED'"></span>
+            </button>
+            <button
+              class="console-tab-btn"
+              [class.active]="activeConsoleTab === 'result'"
+              (click)="activeConsoleTab = 'result'; isConsoleCollapsed = false"
+            >
+              <app-icon name="award" [size]="14"></app-icon>
+              <span>Submission Result</span>
+            </button>
+          </div>
+
+          <div class="console-controls">
+            <button
+              class="console-tool-btn"
+              (click)="isConsoleCollapsed = !isConsoleCollapsed"
+              [title]="isConsoleCollapsed ? 'Expand Console' : 'Collapse Console'"
+            >
+              <app-icon [name]="isConsoleCollapsed ? 'chevron-down' : 'chevron-down'" [size]="14"></app-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Console Body -->
+        <div class="console-body" *ngIf="!isConsoleCollapsed">
+          <!-- TAB 1: TESTCASES -->
+          <div *ngIf="activeConsoleTab === 'testcases'" class="testcase-tab-content">
+            <div class="testcase-pill-selector">
+              <button
+                *ngFor="let c of problem.sampleTestCases; let idx = index"
+                class="case-pill"
+                [class.active]="!isCustomTestCase && selectedTestCaseIndex === idx"
+                (click)="isCustomTestCase = false; selectedTestCaseIndex = idx"
+              >
+                Case {{ idx + 1 }}
+              </button>
+              <button
+                class="case-pill custom-pill"
+                [class.active]="isCustomTestCase"
+                (click)="isCustomTestCase = true"
+              >
+                Custom Parameter Input
+              </button>
+            </div>
+
+            <!-- Standard Case Display -->
+            <div *ngIf="!isCustomTestCase && problem.sampleTestCases[selectedTestCaseIndex] as currentCase" class="case-detail-box">
+              <div class="field-block">
+                <span class="field-label">Standard Input</span>
+                <div class="code-box">{{ currentCase.input }}</div>
+              </div>
+              <div class="field-block">
+                <span class="field-label">Expected Output</span>
+                <div class="code-box">{{ currentCase.expectedOutput }}</div>
+              </div>
+            </div>
+
+            <!-- Custom Input Box -->
+            <div *ngIf="isCustomTestCase" class="case-detail-box">
+              <div class="field-block">
+                <span class="field-label">Custom Test Input</span>
+                <textarea
+                  [(ngModel)]="customInput"
+                  placeholder="Enter arguments (e.g. nums = [2,7,11,15], target = 9)..."
+                  class="custom-input-textarea"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: OUTPUT (RUN RESULT) -->
+          <div *ngIf="activeConsoleTab === 'output'" class="output-tab-content">
+            <div *ngIf="!runResult && !isRunning" class="empty-console">
+              <app-icon name="terminal" [size]="22" customClass="text-muted"></app-icon>
+              <span>Click <strong>"Run"</strong> (Ctrl+') to execute your solution against the selected testcase.</span>
+            </div>
+
+            <div *ngIf="isRunning" class="running-indicator">
+              <div class="spinner-sm"></div>
+              <span>Evaluating code in isolated runtime sandbox...</span>
+            </div>
+
+            <div *ngIf="runResult && !isRunning" class="result-display">
+              <!-- Verdict Banner -->
+              <div
+                class="verdict-banner"
+                [class.banner-success]="runResult.status === 'ACCEPTED'"
+                [class.banner-error]="runResult.status !== 'ACCEPTED'"
+              >
+                <div class="verdict-title">
+                  <app-icon [name]="runResult.status === 'ACCEPTED' ? 'check-circle' : 'alert-circle'" [size]="17"></app-icon>
+                  <span>{{ runResult.status }}</span>
+                </div>
+                <div class="verdict-meta" *ngIf="runResult.executionTimeMs !== undefined">
+                  <span>Runtime: <strong>{{ runResult.executionTimeMs }} ms</strong></span>
+                  <span>Memory: <strong>{{ ((runResult.memoryUsedKb || 35000) / 1024).toFixed(1) }} MB</strong></span>
+                </div>
+              </div>
+
+              <!-- Output Comparison Details -->
+              <div class="output-block-grid">
+                <div class="out-field" *ngIf="runResult.expectedOutput">
+                  <span class="out-title">Expected:</span>
+                  <pre class="out-pre expected-pre"><code>{{ runResult.expectedOutput }}</code></pre>
+                </div>
+                <div class="out-field" *ngIf="runResult.actualOutput">
+                  <span class="out-title">Your Output:</span>
+                  <pre class="out-pre" [class.match-pre]="runResult.status === 'ACCEPTED'"><code>{{ runResult.actualOutput }}</code></pre>
+                </div>
+              </div>
+
+              <div *ngIf="runResult.stdout" class="stdout-block">
+                <span class="out-title">Standard Output:</span>
+                <pre class="out-pre"><code>{{ runResult.stdout }}</code></pre>
+              </div>
+
+              <div *ngIf="runResult.compileOutput || runResult.stderr" class="stderr-block">
+                <span class="out-title error-text">Compiler / Runtime Stderr:</span>
+                <pre class="out-pre error-pre"><code>{{ runResult.compileOutput || runResult.stderr }}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: SUBMISSION RESULT -->
+          <div *ngIf="activeConsoleTab === 'result'" class="submission-tab-content">
+            <div *ngIf="!submitResult && !isSubmitting" class="empty-console">
+              <app-icon name="award" [size]="22" customClass="text-muted"></app-icon>
+              <span>Click <strong>"Submit"</strong> (Ctrl+↵) to evaluate all hidden & sample testcases.</span>
+            </div>
+
+            <div *ngIf="isSubmitting" class="running-indicator">
+              <div class="spinner-sm"></div>
+              <span>Evaluating comprehensive test suite in isolated runner...</span>
+            </div>
+
+            <div *ngIf="submitResult && !isSubmitting" class="submission-evaluation-display">
+              <div
+                class="verdict-banner full-banner"
+                [class.banner-success]="submitResult.status === 'ACCEPTED'"
+                [class.banner-error]="submitResult.status !== 'ACCEPTED'"
+              >
+                <div class="banner-main">
+                  <app-icon [name]="submitResult.status === 'ACCEPTED' ? 'check-circle' : 'x-circle'" [size]="22"></app-icon>
+                  <div>
+                    <h3 class="banner-heading">{{ submitResult.status }}</h3>
+                    <p class="banner-subtext">
+                      {{ submitResult.passedTestCases }} / {{ submitResult.totalTestCases }} Test Cases Passed
+                    </p>
+                  </div>
+                </div>
+                <div class="banner-metrics" *ngIf="submitResult.executionTimeMs">
+                  <div class="metric-item">
+                    <span class="m-label">Runtime</span>
+                    <span class="m-val">{{ submitResult.executionTimeMs }} ms</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="m-label">Memory</span>
+                    <span class="m-val">{{ ((submitResult.memoryUsedKb || 38000) / 1024).toFixed(1) }} MB</span>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="submitResult.status === 'ACCEPTED'" class="success-message-card">
+                <app-icon name="sparkles" [size]="16" customClass="text-accent"></app-icon>
+                <span>Solution accepted! Your submission history and practice statistics have been updated.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Floating Toast Feedback -->
+  <div *ngIf="toastMessage" class="workspace-toast">
+    <app-icon name="check-circle" [size]="15"></app-icon>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

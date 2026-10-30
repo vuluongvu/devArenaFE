@@ -1,0 +1,244 @@
+/* ==========================================================================
+   DevArena Design Token System & Base Styling
+   Refined for spaciousness, high readability, and developer focus
+   ========================================================================== */
+
+:root,
+body.theme-light {
+  /* Surface & Background */
+  --color-bg: #FAFAF9;              /* Warm off-white */
+  --color-surface: #FFFFFF;         /* Pure white surface */
+  --color-surface-hover: #F5F5F4;   /* Subtle hover state */
+  --color-surface-active: #EFEFEF;
+  --color-surface-elevated: #FFFFFF;
+  --color-sidebar: #F7F7F6;         /* Calm sidebar tone */
+  --color-code-bg: #18191E;         /* Deep neutral slate code canvas */
+  --color-code-text: #F4F4F5;
+
+  /* Typography & Text */
+  --color-text-primary: #1C1917;    /* Deep charcoal */
+  --color-text-secondary: #52525B;  /* Readable medium slate */
+  --color-text-muted: #71717A;      /* Accessible secondary */
+  --color-text-inverted: #FFFFFF;
+
+  /* Borders & Dividers */
+  --color-border: #E4E4E7;          /* Clean hairline border */
+  --color-border-subtle: #F1F1F4;   /* Soft divider */
+  --color-border-hover: #D4D4D8;
+
+  /* Brand & Accent (NestJS coral/red, used sparingly) */
+  --color-accent: #E0234E;
+  --color-accent-hover: #C51B42;
+  --color-accent-subtle: rgba(224, 35, 78, 0.08);
+  --color-accent-border: rgba(224, 35, 78, 0.25);
+
+  /* Difficulty Semantic Colors (Muted, High Contrast) */
+  --color-easy: #15803D;
+  --color-easy-bg: rgba(22, 163, 74, 0.10);
+  --color-easy-border: rgba(22, 163, 74, 0.25);
+
+  --color-medium: #B45309;
+  --color-medium-bg: rgba(217, 119, 6, 0.10);
+  --color-medium-border: rgba(217, 119, 6, 0.25);
+
+  --color-hard: #B91C1C;
+  --color-hard-bg: rgba(220, 38, 38, 0.10);
+  --color-hard-border: rgba(220, 38, 38, 0.25);
+
+  /* Verdict Colors */
+  --color-success: #15803D;
+  --color-error: #B91C1C;
+  --color-warning: #B45309;
+  --color-info: #0369A1;
+
+  /* Shadow & Elevation (Subtle, Restrained) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+  /* Focus Ring */
+  --focus-ring: 0 0 0 2px #FFFFFF, 0 0 0 4px rgba(224, 35, 78, 0.45);
+
+  /* Radii */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-full: 9999px;
+
+  /* Typography Scale */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, "SF Mono", Consolas, monospace;
+
+  /* Control Heights */
+  --control-height-sm: 32px;
+  --control-height-md: 38px;
+  --control-height-lg: 44px;
+
+  /* Transition Speeds */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Theme Tokens */
+body.theme-dark {
+  --color-bg: #111215;              /* Balanced neutral dark slate */
+  --color-surface: #18191E;         /* Deep slate surface */
+  --color-surface-hover: #222329;
+  --color-surface-active: #282A31;
+  --color-surface-elevated: #1F2026;
+  --color-sidebar: #141519;
+  --color-code-bg: #101115;
+  --color-code-text: #F4F4F5;
+
+  --color-text-primary: #F4F4F5;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted: #71717A;
+  --color-text-inverted: #111215;
+
+  --color-border: #27282F;
+  --color-border-subtle: #1E2026;
+  --color-border-hover: #383A43;
+
+  --color-accent: #FB7185;
+  --color-accent-hover: #F43F5E;
+  --color-accent-subtle: rgba(244, 63, 94, 0.12);
+  --color-accent-border: rgba(244, 63, 94, 0.30);
+
+  --color-easy: #4ADE80;
+  --color-easy-bg: rgba(34, 197, 94, 0.14);
+  --color-easy-border: rgba(34, 197, 94, 0.30);
+
+  --color-medium: #FBBF24;
+  --color-medium-bg: rgba(245, 158, 11, 0.14);
+  --color-medium-border: rgba(245, 158, 11, 0.30);
+
+  --color-hard: #F87171;
+  --color-hard-bg: rgba(239, 68, 68, 0.14);
+  --color-hard-border: rgba(239, 68, 68, 0.30);
+
+  --color-success: #4ADE80;
+  --color-error: #F87171;
+  --color-warning: #FBBF24;
+  --color-info: #38BDF8;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+
+  --focus-ring: 0 0 0 2px #111215, 0 0 0 4px rgba(251, 113, 133, 0.5);
+}
+
+/* ==========================================================================
+   Base Elements & Reset
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;                  /* Increased from 14px for comfortable reading */
+  line-height: 1.6;                 /* Relaxed line height */
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all var(--transition-fast);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: 14.5px;
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+code, pre {
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   Scrollbar styling
+   ========================================================================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   Focus & Accessibility
+   ========================================================================== */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Global Helper Classes
+   ========================================================================== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.text-easy { color: var(--color-easy) !important; }
+.text-medium { color: var(--color-medium) !important; }
+.text-hard { color: var(--color-hard) !important; }

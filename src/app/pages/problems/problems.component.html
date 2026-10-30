@@ -1,0 +1,309 @@
+<div class="problems-page">
+  <!-- Editorial Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Algorithmic Problem Archive</h1>
+      <p class="page-subtitle">
+        Curated problem sets designed to build deep algorithmic intuition, invariant reasoning, and interview readiness.
+      </p>
+    </div>
+
+    <!-- Quick Progress Pill Summary -->
+    <div class="header-stats-card" *ngIf="stats() as s">
+      <div class="stats-overview">
+        <span class="stats-label">TOTAL SOLVED</span>
+        <span class="stats-number">
+          <strong>{{ s.totalSolved }}</strong> / {{ s.totalProblems }}
+        </span>
+      </div>
+      <div class="stats-breakdown">
+        <div class="breakdown-item">
+          <span class="breakdown-dot dot-easy"></span>
+          <span class="breakdown-text">Easy: <strong>{{ s.solvedByDifficulty.easy }}</strong>/{{ s.solvedByDifficulty.totalEasy }}</span>
+        </div>
+        <div class="breakdown-item">
+          <span class="breakdown-dot dot-medium"></span>
+          <span class="breakdown-text">Med: <strong>{{ s.solvedByDifficulty.medium }}</strong>/{{ s.solvedByDifficulty.totalMedium }}</span>
+        </div>
+        <div class="breakdown-item">
+          <span class="breakdown-dot dot-hard"></span>
+          <span class="breakdown-text">Hard: <strong>{{ s.solvedByDifficulty.hard }}</strong>/{{ s.solvedByDifficulty.totalHard }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Search Controls Bar -->
+  <div class="filter-bar">
+    <!-- Search Input -->
+    <div class="search-field">
+      <app-icon name="search" [size]="15" customClass="search-icon"></app-icon>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onFilterChange()"
+        placeholder="Filter by title, slug, or tag..."
+        class="filter-search-input"
+      />
+      <button
+        *ngIf="searchQuery"
+        class="clear-search-btn"
+        (click)="searchQuery = ''; onFilterChange()"
+        title="Clear search"
+      >
+        <app-icon name="x" [size]="13"></app-icon>
+      </button>
+    </div>
+
+    <!-- Difficulty Select -->
+    <div class="select-group">
+      <select
+        [(ngModel)]="selectedDifficulty"
+        (ngModelChange)="onFilterChange()"
+        class="filter-select"
+        aria-label="Filter by Difficulty"
+      >
+        <option value="ALL">All Difficulties</option>
+        <option value="EASY">Easy</option>
+        <option value="MEDIUM">Medium</option>
+        <option value="HARD">Hard</option>
+      </select>
+    </div>
+
+    <!-- Category Select -->
+    <div class="select-group">
+      <select
+        [(ngModel)]="selectedCategory"
+        (ngModelChange)="onFilterChange()"
+        class="filter-select"
+        aria-label="Filter by Topic"
+      >
+        <option value="ALL">All Topics</option>
+        <option *ngFor="let cat of categories()" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+
+    <!-- Status Select -->
+    <div class="select-group">
+      <select
+        [(ngModel)]="selectedStatus"
+        (ngModelChange)="onFilterChange()"
+        class="filter-select"
+        aria-label="Filter by Status"
+      >
+        <option value="ALL">All Statuses</option>
+        <option value="SOLVED">Solved</option>
+        <option value="ATTEMPTED">Attempted</option>
+        <option value="TODO">Unsolved</option>
+      </select>
+    </div>
+
+    <!-- View Mode Switcher -->
+    <div class="view-mode-toggle">
+      <button
+        class="view-btn"
+        [class.active]="viewMode === 'table'"
+        (click)="viewMode = 'table'"
+        title="Compact Table View"
+      >
+        <app-icon name="sliders" [size]="14"></app-icon>
+        <span>Table</span>
+      </button>
+      <button
+        class="view-btn"
+        [class.active]="viewMode === 'grouped'"
+        (click)="viewMode = 'grouped'"
+        title="Category Grouped View"
+      >
+        <app-icon name="layers" [size]="14"></app-icon>
+        <span>Grouped</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="state-card loading-state">
+    <div class="spinner"></div>
+    <span>Loading algorithmic problems...</span>
+  </div>
+
+  <!-- Error Message Alert -->
+  <div *ngIf="errorMessage && !isLoading" class="alert-notice">
+    <app-icon name="alert-circle" [size]="16" customClass="text-warning"></app-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && problems.length === 0" class="state-card empty-state">
+    <app-icon name="filter" [size]="28" customClass="text-muted"></app-icon>
+    <h3>No matching problems found</h3>
+    <p>Try broadening your search query or resetting active filter tags.</p>
+    <button class="btn btn-outline" (click)="resetFilters()">
+      Reset All Filters
+    </button>
+  </div>
+
+  <!-- Table View (Scanable, Dense, Editorial) -->
+  <div *ngIf="!isLoading && problems.length > 0 && viewMode === 'table'" class="table-container">
+    <table class="problem-table">
+      <thead>
+        <tr>
+          <th class="col-status">Status</th>
+          <th class="col-title sortable" (click)="toggleSort('title')">
+            <div class="th-content">
+              <span>Title</span>
+              <app-icon
+                [name]="sortBy === 'title' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-left') : 'chevron-down'"
+                [size]="13"
+                [customClass]="sortBy === 'title' ? 'sort-active' : 'sort-inactive'"
+              ></app-icon>
+            </div>
+          </th>
+          <th class="col-difficulty sortable" (click)="toggleSort('difficulty')">
+            <div class="th-content">
+              <span>Difficulty</span>
+              <app-icon
+                [name]="sortBy === 'difficulty' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-left') : 'chevron-down'"
+                [size]="13"
+                [customClass]="sortBy === 'difficulty' ? 'sort-active' : 'sort-inactive'"
+              ></app-icon>
+            </div>
+          </th>
+          <th class="col-category">Category</th>
+          <th class="col-acceptance sortable" (click)="toggleSort('acceptance')">
+            <div class="th-content">
+              <span>Acceptance</span>
+              <app-icon
+                [name]="sortBy === 'acceptance' ? (sortOrder === 'asc' ? 'chevron-down' : 'chevron-left') : 'chevron-down'"
+                [size]="13"
+                [customClass]="sortBy === 'acceptance' ? 'sort-active' : 'sort-inactive'"
+              ></app-icon>
+            </div>
+          </th>
+          <th class="col-action text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let problem of problems" class="problem-row">
+          <!-- Status Icon -->
+          <td class="col-status">
+            <span
+              class="status-indicator"
+              [class.status-solved]="problem.userStatus === 'SOLVED'"
+              [class.status-attempted]="problem.userStatus === 'ATTEMPTED'"
+              [class.status-todo]="!problem.userStatus || problem.userStatus === 'TODO'"
+              [title]="problem.userStatus || 'Unsolved'"
+            >
+              <app-icon
+                *ngIf="problem.userStatus === 'SOLVED'"
+                name="check-circle"
+                [size]="15"
+                customClass="text-easy"
+              ></app-icon>
+              <app-icon
+                *ngIf="problem.userStatus === 'ATTEMPTED'"
+                name="clock"
+                [size]="15"
+                customClass="text-medium"
+              ></app-icon>
+              <span *ngIf="!problem.userStatus || problem.userStatus === 'TODO'" class="todo-dot"></span>
+            </span>
+          </td>
+
+          <!-- Title & Tags -->
+          <td class="col-title">
+            <div class="title-cell">
+              <a [routerLink]="['/problems', problem.slug]" class="title-link">
+                {{ problem.title }}
+              </a>
+              <div class="tag-row">
+                <span *ngFor="let t of problem.tags.slice(0, 2)" class="mini-tag">
+                  {{ t }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Difficulty Badge -->
+          <td class="col-difficulty">
+            <app-badge [difficulty]="problem.difficulty"></app-badge>
+          </td>
+
+          <!-- Category -->
+          <td class="col-category">
+            <span class="category-name">{{ problem.category }}</span>
+          </td>
+
+          <!-- Acceptance Rate -->
+          <td class="col-acceptance">
+            <span class="acceptance-text">{{ problem.acceptanceRate }}%</span>
+          </td>
+
+          <!-- Solve / View Button -->
+          <td class="col-action text-right">
+            <a [routerLink]="['/problems', problem.slug]" class="solve-link-btn">
+              <span>{{ problem.userStatus === 'SOLVED' ? 'Practice' : 'Solve' }}</span>
+              <app-icon name="chevron-right" [size]="13"></app-icon>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Grouped View (NeetCode Style) -->
+  <div *ngIf="!isLoading && problems.length > 0 && viewMode === 'grouped'" class="grouped-container">
+    <div *ngFor="let group of getGroupedProblems()" class="category-group-card">
+      <div class="group-header">
+        <div class="group-header-left">
+          <app-icon name="layers" [size]="16" customClass="text-secondary"></app-icon>
+          <h2 class="group-title">{{ group.category }}</h2>
+          <span class="group-count">({{ group.problems.length }} problems)</span>
+        </div>
+        <div class="group-progress">
+          <span class="group-progress-text">
+            <strong>{{ group.solvedCount }}</strong> / {{ group.problems.length }} solved
+          </span>
+          <div class="group-progress-bar">
+            <div
+              class="group-progress-fill"
+              [style.width.%]="(group.solvedCount / group.problems.length) * 100"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group-problems-list">
+        <div *ngFor="let p of group.problems" class="group-problem-row">
+          <div class="group-left">
+            <app-icon
+              *ngIf="p.userStatus === 'SOLVED'"
+              name="check-circle"
+              [size]="15"
+              customClass="text-easy"
+            ></app-icon>
+            <app-icon
+              *ngIf="p.userStatus === 'ATTEMPTED'"
+              name="clock"
+              [size]="15"
+              customClass="text-medium"
+            ></app-icon>
+            <span *ngIf="!p.userStatus || p.userStatus === 'TODO'" class="todo-dot"></span>
+            
+            <a [routerLink]="['/problems', p.slug]" class="group-title-link">
+              {{ p.title }}
+            </a>
+          </div>
+          <div class="group-right">
+            <span class="group-acceptance">{{ p.acceptanceRate }}% acc</span>
+            <app-badge [difficulty]="p.difficulty"></app-badge>
+            <a [routerLink]="['/problems', p.slug]" class="solve-link-btn compact">
+              <span>Solve</span>
+              <app-icon name="chevron-right" [size]="12"></app-icon>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
