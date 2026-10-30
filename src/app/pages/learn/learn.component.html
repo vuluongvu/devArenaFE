@@ -605,10 +605,11 @@
         <div class="deck-left">
           <div class="input-action-group">
             <input
-              type="number"
+              type="text"
+              inputmode="numeric"
               [(ngModel)]="bstInput"
               (keyup.enter)="insertBST()"
-              placeholder="Integer (e.g. 35)..."
+              placeholder="Enter integer (e.g. 35)..."
               class="deck-input"
             />
             <button class="btn-deck btn-push" (click)="insertBST()">
@@ -621,10 +622,13 @@
             <span>Search(x)</span>
           </button>
 
+          <button class="btn-deck btn-secondary" (click)="insertRandomBST()">
+            <span>+ Random Node</span>
+          </button>
+
           <button class="btn-deck btn-ghost" (click)="searchBST(20)"><span>Search: 20</span></button>
           <button class="btn-deck btn-ghost" (click)="searchBST(40)"><span>Search: 40</span></button>
           <button class="btn-deck btn-ghost" (click)="searchBST(70)"><span>Search: 70</span></button>
-          <button class="btn-deck btn-ghost" (click)="searchBST(80)"><span>Search: 80</span></button>
 
           <button class="btn-deck btn-ghost" (click)="resetBST()">
             <app-icon name="rotate-ccw" [size]="13"></app-icon>
@@ -633,7 +637,7 @@
         </div>
 
         <div class="deck-right">
-          <span class="capacity-text">Root: <strong>50</strong> (Invariant: Left &lt; Root &lt; Right)</span>
+          <span class="capacity-text">Root: <strong>{{ bstRoot?.val ?? 'null' }}</strong> (Invariant: Left &lt; Parent &lt; Right)</span>
         </div>
       </div>
 
@@ -647,39 +651,31 @@
           </div>
 
           <div class="bst-tree-container">
-            <!-- Connecting Branches ("Dây nối cây BST") -->
-            <svg class="bst-edges-svg" viewBox="0 0 800 280" preserveAspectRatio="none">
-              <!-- Edge 50 -> 30 -->
-              <line x1="400" y1="52" x2="200" y2="140" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('50-30')" />
-              <!-- Edge 50 -> 70 -->
-              <line x1="400" y1="52" x2="600" y2="140" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('50-70')" />
-              <!-- Edge 30 -> 20 -->
-              <line x1="200" y1="140" x2="100" y2="228" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('30-20')" />
-              <!-- Edge 30 -> 40 -->
-              <line x1="200" y1="140" x2="300" y2="228" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('30-40')" />
-              <!-- Edge 70 -> 60 -->
-              <line x1="600" y1="140" x2="500" y2="228" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('70-60')" />
-              <!-- Edge 70 -> 80 -->
-              <line x1="600" y1="140" x2="700" y2="228" class="bst-edge-line" [class.active-edge]="bstActiveEdges.has('70-80')" />
+            <!-- Dynamic Connecting Branches ("Dây nối cây BST") -->
+            <svg class="bst-edges-svg" viewBox="0 0 800 320" preserveAspectRatio="none">
+              <line
+                *ngFor="let edge of bstEdges"
+                [attr.x1]="edge.x1"
+                [attr.y1]="edge.y1"
+                [attr.x2]="edge.x2"
+                [attr.y2]="edge.y2"
+                class="bst-edge-line"
+                [class.active-edge]="edge.active"
+              />
             </svg>
 
-            <!-- Level 0: Root -->
-            <div class="bst-tree-level">
-              <div class="bst-circle is-root" [class.highlight]="bstNodes[0].highlight">50</div>
-            </div>
-
-            <!-- Level 1 -->
-            <div class="bst-tree-level">
-              <div class="bst-circle" [class.highlight]="bstNodes[1].highlight">30</div>
-              <div class="bst-circle" [class.highlight]="bstNodes[2].highlight">70</div>
-            </div>
-
-            <!-- Level 2 -->
-            <div class="bst-tree-level">
-              <div class="bst-circle" [class.highlight]="bstNodes[3].highlight">20</div>
-              <div class="bst-circle" [class.highlight]="bstNodes[4].highlight">40</div>
-              <div class="bst-circle" [class.highlight]="bstNodes[5].highlight">60</div>
-              <div class="bst-circle" [class.highlight]="bstNodes[6].highlight">80</div>
+            <!-- Dynamic BST Nodes positioned by tree coordinates -->
+            <div
+              *ngFor="let node of bstNodes"
+              class="bst-circle"
+              [class.is-root]="node.isRoot"
+              [class.highlight]="node.highlight"
+              [class.is-found]="node.isFound"
+              [class.is-new]="node.isNew"
+              [style.left.%]="(node.x / 800) * 100"
+              [style.top.%]="(node.y / 320) * 100"
+            >
+              {{ node.val }}
             </div>
           </div>
         </div>
@@ -692,7 +688,7 @@
             </div>
             <div class="stat-box">
               <span class="stat-box-label">HEIGHT</span>
-              <span class="stat-box-value">3</span>
+              <span class="stat-box-value">{{ bstHeight }}</span>
             </div>
             <div class="stat-box">
               <span class="stat-box-label">SEARCH</span>

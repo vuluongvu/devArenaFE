@@ -30,12 +30,30 @@ interface LinkedListNode {
   isHighlight?: boolean;
 }
 
-interface BSTNodeVisual {
-  id: number;
+interface BSTTreeNode {
   val: number;
+  left: BSTTreeNode | null;
+  right: BSTTreeNode | null;
+}
+
+interface BSTNodeVisual {
+  val: number;
+  x: number;
+  y: number;
   level: number;
-  pos: number;
+  isRoot?: boolean;
   highlight?: boolean;
+  isFound?: boolean;
+  isNew?: boolean;
+}
+
+interface BSTEdgeVisual {
+  id: string;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  active?: boolean;
 }
 
 export type VisualizerCategory = 'data-structures' | 'algorithms';
@@ -69,8 +87,13 @@ export class LearnComponent implements OnInit, OnDestroy {
   activeCategory: VisualizerCategory = 'data-structures';
   activeTopic: TopicId = 'stack';
 
-  // BST Connecting Edges state
+  // BST state & animation trackers
   bstActiveEdges = new Set<string>();
+  bstHighlightedVals = new Set<number>();
+  bstFoundVal: number | null = null;
+  bstNewVal: number | null = null;
+  bstAnimInterval: any = null;
+  bstAnimTimeout: any = null;
 
   // Algorithm Auto Run states
   bsAutoRunning = false;
@@ -120,17 +143,12 @@ export class LearnComponent implements OnInit, OnDestroy {
   // ==========================================
   // 4. BST STATE
   // ==========================================
-  bstInput = '';
-  bstNodes: BSTNodeVisual[] = [
-    { id: 1, val: 50, level: 0, pos: 50 },
-    { id: 2, val: 30, level: 1, pos: 25 },
-    { id: 3, val: 70, level: 1, pos: 75 },
-    { id: 4, val: 20, level: 2, pos: 12 },
-    { id: 5, val: 40, level: 2, pos: 38 },
-    { id: 6, val: 60, level: 2, pos: 62 },
-    { id: 7, val: 80, level: 2, pos: 88 }
-  ];
-  bstStatus = 'Status: Balanced Binary Search Tree with Root = 50. Left children < Parent < Right children.';
+  bstInput: string | number = '';
+  bstRoot: BSTTreeNode | null = null;
+  bstNodes: BSTNodeVisual[] = [];
+  bstEdges: BSTEdgeVisual[] = [];
+  bstHeight = 3;
+  bstStatus = 'Status: Balanced Binary Search Tree with Root = 50. Enter an integer to Insert(x) or Search(x).';
 
   // ==========================================
   // 5. BINARY SEARCH STATE
@@ -164,6 +182,8 @@ export class LearnComponent implements OnInit, OnDestroy {
   swStatus = 'Status: Window of size 3 at indices [0..2]. Sum = 2 + 1 + 5 = 8. Max = 8.';
 
   ngOnInit(): void {
+    this.initDefaultBST();
+
     const routeTab = this.route.snapshot.data['tab'];
     if (routeTab) {
       this.activeMainTab = routeTab as 'visualizer' | 'curricula';
@@ -193,6 +213,7 @@ export class LearnComponent implements OnInit, OnDestroy {
   }
 
   stopAllAutoRuns(): void {
+    this.stopBSTAnimation();
     this.stopAutoBinarySearch();
     this.stopAutoTwoPointers();
     this.stopAutoSlidingWindow();
@@ -407,101 +428,315 @@ export class LearnComponent implements OnInit, OnDestroy {
   // ==========================================
   // BST METHODS
   // ==========================================
-  insertBST(): void {
-    const val = parseInt(this.bstInput.trim(), 10);
+  private initDefaultBST(): void {
+    this.bstRoot = {
+      val: 50,
+      left: {
+        val: 30,
+        left: { val: 20, left: null, right: null },
+        right: { val: 40, left: null, right: null }
+      },
+      right: {
+        val: 70,
+        left: { val: 60, left: null, right: null },
+        right: { val: 80, left: null, right: null }
+      }
+    };
+    this.clearBSTHighlights();
+    this.rebuildBSTVisuals();
+  }
+
+  private stopBSTAnimation(): void {
+    if (this.bstAnimInterval) {
+      clearInterval(this.bstAnimInterval);
+      this.bstAnimInterval = null;
+    }
+    if (this.bstAnimTimeout) {
+      clearTimeout(this.bstAnimTimeout);
+      this.bstAnimTimeout = null;
+    }
+  }
+
+  private clearBSTHighlights(): void {
+    this.bstActiveEdges.clear();
+    this.bstHighlightedVals.clear();
+    this.bstFoundVal = null;
+    this.bstNewVal = null;
+  }
+
+  private rebuildBSTVisuals(): void {
+    const nodes: BSTNodeVisual[] = [];
+    const edges: BSTEdgeVisual[] = [];
+    let maxDepth = 0;
+
+    const traverse = (
+      node: BSTTreeNode | null,
+      x: number,
+      y: number,
+      dx: number,
+      level: number
+    ) => {
+      if (!node) return;
+      if (level > maxDepth) maxDepth = level;
+
+      nodes.push({
+        val: node.val,
+        x,
+        y,
+        level,
+        isRoot: level === 0,
+        highlight: this.bstHighlightedVals.has(node.val),
+        isFound: this.bstFoundVal === node.val,
+        isNew: this.bstNewVal === node.val
+      });
+
+      const nextY = y + 80;
+      const nextDx = dx / 2;
+
+      if (node.left) {
+        const leftX = x - dx;
+        const edgeId = `${node.val}-${node.left.val}`;
+        edges.push({
+          id: edgeId,
+          x1: x,
+          y1: y,
+          x2: leftX,
+          y2: nextY,
+          active: this.bstActiveEdges.has(edgeId)
+        });
+        traverse(node.left, leftX, nextY, nextDx, level + 1);
+      }
+
+      if (node.right) {
+        const rightX = x + dx;
+        const edgeId = `${node.val}-${node.right.val}`;
+        edges.push({
+          id: edgeId,
+          x1: x,
+          y1: y,
+          x2: rightX,
+          y2: nextY,
+          active: this.bstActiveEdges.has(edgeId)
+        });
+        traverse(node.right, rightX, nextY, nextDx, level + 1);
+      }
+    };
+
+    traverse(this.bstRoot, 400, 42, 190, 0);
+    this.bstNodes = nodes;
+    this.bstEdges = edges;
+    this.bstHeight = this.bstRoot ? maxDepth + 1 : 0;
+  }
+
+  insertBST(customVal?: number): void {
+    const raw =
+      customVal !== undefined
+        ? String(customVal)
+        : String(this.bstInput ?? '').trim();
+    const val = parseInt(raw, 10);
+
     if (isNaN(val)) {
-      this.bstStatus = 'Please enter a valid integer to insert into BST.';
+      this.bstStatus = 'Please enter a valid integer (e.g. 25, 35, 65, 90) to insert into the BST.';
       return;
     }
-    if (this.bstNodes.some(n => n.val === val)) {
-      this.bstStatus = `Value ${val} already exists in the BST. Duplicate ignored.`;
-      return;
-    }
-    if (this.bstNodes.length >= 10) {
-      this.bstStatus = 'BST demo size reached.';
+    if (val < -999 || val > 999) {
+      this.bstStatus = 'Please enter an integer between -999 and 999.';
       return;
     }
 
-    // Determine position based on root
-    const level = val < 50 ? 2 : 2;
-    const pos = val < 50 ? (val < 30 ? 6 : 44) : (val < 70 ? 56 : 94);
-    this.bstNodes.push({ id: Date.now(), val, level, pos, highlight: true });
+    this.stopBSTAnimation();
+    this.clearBSTHighlights();
+    this.rebuildBSTVisuals();
+
+    if (!this.bstRoot) {
+      this.bstRoot = { val, left: null, right: null };
+      this.bstNewVal = val;
+      this.bstInput = '';
+      this.rebuildBSTVisuals();
+      this.bstStatus = `insert(${val}): Tree was empty. Created Root node ${val}.`;
+      this.bstAnimTimeout = setTimeout(() => {
+        this.clearBSTHighlights();
+        this.rebuildBSTVisuals();
+      }, 2500);
+      return;
+    }
+
+    // Trace path to find insertion spot
+    const steps: { nodeVal: number; edgeId?: string; message: string }[] = [];
+    let curr: BSTTreeNode | null = this.bstRoot;
+    let parent: BSTTreeNode = this.bstRoot;
+    let depth = 0;
+
+    while (curr) {
+      if (val === curr.val) {
+        this.bstHighlightedVals.add(curr.val);
+        this.rebuildBSTVisuals();
+        this.bstStatus = `insert(${val}): Value ${val} already exists in the BST. Duplicate ignored.`;
+        this.bstAnimTimeout = setTimeout(() => {
+          this.clearBSTHighlights();
+          this.rebuildBSTVisuals();
+        }, 2200);
+        return;
+      }
+
+      parent = curr;
+      if (val < curr.val) {
+        const nextNode: BSTTreeNode | null = curr.left;
+        const edgeId = nextNode ? `${curr.val}-${nextNode.val}` : undefined;
+        steps.push({
+          nodeVal: curr.val,
+          edgeId,
+          message: `insert(${val}): ${val} < ${curr.val} → move LEFT${nextNode ? ' to ' + nextNode.val : ' (empty spot)'}`
+        });
+        curr = nextNode;
+      } else {
+        const nextNode: BSTTreeNode | null = curr.right;
+        const edgeId = nextNode ? `${curr.val}-${nextNode.val}` : undefined;
+        steps.push({
+          nodeVal: curr.val,
+          edgeId,
+          message: `insert(${val}): ${val} > ${curr.val} → move RIGHT${nextNode ? ' to ' + nextNode.val : ' (empty spot)'}`
+        });
+        curr = nextNode;
+      }
+      depth++;
+    }
+
+    if (depth > 3) {
+      this.bstStatus = `Cannot insert ${val}: Maximum visual tree depth (4 levels) reached under node ${parent.val}.`;
+      return;
+    }
+
     this.bstInput = '';
-    this.bstStatus = `insert(${val}): Placed node ${val} in BST following left < root < right invariant.`;
+    let stepIdx = 0;
+
+    this.bstAnimInterval = setInterval(() => {
+      if (stepIdx < steps.length) {
+        const s = steps[stepIdx];
+        this.bstHighlightedVals.add(s.nodeVal);
+        if (s.edgeId) {
+          this.bstActiveEdges.add(s.edgeId);
+        }
+        this.bstStatus = s.message;
+        this.rebuildBSTVisuals();
+        stepIdx++;
+      } else {
+        this.stopBSTAnimation();
+        const newNode: BSTTreeNode = { val, left: null, right: null };
+        if (val < parent.val) {
+          parent.left = newNode;
+        } else {
+          parent.right = newNode;
+        }
+        this.bstActiveEdges.add(`${parent.val}-${val}`);
+        this.bstNewVal = val;
+        this.rebuildBSTVisuals();
+        this.bstStatus = `insert(${val}): Inserted node ${val} as ${val < parent.val ? 'LEFT' : 'RIGHT'} child of ${parent.val}!`;
+
+        this.bstAnimTimeout = setTimeout(() => {
+          this.clearBSTHighlights();
+          this.rebuildBSTVisuals();
+        }, 2800);
+      }
+    }, 850);
+  }
+
+  insertRandomBST(): void {
+    const candidates = [10, 25, 35, 45, 55, 65, 75, 90, 15, 32, 48, 62, 85];
+    const existing = new Set(this.bstNodes.map(n => n.val));
+    const available = candidates.filter(c => !existing.has(c));
+    if (available.length === 0) {
+      this.bstStatus = 'All preset leaf positions are filled. Click Reset Tree or enter a custom integer.';
+      return;
+    }
+    const pick = available[Math.floor(Math.random() * available.length)];
+    this.insertBST(pick);
   }
 
   searchBST(customVal?: number): void {
-    const val = customVal !== undefined ? customVal : parseInt(this.bstInput.trim(), 10);
+    const raw =
+      customVal !== undefined
+        ? String(customVal)
+        : String(this.bstInput ?? '').trim();
+    const val = parseInt(raw, 10);
+
     if (isNaN(val)) {
-      this.bstStatus = 'Please enter an integer to search.';
+      this.bstStatus = 'Please enter an integer in the input box to search (or click a quick search button).';
       return;
     }
-    this.bstNodes.forEach(n => n.highlight = false);
-    this.bstActiveEdges.clear();
 
-    // Determine path from root 50
-    const pathNodes: number[] = [50];
-    const pathEdges: string[] = [];
+    this.stopBSTAnimation();
+    this.clearBSTHighlights();
+    this.rebuildBSTVisuals();
 
-    if (val < 50) {
-      pathEdges.push('50-30');
-      pathNodes.push(30);
-      if (val < 30) {
-        pathEdges.push('30-20');
-        pathNodes.push(20);
-      } else if (val > 30) {
-        pathEdges.push('30-40');
-        pathNodes.push(40);
-      }
-    } else if (val > 50) {
-      pathEdges.push('50-70');
-      pathNodes.push(70);
-      if (val < 70) {
-        pathEdges.push('70-60');
-        pathNodes.push(60);
-      } else if (val > 70) {
-        pathEdges.push('70-80');
-        pathNodes.push(80);
+    if (!this.bstRoot) {
+      this.bstStatus = 'BST is empty. Insert nodes first.';
+      return;
+    }
+
+    const steps: { nodeVal: number; edgeId?: string; message: string }[] = [];
+    let curr: BSTTreeNode | null = this.bstRoot;
+    let found = false;
+
+    while (curr) {
+      if (val === curr.val) {
+        steps.push({
+          nodeVal: curr.val,
+          message: `search(${val}): ${val} == ${curr.val} → Node ${val} FOUND in BST!`
+        });
+        found = true;
+        break;
+      } else if (val < curr.val) {
+        const nextNode: BSTTreeNode | null = curr.left;
+        steps.push({
+          nodeVal: curr.val,
+          edgeId: nextNode ? `${curr.val}-${nextNode.val}` : undefined,
+          message: `search(${val}): ${val} < ${curr.val} → traverse LEFT${nextNode ? ' to ' + nextNode.val : ' (null)'}`
+        });
+        curr = nextNode;
+      } else {
+        const nextNode: BSTTreeNode | null = curr.right;
+        steps.push({
+          nodeVal: curr.val,
+          edgeId: nextNode ? `${curr.val}-${nextNode.val}` : undefined,
+          message: `search(${val}): ${val} > ${curr.val} → traverse RIGHT${nextNode ? ' to ' + nextNode.val : ' (null)'}`
+        });
+        curr = nextNode;
       }
     }
 
-    // Step-by-step path animation down the branches
-    let step = 0;
-    const interval = setInterval(() => {
-      if (step < pathNodes.length) {
-        const currNodeVal = pathNodes[step];
-        const node = this.bstNodes.find(n => n.val === currNodeVal);
-        if (node) node.highlight = true;
-        if (step > 0) {
-          this.bstActiveEdges.add(pathEdges[step - 1]);
+    let stepIdx = 0;
+    this.bstAnimInterval = setInterval(() => {
+      if (stepIdx < steps.length) {
+        const s = steps[stepIdx];
+        this.bstHighlightedVals.add(s.nodeVal);
+        if (s.edgeId) {
+          this.bstActiveEdges.add(s.edgeId);
         }
-        step++;
+        if (stepIdx === steps.length - 1 && found) {
+          this.bstFoundVal = val;
+        }
+        this.bstStatus = s.message;
+        this.rebuildBSTVisuals();
+        stepIdx++;
       } else {
-        clearInterval(interval);
-        const found = pathNodes[pathNodes.length - 1] === val;
-        this.bstStatus = found
-          ? `search(${val}): Node ${val} FOUND in BST following branch traversal in O(log N)!`
-          : `search(${val}): Traversal completed. Value ${val} NOT found in BST.`;
-        setTimeout(() => {
-          this.bstNodes.forEach(n => n.highlight = false);
-          this.bstActiveEdges.clear();
+        this.stopBSTAnimation();
+        if (!found) {
+          this.bstStatus = `search(${val}): Reached null branch. Value ${val} NOT found in BST.`;
+        }
+        this.bstAnimTimeout = setTimeout(() => {
+          this.clearBSTHighlights();
+          this.rebuildBSTVisuals();
         }, 3000);
       }
-    }, 450);
+    }, 850);
   }
 
   resetBST(): void {
-    this.bstActiveEdges.clear();
-    this.bstNodes = [
-      { id: 1, val: 50, level: 0, pos: 50 },
-      { id: 2, val: 30, level: 1, pos: 25 },
-      { id: 3, val: 70, level: 1, pos: 75 },
-      { id: 4, val: 20, level: 2, pos: 12 },
-      { id: 5, val: 40, level: 2, pos: 38 },
-      { id: 6, val: 60, level: 2, pos: 62 },
-      { id: 7, val: 80, level: 2, pos: 88 }
-    ];
-    this.bstStatus = 'Reset: Standard balanced BST restored.';
+    this.stopBSTAnimation();
+    this.initDefaultBST();
+    this.bstInput = '';
+    this.bstStatus = 'Reset: Standard balanced BST (7 nodes) restored.';
   }
 
   // ==========================================
@@ -524,7 +759,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoBinarySearch();
           }
         }
-      }, 950);
+      }, 1600);
     }
   }
 
@@ -593,7 +828,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoTwoPointers();
           }
         }
-      }, 950);
+      }, 1600);
     }
   }
 
@@ -662,7 +897,7 @@ export class LearnComponent implements OnInit, OnDestroy {
             this.stopAutoSlidingWindow();
           }
         }
-      }, 950);
+      }, 1600);
     }
   }
 
