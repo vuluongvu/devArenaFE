@@ -65,6 +65,87 @@ export class LearnComponent implements OnInit {
   activeMainTab: 'visualizer' | 'curricula' = 'visualizer';
   activeTopic: TopicId = 'stack';
 
+  // Learning Paths Navigation & Expandable State
+  pathCategory: 'data-structures' | 'algorithms' | 'all' = 'data-structures';
+  expandedPaths = new Set<string>([
+    'ds-core-linear',
+    'ds-hierarchical-trees',
+    'alg-pointers-window',
+    'alg-search-dp'
+  ]);
+  expandedTopics = new Set<string>([
+    'ds-core-linear-0',
+    'ds-core-linear-1',
+    'ds-hierarchical-trees-0',
+    'ds-hierarchical-trees-1',
+    'alg-pointers-window-0',
+    'alg-pointers-window-1',
+    'alg-search-dp-0',
+    'alg-search-dp-1'
+  ]);
+  allExpanded = true;
+
+  setPathCategory(cat: 'data-structures' | 'algorithms' | 'all'): void {
+    this.pathCategory = cat;
+  }
+
+  isPathExpanded(pathId: string): boolean {
+    return this.expandedPaths.has(pathId);
+  }
+
+  togglePath(pathId: string): void {
+    if (this.expandedPaths.has(pathId)) {
+      this.expandedPaths.delete(pathId);
+    } else {
+      this.expandedPaths.add(pathId);
+    }
+  }
+
+  isTopicExpanded(pathId: string, topicIdx: number): boolean {
+    return this.expandedTopics.has(`${pathId}-${topicIdx}`);
+  }
+
+  toggleTopic(pathId: string, topicIdx: number): void {
+    const key = `${pathId}-${topicIdx}`;
+    if (this.expandedTopics.has(key)) {
+      this.expandedTopics.delete(key);
+    } else {
+      this.expandedTopics.add(key);
+    }
+  }
+
+  toggleAllPaths(): void {
+    this.allExpanded = !this.allExpanded;
+    const paths = this.learningPaths();
+    if (this.allExpanded) {
+      paths.forEach(p => {
+        this.expandedPaths.add(p.id);
+        p.topics.forEach((_, idx) => this.expandedTopics.add(`${p.id}-${idx}`));
+      });
+    } else {
+      this.expandedPaths.clear();
+      this.expandedTopics.clear();
+    }
+  }
+
+  get filteredLearningPaths(): LearningPath[] {
+    const all = this.learningPaths();
+    if (this.pathCategory === 'all') return all;
+    return all.filter(p => p.category === this.pathCategory);
+  }
+
+  get dsPathsCount(): number {
+    return this.learningPaths().filter(p => p.category === 'data-structures').length;
+  }
+
+  get algPathsCount(): number {
+    return this.learningPaths().filter(p => p.category === 'algorithms').length;
+  }
+
+  get totalPathsCount(): number {
+    return this.learningPaths().length;
+  }
+
   // ==========================================
   // 1. STACK STATE
   // ==========================================
@@ -148,8 +229,11 @@ export class LearnComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      if (params['tab'] === 'curricula') {
+      if (params['tab'] === 'curricula' || params['tab'] === 'paths') {
         this.activeMainTab = 'curricula';
+      }
+      if (params['pathCategory']) {
+        this.pathCategory = params['pathCategory'] as 'data-structures' | 'algorithms' | 'all';
       }
       if (params['topic']) {
         this.activeTopic = params['topic'] as TopicId;
