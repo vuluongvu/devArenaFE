@@ -281,42 +281,26 @@
           <div class="code-snippet-card">
             <div class="code-card-header">
               <div class="code-tab-group">
-                <span class="pseudocode-badge">ALGORITHM PSEUDOCODE</span>
+                <span class="pseudocode-badge">PSEUDOCODE</span>
               </div>
-              <span class="code-title">Stack Abstract Data Type (ADT)</span>
+              <span class="code-title">Core Methods</span>
             </div>
 
             <!-- Pseudocode Block -->
-            <pre class="code-block"><code><span class="k">class</span> <span class="t">Stack</span>:
-    <span class="f">constructor</span>():
-        items = []
+            <pre class="code-block"><code><span class="f">push</span>(x):
+    items.append(x)
 
-    <span class="c">// Insert element at TOP — O(1)</span>
-    <span class="k">procedure</span> <span class="f">push</span>(value):
-        items.append(value)
+<span class="f">pop</span>():
+    <span class="k">return</span> items.pop()
 
-    <span class="c">// Delete and return element from TOP — O(1)</span>
-    <span class="k">procedure</span> <span class="f">pop</span>():
-        <span class="k">if not</span> isEmpty():
-            <span class="k">return</span> items.removeLast()
-        <span class="k">raise</span> <span class="t">UnderflowError</span>
+<span class="f">peek</span>():
+    <span class="k">return</span> items.top()
 
-    <span class="c">// Read element at TOP without removal — O(1)</span>
-    <span class="k">procedure</span> <span class="f">peek</span>():
-        <span class="k">if not</span> isEmpty():
-            <span class="k">return</span> items.last()
-        <span class="k">return</span> <span class="k">null</span>
+<span class="f">updateTop</span>(x):
+    items.top() = x
 
-    <span class="c">// Mutate value of element at TOP — O(1)</span>
-    <span class="k">procedure</span> <span class="f">updateTop</span>(value):
-        <span class="k">if not</span> isEmpty():
-            items[lastIndex] = value
-
-    <span class="k">function</span> <span class="f">isEmpty</span>():
-        <span class="k">return</span> length(items) == 0
-
-    <span class="k">function</span> <span class="f">size</span>():
-        <span class="k">return</span> length(items)</code></pre>
+<span class="f">isEmpty</span>():
+    <span class="k">return</span> size == 0</code></pre>
           </div>
 
           <!-- Complexity & Operations Cheat Sheet -->
