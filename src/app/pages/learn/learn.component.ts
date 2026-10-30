@@ -1,23 +1,23 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { ProgressService } from '../../core/services/progress.service';
+import { LearningPath } from '../../core/models/progress.model';
 
-interface StackElement {
+interface StackItem {
   id: number;
   value: string;
   isPeeking?: boolean;
   isPopping?: boolean;
+  isUpdated?: boolean;
 }
 
-interface GuidedStep {
-  token: string;
-  action: 'push' | 'pop' | 'peek' | 'success';
-  title: string;
-  explanation: string;
+interface QueueItem {
+  id: number;
+  value: string;
 }
 
 @Component({
@@ -27,90 +27,43 @@ interface GuidedStep {
   templateUrl: './learn.component.html',
   styleUrls: ['./learn.component.css']
 })
-export class LearnComponent implements OnInit, OnDestroy {
+export class LearnComponent implements OnInit {
   private progressService = inject(ProgressService);
   private route = inject(ActivatedRoute);
 
   learningPaths = this.progressService.learningPaths;
   Math = Math;
 
-  // Tabs & Modes
+  // View Navigation
   activeMainTab: 'visualizer' | 'curricula' = 'visualizer';
   activeDs: 'stack' | 'queue' | 'two-pointers' = 'stack';
-  interactionMode: 'sandbox' | 'guided' = 'sandbox';
 
-  // --- STACK STATE ---
-  maxCapacity = 6;
-  pushInputValue = '';
-  stackItems: StackElement[] = [
-    { id: 1, value: '10' },
-    { id: 2, value: '25' },
-    { id: 3, value: '77' }
+  // --- STACK VISUALIZER STATE ---
+  maxStackCapacity = 7;
+  pushInput = '';
+  stackItems: StackItem[] = [
+    { id: 1, value: '42' },
+    { id: 2, value: '15' },
+    { id: 3, value: '88' }
   ];
-  statusMessage = "Stack đang có 3 phần tử. Đỉnh (TOP) hiện tại là 77. Bấm 'Push' hoặc 'Pop' để tương tác.";
-  lastActionType: 'push' | 'pop' | 'peek' | 'clear' | 'none' = 'none';
+  activeCodeLang: 'cpp' | 'java' | 'python' = 'cpp';
+  statusMessage = 'Trạng thái: Ngăn xếp đang có 3 phần tử. Đỉnh hiện tại là 88.';
 
-  // --- GUIDED SCENARIO STATE (LeetCode #8: Valid Parentheses) ---
-  guidedTokens = ['(', '[', '{', '}', ']', ')'];
-  guidedStepIndex = 0;
-  isAutoPlaying = false;
-  private autoPlayTimer: any = null;
-
-  readonly guidedSteps: GuidedStep[] = [
-    {
-      token: '(',
-      action: 'push',
-      title: "Gặp ngoặc mở '('",
-      explanation: "Quy tắc: Khi gặp ngoặc mở, ta đẩy (Push) vào Stack để chờ cặp ngoặc đóng tương ứng."
-    },
-    {
-      token: '[',
-      action: 'push',
-      title: "Gặp ngoặc mở '['",
-      explanation: "Tiếp tục đẩy '[' vào Stack. Hiện tại '[' nằm ở ĐỈNH (TOP)."
-    },
-    {
-      token: '{',
-      action: 'push',
-      title: "Gặp ngoặc mở '{'",
-      explanation: "Đẩy '{' vào Stack. '{' trở thành đỉnh mới nhất."
-    },
-    {
-      token: '}',
-      action: 'peek',
-      title: "Gặp ngoặc đóng '}'",
-      explanation: "Kiểm tra đỉnh Stack (Peek): Đỉnh là '{' -> Khớp hoàn hảo với '}'! Ta lấy '{' ra (Pop)."
-    },
-    {
-      token: ']',
-      action: 'peek',
-      title: "Gặp ngoặc đóng ']'",
-      explanation: "Kiểm tra đỉnh Stack: Đỉnh là '[' -> Khớp với ']'! Ta lấy '[' ra (Pop)."
-    },
-    {
-      token: ')',
-      action: 'peek',
-      title: "Gặp ngoặc đóng ')'",
-      explanation: "Kiểm tra đỉnh Stack: Đỉnh là '(' -> Khớp với ')'! Ta lấy '(' ra (Pop)."
-    },
-    {
-      token: 'DONE',
-      action: 'success',
-      title: "Hoàn thành duyệt chuỗi!",
-      explanation: "Stack rỗng hoàn toàn -> Chuỗi ngoặc '([{}])' HỢP LỆ (BALANCED)! Bạn đã nắm trọn thuật toán bài LeetCode #8!"
-    }
+  // --- QUEUE VISUALIZER STATE ---
+  maxQueueCapacity = 6;
+  enqueueInput = '';
+  queueItems: QueueItem[] = [
+    { id: 10, value: '10' },
+    { id: 11, value: '25' },
+    { id: 12, value: '70' }
   ];
 
-  // --- QUEUE STATE ---
-  queueItems: string[] = ['Khách 1', 'Khách 2', 'Khách 3'];
-  queueMessage = "Queue hoạt động theo nguyên lý FIFO: Vào trước sẽ ra trước.";
-
-  // --- TWO POINTERS STATE ---
-  tpArray = ['r', 'a', 'c', 'e', 'c', 'a', 'r'];
-  leftPtr = 0;
-  rightPtr = 6;
-  tpMessage = "Hai con trỏ Left & Right bắt đầu từ 2 đầu mút chuỗi 'racecar'.";
-  tpFinished = false;
+  // --- TWO POINTERS VISUALIZER STATE ---
+  twoPointerArray: string[] = ['r', 'a', 'c', 'e', 'c', 'a', 'r'];
+  leftPointer = 0;
+  rightPointer = 6;
+  twoPointerMessage = "Khởi tạo: Con trỏ L tại 0 ('r'), con trỏ R tại 6 ('r').";
+  twoPointerDone = false;
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -118,226 +71,162 @@ export class LearnComponent implements OnInit, OnDestroy {
         this.activeMainTab = 'curricula';
       }
       if (params['ds']) {
-        this.activeDs = params['ds'];
+        this.activeDs = params['ds'] as any;
       }
     });
   }
 
-  ngOnDestroy(): void {
-    this.stopAutoPlay();
-  }
-
-  selectDs(ds: 'stack' | 'queue' | 'two-pointers'): void {
-    this.activeDs = ds;
-    this.stopAutoPlay();
-  }
-
-  setInteractionMode(mode: 'sandbox' | 'guided'): void {
-    this.interactionMode = mode;
-    this.stopAutoPlay();
-    if (mode === 'guided') {
-      this.resetGuided();
-    } else {
-      this.statusMessage = "Đã chuyển về chế độ tự do. Bạn có thể tự thêm/bớt phần tử tùy thích.";
-    }
-  }
-
   // ==========================================
-  // STACK SANDBOX METHODS
+  // STACK OPERATIONS: Thêm, Sửa, Xóa, Xem
   // ==========================================
-  pushRandom(): void {
-    const randomVal = String(Math.floor(Math.random() * 90) + 10);
-    this.pushItem(randomVal);
-  }
 
-  pushCustom(): void {
-    const val = this.pushInputValue.trim();
-    if (!val) {
-      this.pushRandom();
-      return;
-    }
-    this.pushItem(val);
-    this.pushInputValue = '';
-  }
-
-  private pushItem(val: string): void {
-    if (this.stackItems.length >= this.maxCapacity) {
-      this.statusMessage = `⚠️ Stack đã đầy (tối đa ${this.maxCapacity} phần tử trong demo). Hãy Pop bớt ra trước nhé!`;
+  // Thêm phần tử vào đỉnh (Push)
+  pushStack(customVal?: string): void {
+    if (this.stackItems.length >= this.maxStackCapacity) {
+      this.statusMessage = `Stack Overflow: Đã đầy dung lượng bộ nhớ mô phỏng (${this.maxStackCapacity} phần tử).`;
       return;
     }
 
-    const newItem: StackElement = {
+    const val = (customVal !== undefined ? customVal : this.pushInput.trim()) || String(Math.floor(Math.random() * 90) + 10);
+    const newItem: StackItem = {
       id: Date.now() + Math.random(),
       value: val
     };
 
     this.stackItems.push(newItem);
-    this.lastActionType = 'push';
-    this.statusMessage = `✅ Đã PUSH phần tử '${val}' vào đỉnh Stack (Index ${this.stackItems.length - 1}). Thao tác mất thời gian O(1).`;
+    this.pushInput = '';
+    this.statusMessage = `Push('${val}'): Đã thêm phần tử '${val}' vào đỉnh ngăn xếp.`;
   }
 
-  popItem(): void {
+  // Xóa phần tử khỏi đỉnh (Pop)
+  popStack(): void {
     if (this.stackItems.length === 0) {
-      this.statusMessage = "⚠️ Stack đang rỗng (Stack Underflow)! Không thể lấy thêm phần tử nào nữa.";
+      this.statusMessage = 'Stack Underflow: Ngăn xếp đang rỗng, không thể xóa phần tử.';
       return;
     }
 
     const popped = this.stackItems[this.stackItems.length - 1];
     popped.isPopping = true;
-    this.lastActionType = 'pop';
 
     setTimeout(() => {
       this.stackItems.pop();
-      const currentTop = this.topItem ? `'${this.topItem.value}'` : 'Rỗng';
-      this.statusMessage = `🔻 Đã POP phần tử '${popped.value}' ra khỏi đỉnh. Đỉnh mới hiện tại là: ${currentTop}. Thao tác mất O(1).`;
+      const newTop = this.stackItems.length > 0 ? `'${this.stackItems[this.stackItems.length - 1].value}'` : 'null (rỗng)';
+      this.statusMessage = `Pop(): Đã xóa phần tử '${popped.value}' khỏi đỉnh. Đỉnh mới là ${newTop}.`;
     }, 180);
   }
 
-  peekItem(): void {
+  // Xem phần tử ở đỉnh (Peek / Top)
+  peekStack(): void {
     if (this.stackItems.length === 0) {
-      this.statusMessage = "ℹ️ Stack rỗng, không có phần tử nào ở đỉnh.";
+      this.statusMessage = 'Peek(): Ngăn xếp đang rỗng.';
       return;
     }
 
-    const top = this.topItem;
-    if (top) {
-      top.isPeeking = true;
-      this.lastActionType = 'peek';
-      this.statusMessage = `👁️ PEEK: Đỉnh Stack hiện tại là '${top.value}'. Dữ liệu trong Stack không bị thay đổi (O(1)).`;
-      setTimeout(() => {
-        top.isPeeking = false;
-      }, 1000);
-    }
+    const topItem = this.stackItems[this.stackItems.length - 1];
+    topItem.isPeeking = true;
+    this.statusMessage = `Peek(): Phần tử ở đỉnh hiện tại là '${topItem.value}' (O(1)).`;
+
+    setTimeout(() => {
+      topItem.isPeeking = false;
+    }, 1200);
   }
 
+  // Sửa giá trị phần tử ở đỉnh
+  updateTopStack(): void {
+    if (this.stackItems.length === 0) {
+      this.statusMessage = 'Không thể sửa: Ngăn xếp đang rỗng.';
+      return;
+    }
+    const val = this.pushInput.trim();
+    if (!val) {
+      this.statusMessage = 'Vui lòng nhập giá trị vào ô để sửa phần tử đỉnh.';
+      return;
+    }
+
+    const topItem = this.stackItems[this.stackItems.length - 1];
+    const oldVal = topItem.value;
+    topItem.value = val;
+    topItem.isUpdated = true;
+    this.pushInput = '';
+    this.statusMessage = `Sửa đỉnh: Đã cập nhật phần tử đỉnh từ '${oldVal}' thành '${val}'.`;
+
+    setTimeout(() => {
+      topItem.isUpdated = false;
+    }, 1000);
+  }
+
+  // Xóa toàn bộ phần tử
   clearStack(): void {
     this.stackItems = [];
-    this.lastActionType = 'clear';
-    this.statusMessage = "🔄 Đã dọn sạch Stack về trạng thái rỗng.";
+    this.statusMessage = 'Clear(): Đã xóa toàn bộ phần tử trong ngăn xếp.';
   }
 
-  get topItem(): StackElement | null {
-    return this.stackItems.length > 0 ? this.stackItems[this.stackItems.length - 1] : null;
+  // Thêm phần tử ngẫu nhiên
+  pushRandom(): void {
+    const randoms = ['42', '15', '99', '7', '108', '24', '63', '80'];
+    const chosen = randoms[Math.floor(Math.random() * randoms.length)];
+    this.pushStack(chosen);
   }
 
   // ==========================================
-  // GUIDED LESSON METHODS
+  // QUEUE OPERATIONS (Thêm, Xóa, Xóa sạch)
   // ==========================================
-  resetGuided(): void {
-    this.stopAutoPlay();
-    this.guidedStepIndex = 0;
-    this.stackItems = [];
-    this.statusMessage = "Bắt đầu kịch bản kiểm tra chuỗi ngoặc '([{}])'. Bấm 'Bước tiếp theo' để xem cách Stack giải quyết!";
-  }
-
-  nextGuidedStep(): void {
-    if (this.guidedStepIndex >= this.guidedSteps.length) {
-      this.statusMessage = "Kịch bản đã hoàn thành! Bấm 'Bắt đầu lại' nếu muốn xem lại.";
-      this.stopAutoPlay();
+  enqueue(): void {
+    if (this.queueItems.length >= this.maxQueueCapacity) {
       return;
     }
-
-    const step = this.guidedSteps[this.guidedStepIndex];
-
-    if (step.action === 'push') {
-      this.stackItems.push({
-        id: Date.now() + Math.random(),
-        value: step.token
-      });
-      this.lastActionType = 'push';
-    } else if (step.action === 'peek') {
-      // Pop the matching pair
-      const popped = this.stackItems.pop();
-      this.lastActionType = 'pop';
-    } else if (step.action === 'success') {
-      this.lastActionType = 'peek';
-    }
-
-    this.statusMessage = `${step.title}: ${step.explanation}`;
-    this.guidedStepIndex++;
-
-    if (this.guidedStepIndex >= this.guidedSteps.length) {
-      this.stopAutoPlay();
-    }
+    const val = this.enqueueInput.trim() || String(Math.floor(Math.random() * 80) + 10);
+    this.queueItems.push({ id: Date.now(), value: val });
+    this.enqueueInput = '';
   }
 
-  toggleAutoPlay(): void {
-    if (this.isAutoPlaying) {
-      this.stopAutoPlay();
-    } else {
-      this.isAutoPlaying = true;
-      if (this.guidedStepIndex >= this.guidedSteps.length) {
-        this.resetGuided();
-      }
-      this.autoPlayTimer = setInterval(() => {
-        if (this.guidedStepIndex < this.guidedSteps.length) {
-          this.nextGuidedStep();
-        } else {
-          this.stopAutoPlay();
-        }
-      }, 1200);
-    }
-  }
-
-  private stopAutoPlay(): void {
-    this.isAutoPlaying = false;
-    if (this.autoPlayTimer) {
-      clearInterval(this.autoPlayTimer);
-      this.autoPlayTimer = null;
-    }
-  }
-
-  // ==========================================
-  // QUEUE METHODS
-  // ==========================================
-  enqueueQuick(): void {
-    if (this.queueItems.length >= 5) {
-      this.queueMessage = "Hàng đợi đã đầy trong bản mô phỏng.";
-      return;
-    }
-    const val = `Khách ${this.queueItems.length + 1}`;
-    this.queueItems.push(val);
-    this.queueMessage = `Đã thêm (Enqueue) '${val}' vào cuối hàng đợi (REAR).`;
-  }
-
-  dequeueQuick(): void {
+  dequeue(): void {
     if (this.queueItems.length === 0) {
-      this.queueMessage = "Hàng đợi rỗng!";
       return;
     }
-    const removed = this.queueItems.shift();
-    this.queueMessage = `Đã phục vụ & lấy (Dequeue) '${removed}' ra từ đầu hàng đợi (FRONT).`;
+    this.queueItems.shift();
+  }
+
+  clearQueue(): void {
+    this.queueItems = [];
   }
 
   // ==========================================
-  // TWO POINTERS METHODS
+  // TWO POINTERS OPERATIONS
   // ==========================================
   stepTwoPointers(): void {
-    if (this.leftPtr >= this.rightPtr) {
-      this.tpFinished = true;
-      this.tpMessage = `🎉 Hai con trỏ đã gặp nhau ở giữa! Mọi ký tự đối xứng đều trùng khớp. 'racecar' là PALINDROME!`;
+    if (this.leftPointer >= this.rightPointer) {
+      this.twoPointerDone = true;
+      this.twoPointerMessage = `Hai con trỏ đã gặp nhau tại index ${this.leftPointer}. Chuỗi đối xứng hợp lệ (Palindrome)!`;
       return;
     }
 
-    const lChar = this.tpArray[this.leftPtr];
-    const rChar = this.tpArray[this.rightPtr];
+    const leftChar = this.twoPointerArray[this.leftPointer];
+    const rightChar = this.twoPointerArray[this.rightPointer];
 
-    if (lChar === rChar) {
-      this.leftPtr++;
-      this.rightPtr--;
-      if (this.leftPtr < this.rightPtr) {
-        this.tpMessage = `✅ Ký tự '${lChar}' ở vị trí ${this.leftPtr - 1} khớp với '${rChar}' ở vị trí ${this.rightPtr + 1}. Thu hẹp tiếp...`;
+    if (leftChar === rightChar) {
+      this.leftPointer++;
+      this.rightPointer--;
+      if (this.leftPointer < this.rightPointer) {
+        this.twoPointerMessage = `Trùng khớp '${leftChar}' == '${rightChar}'. Con trỏ L dịch sang ${this.leftPointer}, R dịch sang ${this.rightPointer}.`;
       } else {
-        this.tpFinished = true;
-        this.tpMessage = `🎉 Hoàn thành kiểm tra! Chuỗi 'racecar' là Palindrome hợp lệ (Thời gian O(N), Bộ nhớ O(1)).`;
+        this.twoPointerDone = true;
+        this.twoPointerMessage = `Tất cả ký tự đối xứng khớp nhau! Chuỗi 'racecar' là Palindrome (O(N) thời gian, O(1) không gian).`;
       }
+    } else {
+      this.twoPointerDone = true;
+      this.twoPointerMessage = `Không khớp: '${leftChar}' != '${rightChar}'.`;
     }
   }
 
   resetTwoPointers(): void {
-    this.leftPtr = 0;
-    this.rightPtr = 6;
-    this.tpFinished = false;
-    this.tpMessage = "Đã đặt lại 2 con trỏ về 2 đầu mút ban đầu.";
+    this.leftPointer = 0;
+    this.rightPointer = 6;
+    this.twoPointerDone = false;
+    this.twoPointerMessage = "Khởi tạo: Con trỏ L tại 0 ('r'), con trỏ R tại 6 ('r').";
+  }
+
+  get stackTopItem(): StackItem | null {
+    return this.stackItems.length > 0 ? this.stackItems[this.stackItems.length - 1] : null;
   }
 }
