@@ -574,7 +574,7 @@
   color: var(--color-text-muted);
 }
 .code-block {
-  padding: 14px 16px;
+  padding: 24px 16px;
   margin: 0;
   font-family: var(--font-mono);
   font-size: 12.5px;
@@ -582,7 +582,8 @@
   background-color: var(--color-code-bg);
   color: var(--color-code-text);
   overflow-x: auto;
-  max-height: 290px;
+  min-height: 250px;
+  max-height: 310px;
 }
 .code-block .k { color: #F472B6; }
 .code-block .t { color: #60A5FA; }
