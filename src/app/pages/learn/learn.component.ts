@@ -1,31 +1,23 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { ProgressService } from '../../core/services/progress.service';
-import { LearningPath } from '../../core/models/progress.model';
 
-interface StackItem {
+interface StackElement {
   id: number;
   value: string;
   isPeeking?: boolean;
   isPopping?: boolean;
 }
 
-interface QueueItem {
-  id: number;
-  value: string;
-  isFront?: boolean;
-  isRear?: boolean;
-}
-
-interface OperationLog {
-  id: number;
-  time: string;
-  type: 'push' | 'pop' | 'peek' | 'clear' | 'info';
-  message: string;
+interface GuidedStep {
+  token: string;
+  action: 'push' | 'pop' | 'peek' | 'success';
+  title: string;
+  explanation: string;
 }
 
 @Component({
@@ -35,75 +27,90 @@ interface OperationLog {
   templateUrl: './learn.component.html',
   styleUrls: ['./learn.component.css']
 })
-export class LearnComponent implements OnInit {
+export class LearnComponent implements OnInit, OnDestroy {
   private progressService = inject(ProgressService);
   private route = inject(ActivatedRoute);
 
   learningPaths = this.progressService.learningPaths;
   Math = Math;
 
-  // View Navigation
+  // Tabs & Modes
   activeMainTab: 'visualizer' | 'curricula' = 'visualizer';
   activeDs: 'stack' | 'queue' | 'two-pointers' = 'stack';
+  interactionMode: 'sandbox' | 'guided' = 'sandbox';
 
-  // --- STACK VISUALIZER STATE ---
-  maxStackCapacity = 7;
-  pushInput = '';
-  stackItems: StackItem[] = [
-    { id: 1, value: '42' },
-    { id: 2, value: '15' },
-    { id: 3, value: '88' }
+  // --- STACK STATE ---
+  maxCapacity = 6;
+  pushInputValue = '';
+  stackItems: StackElement[] = [
+    { id: 1, value: '10' },
+    { id: 2, value: '25' },
+    { id: 3, value: '77' }
   ];
-  operationLogs: OperationLog[] = [
-    { id: 1, time: '10:00:00', type: 'info', message: 'Stack initialized with 3 initial elements. LIFO (Last-In, First-Out) invariant active.' }
+  statusMessage = "Stack đang có 3 phần tử. Đỉnh (TOP) hiện tại là 77. Bấm 'Push' hoặc 'Pop' để tương tác.";
+  lastActionType: 'push' | 'pop' | 'peek' | 'clear' | 'none' = 'none';
+
+  // --- GUIDED SCENARIO STATE (LeetCode #8: Valid Parentheses) ---
+  guidedTokens = ['(', '[', '{', '}', ']', ')'];
+  guidedStepIndex = 0;
+  isAutoPlaying = false;
+  private autoPlayTimer: any = null;
+
+  readonly guidedSteps: GuidedStep[] = [
+    {
+      token: '(',
+      action: 'push',
+      title: "Gặp ngoặc mở '('",
+      explanation: "Quy tắc: Khi gặp ngoặc mở, ta đẩy (Push) vào Stack để chờ cặp ngoặc đóng tương ứng."
+    },
+    {
+      token: '[',
+      action: 'push',
+      title: "Gặp ngoặc mở '['",
+      explanation: "Tiếp tục đẩy '[' vào Stack. Hiện tại '[' nằm ở ĐỈNH (TOP)."
+    },
+    {
+      token: '{',
+      action: 'push',
+      title: "Gặp ngoặc mở '{'",
+      explanation: "Đẩy '{' vào Stack. '{' trở thành đỉnh mới nhất."
+    },
+    {
+      token: '}',
+      action: 'peek',
+      title: "Gặp ngoặc đóng '}'",
+      explanation: "Kiểm tra đỉnh Stack (Peek): Đỉnh là '{' -> Khớp hoàn hảo với '}'! Ta lấy '{' ra (Pop)."
+    },
+    {
+      token: ']',
+      action: 'peek',
+      title: "Gặp ngoặc đóng ']'",
+      explanation: "Kiểm tra đỉnh Stack: Đỉnh là '[' -> Khớp với ']'! Ta lấy '[' ra (Pop)."
+    },
+    {
+      token: ')',
+      action: 'peek',
+      title: "Gặp ngoặc đóng ')'",
+      explanation: "Kiểm tra đỉnh Stack: Đỉnh là '(' -> Khớp với ')'! Ta lấy '(' ra (Pop)."
+    },
+    {
+      token: 'DONE',
+      action: 'success',
+      title: "Hoàn thành duyệt chuỗi!",
+      explanation: "Stack rỗng hoàn toàn -> Chuỗi ngoặc '([{}])' HỢP LỆ (BALANCED)! Bạn đã nắm trọn thuật toán bài LeetCode #8!"
+    }
   ];
-  activeCodeLang: 'typescript' | 'python' = 'typescript';
 
-  // Stack Scenarios
-  activeScenario: 'none' | 'brackets' | 'callstack' = 'none';
-  scenarioStep = 0;
-  scenarioDescription = '';
-  scenarioInputTokens: string[] = [];
+  // --- QUEUE STATE ---
+  queueItems: string[] = ['Khách 1', 'Khách 2', 'Khách 3'];
+  queueMessage = "Queue hoạt động theo nguyên lý FIFO: Vào trước sẽ ra trước.";
 
-  readonly bracketSteps = [
-    { action: 'push', token: '(', desc: "Encountered opening bracket '('. Push onto stack." },
-    { action: 'push', token: '[', desc: "Encountered opening bracket '['. Push onto stack." },
-    { action: 'push', token: '{', desc: "Encountered opening bracket '{'. Push onto stack." },
-    { action: 'peek', token: '}', desc: "Encountered closing bracket '}'. Peek TOP: '{' matches correctly!" },
-    { action: 'pop', token: '}', desc: "Matched pair '{ }'. Pop '{' from stack." },
-    { action: 'peek', token: ']', desc: "Encountered closing bracket ']'. Peek TOP: '[' matches correctly!" },
-    { action: 'pop', token: ']', desc: "Matched pair '[ ]'. Pop '[' from stack." },
-    { action: 'peek', token: ')', desc: "Encountered closing bracket ')'. Peek TOP: '(' matches correctly!" },
-    { action: 'pop', token: ')', desc: "Matched pair '( )'. Pop '(' from stack." },
-    { action: 'info', token: '', desc: "Traversal finished. Stack is empty -> String is 100% VALID & BALANCED!" }
-  ];
-
-  readonly callStackSteps = [
-    { action: 'push', token: 'main()', desc: "Program entry: push main() stack frame." },
-    { action: 'push', token: 'parseInput()', desc: "main() calls parseInput(). New frame pushed to TOP." },
-    { action: 'push', token: 'readBuffer()', desc: "parseInput() calls readBuffer(). readBuffer() is now active." },
-    { action: 'pop', token: 'readBuffer()', desc: "readBuffer() returned data. Frame popped." },
-    { action: 'pop', token: 'parseInput()', desc: "parseInput() completed. Frame popped." },
-    { action: 'push', token: 'solveAlgorithm()', desc: "main() calls solveAlgorithm(). Frame pushed." },
-    { action: 'pop', token: 'solveAlgorithm()', desc: "solveAlgorithm() returned result. Frame popped." },
-    { action: 'pop', token: 'main()', desc: "main() returned 0. Call stack is empty." }
-  ];
-
-  // --- QUEUE VISUALIZER STATE ---
-  maxQueueCapacity = 6;
-  enqueueInput = '';
-  queueItems: QueueItem[] = [
-    { id: 10, value: 'Req-1' },
-    { id: 11, value: 'Req-2' },
-    { id: 12, value: 'Req-3' }
-  ];
-
-  // --- TWO POINTERS VISUALIZER STATE ---
-  twoPointerArray: string[] = ['r', 'a', 'c', 'e', 'c', 'a', 'r'];
-  leftPointer = 0;
-  rightPointer = 6;
-  twoPointerMessage = "Initial state: Left at index 0 ('r'), Right at index 6 ('r').";
-  twoPointerDone = false;
+  // --- TWO POINTERS STATE ---
+  tpArray = ['r', 'a', 'c', 'e', 'c', 'a', 'r'];
+  leftPtr = 0;
+  rightPtr = 6;
+  tpMessage = "Hai con trỏ Left & Right bắt đầu từ 2 đầu mút chuỗi 'racecar'.";
+  tpFinished = false;
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -111,208 +118,226 @@ export class LearnComponent implements OnInit {
         this.activeMainTab = 'curricula';
       }
       if (params['ds']) {
-        this.activeDs = params['ds'] as any;
+        this.activeDs = params['ds'];
       }
     });
   }
 
+  ngOnDestroy(): void {
+    this.stopAutoPlay();
+  }
+
+  selectDs(ds: 'stack' | 'queue' | 'two-pointers'): void {
+    this.activeDs = ds;
+    this.stopAutoPlay();
+  }
+
+  setInteractionMode(mode: 'sandbox' | 'guided'): void {
+    this.interactionMode = mode;
+    this.stopAutoPlay();
+    if (mode === 'guided') {
+      this.resetGuided();
+    } else {
+      this.statusMessage = "Đã chuyển về chế độ tự do. Bạn có thể tự thêm/bớt phần tử tùy thích.";
+    }
+  }
+
   // ==========================================
-  // STACK OPERATIONS
+  // STACK SANDBOX METHODS
   // ==========================================
-  pushStack(customVal?: string): void {
-    if (this.stackItems.length >= this.maxStackCapacity) {
-      this.addLog('info', `Stack Overflow Warning: Demo container maximum capacity (${this.maxStackCapacity}) reached.`);
+  pushRandom(): void {
+    const randomVal = String(Math.floor(Math.random() * 90) + 10);
+    this.pushItem(randomVal);
+  }
+
+  pushCustom(): void {
+    const val = this.pushInputValue.trim();
+    if (!val) {
+      this.pushRandom();
+      return;
+    }
+    this.pushItem(val);
+    this.pushInputValue = '';
+  }
+
+  private pushItem(val: string): void {
+    if (this.stackItems.length >= this.maxCapacity) {
+      this.statusMessage = `⚠️ Stack đã đầy (tối đa ${this.maxCapacity} phần tử trong demo). Hãy Pop bớt ra trước nhé!`;
       return;
     }
 
-    const val = (customVal !== undefined ? customVal : this.pushInput.trim()) || String(Math.floor(Math.random() * 90) + 10);
-    const newItem: StackItem = {
+    const newItem: StackElement = {
       id: Date.now() + Math.random(),
       value: val
     };
 
     this.stackItems.push(newItem);
-    this.pushInput = '';
-    this.addLog('push', `PUSH('${val}'): Placed at index ${this.stackItems.length - 1}. Top is now '${val}'.`);
+    this.lastActionType = 'push';
+    this.statusMessage = `✅ Đã PUSH phần tử '${val}' vào đỉnh Stack (Index ${this.stackItems.length - 1}). Thao tác mất thời gian O(1).`;
   }
 
-  popStack(): void {
+  popItem(): void {
     if (this.stackItems.length === 0) {
-      this.addLog('info', 'Stack Underflow: Cannot pop from an empty stack.');
+      this.statusMessage = "⚠️ Stack đang rỗng (Stack Underflow)! Không thể lấy thêm phần tử nào nữa.";
       return;
     }
 
     const popped = this.stackItems[this.stackItems.length - 1];
     popped.isPopping = true;
+    this.lastActionType = 'pop';
 
     setTimeout(() => {
       this.stackItems.pop();
-      const newTop = this.stackItems.length > 0 ? this.stackItems[this.stackItems.length - 1].value : 'null (empty)';
-      this.addLog('pop', `POP(): Removed '${popped.value}' from TOP. New Top is ${newTop}.`);
+      const currentTop = this.topItem ? `'${this.topItem.value}'` : 'Rỗng';
+      this.statusMessage = `🔻 Đã POP phần tử '${popped.value}' ra khỏi đỉnh. Đỉnh mới hiện tại là: ${currentTop}. Thao tác mất O(1).`;
     }, 180);
   }
 
-  peekStack(): void {
+  peekItem(): void {
     if (this.stackItems.length === 0) {
-      this.addLog('info', 'PEEK(): Stack is currently empty.');
+      this.statusMessage = "ℹ️ Stack rỗng, không có phần tử nào ở đỉnh.";
       return;
     }
 
-    const topItem = this.stackItems[this.stackItems.length - 1];
-    topItem.isPeeking = true;
-    this.addLog('peek', `PEEK(): Inspecting TOP element: '${topItem.value}' (O(1) time, stack unchanged).`);
-
-    setTimeout(() => {
-      topItem.isPeeking = false;
-    }, 1200);
+    const top = this.topItem;
+    if (top) {
+      top.isPeeking = true;
+      this.lastActionType = 'peek';
+      this.statusMessage = `👁️ PEEK: Đỉnh Stack hiện tại là '${top.value}'. Dữ liệu trong Stack không bị thay đổi (O(1)).`;
+      setTimeout(() => {
+        top.isPeeking = false;
+      }, 1000);
+    }
   }
 
   clearStack(): void {
     this.stackItems = [];
-    this.activeScenario = 'none';
-    this.addLog('clear', 'CLEAR(): All elements removed. Stack reset to empty.');
+    this.lastActionType = 'clear';
+    this.statusMessage = "🔄 Đã dọn sạch Stack về trạng thái rỗng.";
   }
 
-  pushRandom(): void {
-    const randoms = ['42', '15', '99', '7', '108', '24', '63', 'A', 'X'];
-    const chosen = randoms[Math.floor(Math.random() * randoms.length)];
-    this.pushStack(chosen);
+  get topItem(): StackElement | null {
+    return this.stackItems.length > 0 ? this.stackItems[this.stackItems.length - 1] : null;
   }
 
   // ==========================================
-  // SCENARIO SIMULATIONS
+  // GUIDED LESSON METHODS
   // ==========================================
-  startScenario(type: 'brackets' | 'callstack'): void {
-    this.activeScenario = type;
-    this.scenarioStep = 0;
+  resetGuided(): void {
+    this.stopAutoPlay();
+    this.guidedStepIndex = 0;
     this.stackItems = [];
-
-    if (type === 'brackets') {
-      this.scenarioInputTokens = ['(', '[', '{', '}', ']', ')'];
-      this.scenarioDescription = "Simulating problem #8: Valid Parentheses on string '([{}])'. Step through each token!";
-      this.addLog('info', "Scenario Started: Balanced Brackets Validation '([{}])'");
-    } else {
-      this.scenarioInputTokens = ['main()', 'parseInput()', 'readBuffer()', 'solveAlgorithm()'];
-      this.scenarioDescription = "Simulating call stack frame allocation during nested function execution.";
-      this.addLog('info', "Scenario Started: Call Stack Frame Allocation");
-    }
+    this.statusMessage = "Bắt đầu kịch bản kiểm tra chuỗi ngoặc '([{}])'. Bấm 'Bước tiếp theo' để xem cách Stack giải quyết!";
   }
 
-  nextScenarioStep(): void {
-    const steps = this.activeScenario === 'brackets' ? this.bracketSteps : this.callStackSteps;
-    if (this.scenarioStep >= steps.length) {
-      this.scenarioDescription = "Scenario completed! Feel free to reset or try custom operations.";
+  nextGuidedStep(): void {
+    if (this.guidedStepIndex >= this.guidedSteps.length) {
+      this.statusMessage = "Kịch bản đã hoàn thành! Bấm 'Bắt đầu lại' nếu muốn xem lại.";
+      this.stopAutoPlay();
       return;
     }
 
-    const current = steps[this.scenarioStep];
-    this.scenarioDescription = current.desc;
+    const step = this.guidedSteps[this.guidedStepIndex];
 
-    if (current.action === 'push') {
-      this.pushStack(current.token);
-    } else if (current.action === 'pop') {
-      this.popStack();
-    } else if (current.action === 'peek') {
-      this.peekStack();
-    } else {
-      this.addLog('info', current.desc);
+    if (step.action === 'push') {
+      this.stackItems.push({
+        id: Date.now() + Math.random(),
+        value: step.token
+      });
+      this.lastActionType = 'push';
+    } else if (step.action === 'peek') {
+      // Pop the matching pair
+      const popped = this.stackItems.pop();
+      this.lastActionType = 'pop';
+    } else if (step.action === 'success') {
+      this.lastActionType = 'peek';
     }
 
-    this.scenarioStep++;
+    this.statusMessage = `${step.title}: ${step.explanation}`;
+    this.guidedStepIndex++;
+
+    if (this.guidedStepIndex >= this.guidedSteps.length) {
+      this.stopAutoPlay();
+    }
   }
 
-  resetScenario(): void {
-    this.activeScenario = 'none';
-    this.scenarioStep = 0;
-    this.scenarioDescription = '';
-    this.stackItems = [
-      { id: 1, value: '42' },
-      { id: 2, value: '15' },
-      { id: 3, value: '88' }
-    ];
-    this.addLog('info', 'Scenario stopped. Restored interactive playground.');
+  toggleAutoPlay(): void {
+    if (this.isAutoPlaying) {
+      this.stopAutoPlay();
+    } else {
+      this.isAutoPlaying = true;
+      if (this.guidedStepIndex >= this.guidedSteps.length) {
+        this.resetGuided();
+      }
+      this.autoPlayTimer = setInterval(() => {
+        if (this.guidedStepIndex < this.guidedSteps.length) {
+          this.nextGuidedStep();
+        } else {
+          this.stopAutoPlay();
+        }
+      }, 1200);
+    }
+  }
+
+  private stopAutoPlay(): void {
+    this.isAutoPlaying = false;
+    if (this.autoPlayTimer) {
+      clearInterval(this.autoPlayTimer);
+      this.autoPlayTimer = null;
+    }
   }
 
   // ==========================================
-  // QUEUE OPERATIONS
+  // QUEUE METHODS
   // ==========================================
-  enqueue(): void {
-    if (this.queueItems.length >= this.maxQueueCapacity) {
-      this.addLog('info', 'Queue Full: Maximum capacity reached.');
+  enqueueQuick(): void {
+    if (this.queueItems.length >= 5) {
+      this.queueMessage = "Hàng đợi đã đầy trong bản mô phỏng.";
       return;
     }
-    const val = this.enqueueInput.trim() || `Req-${Math.floor(Math.random() * 80) + 10}`;
-    this.queueItems.push({ id: Date.now(), value: val });
-    this.enqueueInput = '';
-    this.addLog('push', `ENQUEUE('${val}'): Added to REAR. Length: ${this.queueItems.length}.`);
+    const val = `Khách ${this.queueItems.length + 1}`;
+    this.queueItems.push(val);
+    this.queueMessage = `Đã thêm (Enqueue) '${val}' vào cuối hàng đợi (REAR).`;
   }
 
-  dequeue(): void {
+  dequeueQuick(): void {
     if (this.queueItems.length === 0) {
-      this.addLog('info', 'Queue Empty: Cannot dequeue.');
+      this.queueMessage = "Hàng đợi rỗng!";
       return;
     }
     const removed = this.queueItems.shift();
-    this.addLog('pop', `DEQUEUE(): Removed '${removed?.value}' from FRONT. FIFO invariant satisfied.`);
-  }
-
-  clearQueue(): void {
-    this.queueItems = [];
-    this.addLog('clear', 'Queue cleared.');
+    this.queueMessage = `Đã phục vụ & lấy (Dequeue) '${removed}' ra từ đầu hàng đợi (FRONT).`;
   }
 
   // ==========================================
-  // TWO POINTERS OPERATIONS
+  // TWO POINTERS METHODS
   // ==========================================
   stepTwoPointers(): void {
-    if (this.leftPointer >= this.rightPointer) {
-      this.twoPointerDone = true;
-      this.twoPointerMessage = `Pointers met at index ${this.leftPointer}. The string is a PALINDROME!`;
+    if (this.leftPtr >= this.rightPtr) {
+      this.tpFinished = true;
+      this.tpMessage = `🎉 Hai con trỏ đã gặp nhau ở giữa! Mọi ký tự đối xứng đều trùng khớp. 'racecar' là PALINDROME!`;
       return;
     }
 
-    const leftChar = this.twoPointerArray[this.leftPointer];
-    const rightChar = this.twoPointerArray[this.rightPointer];
+    const lChar = this.tpArray[this.leftPtr];
+    const rChar = this.tpArray[this.rightPtr];
 
-    if (leftChar === rightChar) {
-      this.leftPointer++;
-      this.rightPointer--;
-      if (this.leftPointer < this.rightPointer) {
-        this.twoPointerMessage = `Matched '${leftChar}' == '${rightChar}'. Left pointer moved to ${this.leftPointer}, Right pointer to ${this.rightPointer}.`;
+    if (lChar === rChar) {
+      this.leftPtr++;
+      this.rightPtr--;
+      if (this.leftPtr < this.rightPtr) {
+        this.tpMessage = `✅ Ký tự '${lChar}' ở vị trí ${this.leftPtr - 1} khớp với '${rChar}' ở vị trí ${this.rightPtr + 1}. Thu hẹp tiếp...`;
       } else {
-        this.twoPointerDone = true;
-        this.twoPointerMessage = `All boundary characters matched! String 'racecar' is a valid PALINDROME! (O(N) Time, O(1) Space)`;
+        this.tpFinished = true;
+        this.tpMessage = `🎉 Hoàn thành kiểm tra! Chuỗi 'racecar' là Palindrome hợp lệ (Thời gian O(N), Bộ nhớ O(1)).`;
       }
-    } else {
-      this.twoPointerDone = true;
-      this.twoPointerMessage = `Mismatch: '${leftChar}' != '${rightChar}'. Not a palindrome.`;
     }
   }
 
   resetTwoPointers(): void {
-    this.leftPointer = 0;
-    this.rightPointer = 6;
-    this.twoPointerDone = false;
-    this.twoPointerMessage = "Initial state: Left at index 0 ('r'), Right at index 6 ('r').";
-  }
-
-  // ==========================================
-  // HELPER METHODS
-  // ==========================================
-  private addLog(type: OperationLog['type'], message: string): void {
-    const time = new Date().toTimeString().split(' ')[0];
-    this.operationLogs.unshift({
-      id: Date.now() + Math.random(),
-      time,
-      type,
-      message
-    });
-    if (this.operationLogs.length > 20) {
-      this.operationLogs.pop();
-    }
-  }
-
-  get stackTopItem(): StackItem | null {
-    return this.stackItems.length > 0 ? this.stackItems[this.stackItems.length - 1] : null;
+    this.leftPtr = 0;
+    this.rightPtr = 6;
+    this.tpFinished = false;
+    this.tpMessage = "Đã đặt lại 2 con trỏ về 2 đầu mút ban đầu.";
   }
 }

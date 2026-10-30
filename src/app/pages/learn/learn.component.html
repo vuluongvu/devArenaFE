@@ -1,554 +1,381 @@
 <div class="learn-page">
-  <!-- Top Editorial Header & Main Switcher -->
-  <header class="page-header-row">
-    <div class="header-text-block">
-      <div class="header-pill">
-        <app-icon name="sparkles" [size]="13" customClass="text-accent"></app-icon>
-        <span>INTERACTIVE CS LAB</span>
+  <!-- Header đơn giản, tập trung -->
+  <header class="learn-header">
+    <div class="header-main">
+      <div class="header-badge">
+        <app-icon name="sparkles" [size]="14" customClass="text-accent"></app-icon>
+        <span>PHÒNG THÍ NGHIỆM TRỰC QUAN</span>
       </div>
-      <h1 class="page-title">Data Structure Visualizer & Learning Lab</h1>
+      <h1 class="page-title">Mô phỏng Trực quan Cấu trúc Dữ liệu</h1>
       <p class="page-subtitle">
-        Explore algorithmic invariants, memory representations, and step-by-step executions through interactive data structure simulations.
+        Tương tác trực tiếp để nắm bắt trực giác về cách dữ liệu được lưu trữ, đẩy vào và lấy ra trong bộ nhớ.
       </p>
     </div>
 
-    <!-- Main Mode Toggle -->
-    <div class="main-tab-toggle">
+    <!-- Toggle chính giữa Lab và Lộ trình bài tập -->
+    <div class="main-mode-toggle">
       <button
-        class="tab-toggle-btn"
+        class="mode-btn"
         [class.active]="activeMainTab === 'visualizer'"
         (click)="activeMainTab = 'visualizer'"
       >
         <app-icon name="layers" [size]="15"></app-icon>
-        <span>Visualizer Studio</span>
+        <span>Mô phỏng trực quan</span>
       </button>
       <button
-        class="tab-toggle-btn"
+        class="mode-btn"
         [class.active]="activeMainTab === 'curricula'"
         (click)="activeMainTab = 'curricula'"
       >
         <app-icon name="book" [size]="15"></app-icon>
-        <span>Curricula & Paths</span>
+        <span>Lộ trình bài tập</span>
       </button>
     </div>
   </header>
 
-  <!-- =================================================================== -->
-  <!-- 1. DATA STRUCTURE VISUALIZER STUDIO -->
-  <!-- =================================================================== -->
-  <div *ngIf="activeMainTab === 'visualizer'" class="visualizer-container">
-    <!-- Sub-Navbar: Data Structure Selector -->
-    <div class="ds-selector-bar">
-      <div class="ds-tabs">
+  <!-- ============================================================== -->
+  <!-- 1. GIAO DIỆN MÔ PHỎNG (VISUALIZER) -->
+  <!-- ============================================================== -->
+  <div *ngIf="activeMainTab === 'visualizer'" class="visualizer-shell">
+    <!-- Thanh chọn Cấu trúc Dữ liệu -->
+    <div class="category-navbar">
+      <div class="ds-buttons">
         <button
-          class="ds-tab-btn"
+          class="ds-nav-btn"
           [class.active]="activeDs === 'stack'"
-          (click)="activeDs = 'stack'"
+          (click)="selectDs('stack')"
         >
-          <app-icon name="layers" [size]="15"></app-icon>
-          <span class="tab-label">Stack</span>
-          <span class="badge-pill">LIFO</span>
+          <app-icon name="layers" [size]="16"></app-icon>
+          <span class="btn-text">Stack (Ngăn xếp - LIFO)</span>
+          <span class="pill-tag">Khuyên dùng</span>
         </button>
 
         <button
-          class="ds-tab-btn"
+          class="ds-nav-btn"
           [class.active]="activeDs === 'queue'"
-          (click)="activeDs = 'queue'"
+          (click)="selectDs('queue')"
         >
-          <app-icon name="sliders" [size]="15"></app-icon>
-          <span class="tab-label">Queue</span>
-          <span class="badge-pill">FIFO</span>
+          <app-icon name="sliders" [size]="16"></app-icon>
+          <span class="btn-text">Queue (Hàng đợi - FIFO)</span>
         </button>
 
         <button
-          class="ds-tab-btn"
+          class="ds-nav-btn"
           [class.active]="activeDs === 'two-pointers'"
-          (click)="activeDs = 'two-pointers'"
+          (click)="selectDs('two-pointers')"
         >
-          <app-icon name="compass" [size]="15"></app-icon>
-          <span class="tab-label">Two Pointers</span>
-          <span class="badge-pill">In-Place</span>
+          <app-icon name="compass" [size]="16"></app-icon>
+          <span class="btn-text">Two Pointers (Hai con trỏ)</span>
         </button>
       </div>
 
-      <!-- Quick Preset Scenarios (Visible when Stack is active) -->
-      <div *ngIf="activeDs === 'stack'" class="scenario-actions">
-        <span class="scenario-label">Algorithms Playground:</span>
+      <!-- Chế độ thao tác: Tự do vs Kịch bản mẫu -->
+      <div class="mode-switch-group" *ngIf="activeDs === 'stack'">
         <button
-          class="scenario-btn"
-          [class.active]="activeScenario === 'brackets'"
-          (click)="startScenario('brackets')"
-          title="Simulate Valid Parentheses evaluation step-by-step"
+          class="switch-btn"
+          [class.active]="interactionMode === 'sandbox'"
+          (click)="setInteractionMode('sandbox')"
         >
-          <app-icon name="check-circle" [size]="13"></app-icon>
-          <span>() Valid Parentheses (#8)</span>
+          <span>🛠️ Tự do thử nghiệm</span>
         </button>
         <button
-          class="scenario-btn"
-          [class.active]="activeScenario === 'callstack'"
-          (click)="startScenario('callstack')"
-          title="Simulate execution context call stack"
+          class="switch-btn"
+          [class.active]="interactionMode === 'guided'"
+          (click)="setInteractionMode('guided')"
         >
-          <app-icon name="terminal" [size]="13"></app-icon>
-          <span>Call Stack Simulator</span>
+          <span>🎯 Kịch bản mẫu: Bài toán Ngoặc (#8)</span>
         </button>
       </div>
     </div>
 
-    <!-- ------------------------------------------------------------- -->
+    <!-- ---------------------------------------------------------- -->
     <!-- STACK VISUALIZER -->
-    <!-- ------------------------------------------------------------- -->
-    <div *ngIf="activeDs === 'stack'" class="stack-view-wrapper">
-      <!-- Scenario Walkthrough Banner (if active) -->
-      <div *ngIf="activeScenario !== 'none'" class="scenario-banner">
-        <div class="scenario-banner-left">
-          <div class="scenario-step-badge">
-            STEP {{ scenarioStep }} / {{ activeScenario === 'brackets' ? bracketSteps.length : callStackSteps.length }}
-          </div>
-          <div class="scenario-step-text">
-            <strong>{{ scenarioDescription }}</strong>
-          </div>
-        </div>
-        <div class="scenario-banner-right">
-          <button
-            class="btn-scenario-action next-btn"
-            (click)="nextScenarioStep()"
-            [disabled]="scenarioStep >= (activeScenario === 'brackets' ? bracketSteps.length : callStackSteps.length)"
-          >
-            <span>Next Step</span>
-            <app-icon name="chevron-right" [size]="14"></app-icon>
+    <!-- ---------------------------------------------------------- -->
+    <div *ngIf="activeDs === 'stack'" class="stack-canvas-card">
+      <!-- 1. Thanh điều khiển chính (Controls) -->
+      <div class="controls-toolbar">
+        <!-- Chế độ 1: Tự do thao tác (Sandbox) -->
+        <ng-container *ngIf="interactionMode === 'sandbox'">
+          <!-- Nút Push nhanh số ngẫu nhiên (1 click là có hiệu ứng ngay) -->
+          <button class="action-btn btn-primary" (click)="pushRandom()" [disabled]="stackItems.length >= maxCapacity">
+            <app-icon name="chevron-down" [size]="16"></app-icon>
+            <span>Push ngẫu nhiên</span>
           </button>
-          <button class="btn-scenario-action reset-btn" (click)="resetScenario()">
-            <app-icon name="rotate-ccw" [size]="13"></app-icon>
-            <span>Stop Scenario</span>
-          </button>
-        </div>
-      </div>
 
-      <!-- Interactive Controls Deck -->
-      <div class="control-deck-card">
-        <div class="deck-left">
-          <div class="input-action-group">
+          <!-- Ô nhập giá trị tùy chỉnh -->
+          <div class="custom-input-wrap">
             <input
               type="text"
-              [(ngModel)]="pushInput"
-              (keyup.enter)="pushStack()"
-              placeholder="Value to push (e.g. 42, 'A')..."
-              class="deck-input"
-              maxlength="12"
+              [(ngModel)]="pushInputValue"
+              (keyup.enter)="pushCustom()"
+              placeholder="Nhập giá trị..."
+              class="val-input"
+              maxlength="10"
             />
-            <button
-              class="btn-deck btn-push"
-              (click)="pushStack()"
-              [disabled]="stackItems.length >= maxStackCapacity"
-              title="Push element to the top of the stack (O(1))"
-            >
-              <app-icon name="chevron-down" [size]="14"></app-icon>
-              <span>Push</span>
+            <button class="btn-input-push" (click)="pushCustom()" [disabled]="stackItems.length >= maxCapacity">
+              <span>Thêm</span>
             </button>
           </div>
 
-          <button
-            class="btn-deck btn-pop"
-            (click)="popStack()"
-            [disabled]="stackItems.length === 0"
-            title="Pop top element from the stack (O(1))"
-          >
-            <app-icon name="chevron-left" [size]="14" customClass="rotate-up"></app-icon>
-            <span>Pop()</span>
+          <!-- Nút Pop -->
+          <button class="action-btn btn-pop" (click)="popItem()" [disabled]="stackItems.length === 0">
+            <app-icon name="chevron-left" [size]="16" customClass="rotate-up"></app-icon>
+            <span>Pop (Lấy ra)</span>
           </button>
 
-          <button
-            class="btn-deck btn-peek"
-            (click)="peekStack()"
-            [disabled]="stackItems.length === 0"
-            title="Inspect top element without removing (O(1))"
-          >
-            <app-icon name="eye" [size]="14"></app-icon>
-            <span>Peek()</span>
+          <!-- Nút Peek -->
+          <button class="action-btn btn-peek" (click)="peekItem()" [disabled]="stackItems.length === 0">
+            <app-icon name="eye" [size]="15"></app-icon>
+            <span>Peek (Xem đỉnh)</span>
           </button>
 
-          <button
-            class="btn-deck btn-secondary"
-            (click)="pushRandom()"
-            [disabled]="stackItems.length >= maxStackCapacity"
-            title="Push random integer"
-          >
-            <app-icon name="sparkles" [size]="13"></app-icon>
-            <span>Random</span>
+          <!-- Nút Dọn sạch -->
+          <button class="action-btn btn-ghost" (click)="clearStack()" [disabled]="stackItems.length === 0">
+            <app-icon name="rotate-ccw" [size]="14"></app-icon>
+            <span>Xóa hết</span>
           </button>
+        </ng-container>
 
-          <button
-            class="btn-deck btn-ghost"
-            (click)="clearStack()"
-            [disabled]="stackItems.length === 0"
-            title="Clear all elements"
-          >
-            <app-icon name="rotate-ccw" [size]="13"></app-icon>
-            <span>Clear</span>
-          </button>
-        </div>
-
-        <div class="deck-right">
-          <div class="capacity-meter">
-            <span class="capacity-text">
-              Capacity: <strong>{{ stackItems.length }}</strong> / {{ maxStackCapacity }}
-            </span>
-            <div class="capacity-track">
-              <div
-                class="capacity-fill"
-                [style.width.%]="(stackItems.length / maxStackCapacity) * 100"
-                [class.fill-warning]="stackItems.length >= maxStackCapacity"
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Visual Stage: Beaker + Inspector / Operations -->
-      <div class="stage-grid">
-        <!-- Visual Stage Left: The Stack Beaker -->
-        <div class="beaker-stage-card">
-          <div class="stage-header">
-            <div class="stage-title-wrap">
-              <h3 class="stage-heading">LIFO Stack Memory Model</h3>
-              <span class="stage-subheading">Elements enter and exit exclusively through the TOP boundary.</span>
-            </div>
-            <div class="top-tag" *ngIf="stackTopItem">
-              <span>Current TOP: <strong>'{{ stackTopItem.value }}'</strong></span>
-            </div>
-          </div>
-
-          <!-- Glass Beaker Canvas -->
-          <div class="beaker-outer">
-            <!-- Beaker Open Mouth Indicator -->
-            <div class="beaker-mouth">
-              <span class="mouth-label">Stack Input / Output (TOP)</span>
-              <div class="mouth-arrow-group">
-                <span class="arrow-down">↓ PUSH</span>
-                <span class="arrow-up">↑ POP</span>
-              </div>
-            </div>
-
-            <!-- Beaker Chamber (Vertical) -->
-            <div class="beaker-chamber">
-              <!-- Empty State Overlay -->
-              <div *ngIf="stackItems.length === 0" class="beaker-empty-state">
-                <app-icon name="layers" [size]="36" customClass="text-muted"></app-icon>
-                <div class="empty-title">Stack is Empty</div>
-                <div class="empty-subtitle">Use the Push button above to add elements.</div>
-              </div>
-
-              <!-- Stacking Items (Flex column-reverse: index 0 at bottom, top at top) -->
-              <div class="stack-items-container">
-                <div
-                  *ngFor="let item of stackItems; let i = index; let isLast = last"
-                  class="stack-block"
-                  [class.is-top]="isLast"
-                  [class.is-peeking]="item.isPeeking"
-                  [class.is-popping]="item.isPopping"
-                >
-                  <div class="block-left">
-                    <span class="block-index">[{{ i }}]</span>
-                    <span class="block-value">{{ item.value }}</span>
-                  </div>
-
-                  <div class="block-right">
-                    <span *ngIf="isLast" class="top-badge">
-                      <app-icon name="chevron-left" [size]="12"></app-icon>
-                      <span>TOP</span>
-                    </span>
-                    <span *ngIf="!isLast" class="block-tag">in-stack</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Beaker Solid Base -->
-            <div class="beaker-base">
-              <span>Closed Base (Index 0 / Bottom of Stack)</span>
-            </div>
-          </div>
-
-          <!-- Invariant Explanatory Footnote -->
-          <div class="stage-footer-note">
-            <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-            <span><strong>Core Invariant:</strong> Last-In, First-Out (LIFO). Push, Pop, and Peek execute in constant <code>O(1)</code> time without memory reallocation.</span>
-          </div>
-        </div>
-
-        <!-- Visual Stage Right: Inspector, Operations Log & Implementation -->
-        <div class="inspector-column">
-          <!-- Metric Cards Grid -->
-          <div class="metrics-subgrid">
-            <div class="stat-box">
-              <span class="stat-box-label">CURRENT SIZE</span>
-              <span class="stat-box-value">{{ stackItems.length }}</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-box-label">TOP ELEMENT</span>
-              <span class="stat-box-value mono">{{ stackTopItem ? stackTopItem.value : 'null' }}</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-box-label">TIME COMPLEXITY</span>
-              <span class="stat-box-value text-easy">O(1)</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-box-label">SPACE COMPLEXITY</span>
-              <span class="stat-box-value">O(N)</span>
-            </div>
-          </div>
-
-          <!-- Real-Time Operations Terminal Log -->
-          <div class="operations-log-card">
-            <div class="log-card-header">
-              <div class="log-title-wrap">
-                <app-icon name="terminal" [size]="14"></app-icon>
-                <span class="log-heading">Operations Log</span>
-              </div>
-              <span class="log-count">{{ operationLogs.length }} events</span>
-            </div>
-            <div class="log-body">
-              <div *ngFor="let log of operationLogs" class="log-entry">
-                <span class="log-time">{{ log.time }}</span>
+        <!-- Chế độ 2: Kịch bản mẫu (Guided) -->
+        <ng-container *ngIf="interactionMode === 'guided'">
+          <div class="guided-controls">
+            <div class="guided-token-stream">
+              <span class="stream-label">Chuỗi đầu vào:</span>
+              <div class="tokens-list">
                 <span
-                  class="log-badge"
-                  [class.badge-push]="log.type === 'push'"
-                  [class.badge-pop]="log.type === 'pop'"
-                  [class.badge-peek]="log.type === 'peek'"
-                  [class.badge-clear]="log.type === 'clear'"
-                  [class.badge-info]="log.type === 'info'"
+                  *ngFor="let tok of guidedTokens; let tIdx = index"
+                  class="token-item"
+                  [class.current]="tIdx === guidedStepIndex"
+                  [class.processed]="tIdx < guidedStepIndex"
                 >
-                  {{ log.type | uppercase }}
+                  {{ tok }}
                 </span>
-                <span class="log-message">{{ log.message }}</span>
               </div>
             </div>
-          </div>
 
-          <!-- Code Architecture & Implementation -->
-          <div class="code-snippet-card">
-            <div class="code-card-header">
-              <div class="code-tab-group">
-                <button
-                  class="code-tab"
-                  [class.active]="activeCodeLang === 'typescript'"
-                  (click)="activeCodeLang = 'typescript'"
-                >
-                  TypeScript
-                </button>
-                <button
-                  class="code-tab"
-                  [class.active]="activeCodeLang === 'python'"
-                  (click)="activeCodeLang = 'python'"
-                >
-                  Python
-                </button>
-              </div>
-              <span class="code-title">Production Stack Pattern</span>
-            </div>
-
-            <!-- Code block -->
-            <pre class="code-block" *ngIf="activeCodeLang === 'typescript'"><code><span class="k">class</span> <span class="t">Stack</span>&lt;<span class="t">T</span>&gt; &#123;
-  <span class="k">private</span> items: <span class="t">T</span>[] = [];
-
-  <span class="f">push</span>(item: <span class="t">T</span>): <span class="t">void</span> &#123;
-    <span class="k">this</span>.items.push(item); <span class="c">// O(1)</span>
-  &#125;
-
-  <span class="f">pop</span>(): <span class="t">T</span> | <span class="t">undefined</span> &#123;
-    <span class="k">return</span> <span class="k">this</span>.items.pop(); <span class="c">// O(1)</span>
-  &#125;
-
-  <span class="f">peek</span>(): <span class="t">T</span> | <span class="t">undefined</span> &#123;
-    <span class="k">return</span> <span class="k">this</span>.items[<span class="k">this</span>.items.length - 1]; <span class="c">// O(1)</span>
-  &#125;
-&#125;</code></pre>
-
-            <pre class="code-block" *ngIf="activeCodeLang === 'python'"><code><span class="k">class</span> <span class="t">Stack</span>:
-    <span class="k">def</span> <span class="f">__init__</span>(self):
-        self._items = []
-
-    <span class="k">def</span> <span class="f">push</span>(self, item):
-        self._items.append(item)  <span class="c"># O(1)</span>
-
-    <span class="k">def</span> <span class="f">pop</span>(self):
-        <span class="k">if</span> <span class="k">not</span> self.is_empty():
-            <span class="k">return</span> self._items.pop()  <span class="c"># O(1)</span>
-
-    <span class="k">def</span> <span class="f">peek</span>(self):
-        <span class="k">if</span> <span class="k">not</span> self.is_empty():
-            <span class="k">return</span> self._items[-1]  <span class="c"># O(1)</span></code></pre>
-          </div>
-
-          <!-- Benchmark Problem Integration -->
-          <div class="problem-links-card">
-            <h4 class="card-mini-title">Apply in Practice Problems</h4>
-            <div class="practice-chips">
-              <a routerLink="/problems/valid-parentheses" class="practice-chip">
-                <div class="chip-main">
-                  <span class="chip-num">#8</span>
-                  <span class="chip-title">Valid Parentheses</span>
-                </div>
-                <app-badge difficulty="EASY"></app-badge>
-              </a>
-
-              <a routerLink="/problems/trapping-rain-water" class="practice-chip">
-                <div class="chip-main">
-                  <span class="chip-num">#6</span>
-                  <span class="chip-title">Trapping Rain Water (Monotonic Stack)</span>
-                </div>
-                <app-badge difficulty="HARD"></app-badge>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ------------------------------------------------------------- -->
-    <!-- QUEUE VISUALIZER -->
-    <!-- ------------------------------------------------------------- -->
-    <div *ngIf="activeDs === 'queue'" class="queue-view-wrapper">
-      <div class="control-deck-card">
-        <div class="deck-left">
-          <div class="input-action-group">
-            <input
-              type="text"
-              [(ngModel)]="enqueueInput"
-              (keyup.enter)="enqueue()"
-              placeholder="Value to enqueue..."
-              class="deck-input"
-              maxlength="12"
-            />
-            <button
-              class="btn-deck btn-push"
-              (click)="enqueue()"
-              [disabled]="queueItems.length >= maxQueueCapacity"
-            >
-              <app-icon name="chevron-right" [size]="14"></app-icon>
-              <span>Enqueue (Rear)</span>
-            </button>
-          </div>
-
-          <button
-            class="btn-deck btn-pop"
-            (click)="dequeue()"
-            [disabled]="queueItems.length === 0"
-          >
-            <app-icon name="chevron-left" [size]="14"></app-icon>
-            <span>Dequeue (Front)</span>
-          </button>
-
-          <button class="btn-deck btn-ghost" (click)="clearQueue()" [disabled]="queueItems.length === 0">
-            <app-icon name="rotate-ccw" [size]="13"></app-icon>
-            <span>Clear</span>
-          </button>
-        </div>
-
-        <div class="deck-right">
-          <span class="capacity-text">Length: <strong>{{ queueItems.length }}</strong> / {{ maxQueueCapacity }}</span>
-        </div>
-      </div>
-
-      <!-- Pipeline Visualization -->
-      <div class="beaker-stage-card">
-        <div class="stage-header">
-          <div class="stage-title-wrap">
-            <h3 class="stage-heading">FIFO Queue Pipeline Model</h3>
-            <span class="stage-subheading">Elements enter through REAR and exit sequentially through FRONT.</span>
-          </div>
-        </div>
-
-        <div class="queue-pipeline-container">
-          <div class="queue-pointer front-pointer">
-            <span class="pointer-label">FRONT</span>
-            <span class="pointer-sub">Dequeue exit</span>
-            <app-icon name="chevron-left" [size]="18" customClass="text-accent"></app-icon>
-          </div>
-
-          <div class="queue-track">
-            <div *ngIf="queueItems.length === 0" class="beaker-empty-state">
-              <div class="empty-title">Queue is Empty</div>
-            </div>
-
-            <div *ngFor="let q of queueItems; let idx = index" class="queue-element">
-              <span class="queue-element-idx">[{{ idx }}]</span>
-              <span class="queue-element-val">{{ q.value }}</span>
-            </div>
-          </div>
-
-          <div class="queue-pointer rear-pointer">
-            <app-icon name="chevron-right" [size]="18" customClass="text-accent"></app-icon>
-            <span class="pointer-label">REAR</span>
-            <span class="pointer-sub">Enqueue entry</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ------------------------------------------------------------- -->
-    <!-- TWO POINTERS VISUALIZER -->
-    <!-- ------------------------------------------------------------- -->
-    <div *ngIf="activeDs === 'two-pointers'" class="two-pointers-wrapper">
-      <div class="control-deck-card">
-        <div class="deck-left">
-          <button class="btn-deck btn-push" (click)="stepTwoPointers()" [disabled]="twoPointerDone">
-            <app-icon name="play" [size]="14"></app-icon>
-            <span>Step Pointers</span>
-          </button>
-          <button class="btn-deck btn-secondary" (click)="resetTwoPointers()">
-            <app-icon name="rotate-ccw" [size]="13"></app-icon>
-            <span>Reset</span>
-          </button>
-        </div>
-        <div class="deck-right">
-          <span class="capacity-text">Pattern: In-Place Palindrome Invariant</span>
-        </div>
-      </div>
-
-      <div class="beaker-stage-card">
-        <div class="stage-header">
-          <h3 class="stage-heading">Two Pointers Convergence: String 'racecar'</h3>
-          <span class="stage-subheading">{{ twoPointerMessage }}</span>
-        </div>
-
-        <div class="two-pointers-display">
-          <div class="pointers-row">
-            <div
-              *ngFor="let char of twoPointerArray; let i = index"
-              class="pointer-cell-wrap"
-            >
-              <div class="pointer-top-indicator">
-                <span *ngIf="i === leftPointer" class="ptr-badge ptr-left">L ({{ i }})</span>
-                <span *ngIf="i === rightPointer" class="ptr-badge ptr-right">R ({{ i }})</span>
-              </div>
-
-              <div
-                class="array-cell"
-                [class.is-left]="i === leftPointer"
-                [class.is-right]="i === rightPointer"
-                [class.is-matched]="i >= leftPointer && i <= rightPointer"
+            <div class="guided-btn-row">
+              <button
+                class="action-btn btn-primary"
+                (click)="nextGuidedStep()"
+                [disabled]="guidedStepIndex >= guidedSteps.length"
               >
-                {{ char }}
-              </div>
+                <span>Bước tiếp theo ▶</span>
+              </button>
 
-              <div class="pointer-bottom-index">idx {{ i }}</div>
+              <button
+                class="action-btn btn-peek"
+                (click)="toggleAutoPlay()"
+              >
+                <span>{{ isAutoPlaying ? 'Tạm dừng ⏸' : 'Tự động chạy ⏩' }}</span>
+              </button>
+
+              <button class="action-btn btn-ghost" (click)="resetGuided()">
+                <app-icon name="rotate-ccw" [size]="14"></app-icon>
+                <span>Bắt đầu lại</span>
+              </button>
             </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- 2. Hộp thông báo phản hồi thời gian thực (Status Bubble) -->
+      <div
+        class="live-status-bubble"
+        [class.is-push]="lastActionType === 'push'"
+        [class.is-pop]="lastActionType === 'pop'"
+        [class.is-peek]="lastActionType === 'peek'"
+      >
+        <app-icon name="sparkles" [size]="16" customClass="text-accent"></app-icon>
+        <span class="status-msg-text">{{ statusMessage }}</span>
+      </div>
+
+      <!-- 3. Khu vực mô phỏng ống trụ Stack (Memory Beaker) -->
+      <div class="stack-stage-wrapper">
+        <div class="beaker-container">
+          <!-- Miệng mở của Stack (Chỉ có thể vào/ra ở đây) -->
+          <div class="beaker-top-rim">
+            <div class="rim-text">
+              <span class="rim-title">ĐỈNH (TOP)</span>
+              <span class="rim-sub">Điểm vào (Push) và ra (Pop) duy nhất</span>
+            </div>
+            <div class="rim-arrows">
+              <span class="arrow-push">↓ Push</span>
+              <span class="arrow-pop">↑ Pop</span>
+            </div>
+          </div>
+
+          <!-- Khoang chứa các phần tử -->
+          <div class="beaker-core">
+            <!-- Trạng thái rỗng -->
+            <div *ngIf="stackItems.length === 0" class="empty-tray">
+              <app-icon name="layers" [size]="32" customClass="text-muted"></app-icon>
+              <span class="tray-text">Stack hiện đang rỗng</span>
+              <span class="tray-sub">Bấm "Push ngẫu nhiên" ở trên để đưa phần tử vào</span>
+            </div>
+
+            <!-- Danh sách các khối xếp chồng -->
+            <div class="blocks-stack">
+              <div
+                *ngFor="let item of stackItems; let i = index; let isTop = last"
+                class="stack-item-card"
+                [class.is-top-item]="isTop"
+                [class.is-peeking-item]="item.isPeeking"
+                [class.is-popping-item]="item.isPopping"
+              >
+                <div class="item-index-badge">Index [{{ i }}]</div>
+                <div class="item-value-display">{{ item.value }}</div>
+                <div class="item-status-col">
+                  <span *ngIf="isTop" class="top-indicator-badge">
+                    <span>👈 ĐỈNH (TOP)</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Đáy kín của Stack -->
+          <div class="beaker-bottom-base">
+            <span>ĐÁY STACK (Index 0 - Vào đầu tiên, ra sau cùng)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Tóm tắt nhanh lý thuyết & Liên kết bài tập thực hành -->
+      <div class="quick-summary-bar">
+        <div class="concept-item">
+          <span class="concept-label">NGUYÊN LÝ:</span>
+          <span class="concept-val"><strong>LIFO</strong> (Last-In, First-Out — Vào sau cùng, ra đầu tiên)</span>
+        </div>
+        <div class="concept-item">
+          <span class="concept-label">ĐỘ PHỨC TẠP:</span>
+          <span class="concept-val">Push: <strong>O(1)</strong> | Pop: <strong>O(1)</strong> | Peek: <strong>O(1)</strong></span>
+        </div>
+        <div class="concept-item practice-box">
+          <span class="concept-label">BÀI TẬP VẬN DỤNG:</span>
+          <a routerLink="/problems/valid-parentheses" class="link-problem-chip">
+            <span>#8. Valid Parentheses</span>
+            <app-icon name="chevron-right" [size]="13"></app-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------------- -->
+    <!-- QUEUE VISUALIZER -->
+    <!-- ---------------------------------------------------------- -->
+    <div *ngIf="activeDs === 'queue'" class="queue-canvas-card">
+      <div class="controls-toolbar">
+        <button class="action-btn btn-primary" (click)="enqueueQuick()">
+          <span>➕ Thêm vào hàng (Enqueue)</span>
+        </button>
+        <button class="action-btn btn-pop" (click)="dequeueQuick()" [disabled]="queueItems.length === 0">
+          <span>➖ Rời hàng đợi (Dequeue)</span>
+        </button>
+      </div>
+
+      <div class="live-status-bubble">
+        <app-icon name="sparkles" [size]="16" customClass="text-accent"></app-icon>
+        <span class="status-msg-text">{{ queueMessage }}</span>
+      </div>
+
+      <!-- Mô hình băng chuyền hàng đợi -->
+      <div class="queue-stage-wrap">
+        <div class="queue-gate gate-front">
+          <span class="gate-tag">ĐẦU HÀNG (FRONT)</span>
+          <span class="gate-note">Dequeue ra ở đây</span>
+          <app-icon name="chevron-left" [size]="20" customClass="text-accent"></app-icon>
+        </div>
+
+        <div class="queue-pipeline">
+          <div *ngIf="queueItems.length === 0" class="empty-tray">
+            <span>Hàng đợi rỗng</span>
+          </div>
+
+          <div *ngFor="let item of queueItems; let idx = index" class="queue-box">
+            <span class="q-idx">[{{ idx }}]</span>
+            <span class="q-val">{{ item }}</span>
           </div>
         </div>
 
-        <div class="stage-footer-note">
-          <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-          <span>Applied in <strong>#4 Valid Palindrome</strong> and <strong>#5 3Sum</strong>: Converging left & right bounds in <code>O(N)</code> time with <code>O(1)</code> space.</span>
+        <div class="queue-gate gate-rear">
+          <app-icon name="chevron-right" [size]="20" customClass="text-accent"></app-icon>
+          <span class="gate-tag">CUỐI HÀNG (REAR)</span>
+          <span class="gate-note">Enqueue vào ở đây</span>
+        </div>
+      </div>
+
+      <div class="quick-summary-bar">
+        <div class="concept-item">
+          <span class="concept-label">NGUYÊN LÝ:</span>
+          <span class="concept-val"><strong>FIFO</strong> (First-In, First-Out — Vào trước, phục vụ trước)</span>
+        </div>
+        <div class="concept-item">
+          <span class="concept-label">ĐỘ PHỨC TẠP:</span>
+          <span class="concept-val">Enqueue: <strong>O(1)</strong> | Dequeue: <strong>O(1)</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------------- -->
+    <!-- TWO POINTERS VISUALIZER -->
+    <!-- ---------------------------------------------------------- -->
+    <div *ngIf="activeDs === 'two-pointers'" class="two-pointers-card">
+      <div class="controls-toolbar">
+        <button class="action-btn btn-primary" (click)="stepTwoPointers()" [disabled]="tpFinished">
+          <span>Thu hẹp 2 con trỏ ▶</span>
+        </button>
+        <button class="action-btn btn-ghost" (click)="resetTwoPointers()">
+          <app-icon name="rotate-ccw" [size]="14"></app-icon>
+          <span>Đặt lại</span>
+        </button>
+      </div>
+
+      <div class="live-status-bubble">
+        <app-icon name="sparkles" [size]="16" customClass="text-accent"></app-icon>
+        <span class="status-msg-text">{{ tpMessage }}</span>
+      </div>
+
+      <!-- Dãy ký tự và 2 con trỏ -->
+      <div class="tp-stage-wrap">
+        <div class="tp-cells-container">
+          <div *ngFor="let char of tpArray; let i = index" class="tp-column">
+            <div class="tp-pointer-slot">
+              <span *ngIf="i === leftPtr" class="ptr-tag left-ptr">L</span>
+              <span *ngIf="i === rightPtr" class="ptr-tag right-ptr">R</span>
+            </div>
+
+            <div
+              class="tp-letter-box"
+              [class.active-left]="i === leftPtr"
+              [class.active-right]="i === rightPtr"
+              [class.matched]="i >= leftPtr && i <= rightPtr"
+            >
+              {{ char }}
+            </div>
+
+            <div class="tp-index-lbl">[{{ i }}]</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-summary-bar">
+        <div class="concept-item">
+          <span class="concept-label">ÁP DỤNG:</span>
+          <span class="concept-val">Kiểm tra Palindrome, 3Sum, Sliding Window với thời gian <strong>O(N)</strong> và bộ nhớ <strong>O(1)</strong>.</span>
+        </div>
+        <div class="concept-item practice-box">
+          <a routerLink="/problems/valid-palindrome" class="link-problem-chip">
+            <span>#4. Valid Palindrome</span>
+            <app-icon name="chevron-right" [size]="13"></app-icon>
+          </a>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- =================================================================== -->
-  <!-- 2. STRUCTURED LEARNING PATHS (CURRICULA) -->
-  <!-- =================================================================== -->
+  <!-- ============================================================== -->
+  <!-- 2. LỘ TRÌNH BÀI TẬP (CURRICULA) -->
+  <!-- ============================================================== -->
   <div *ngIf="activeMainTab === 'curricula'" class="paths-container">
     <div *ngFor="let path of learningPaths()" class="path-card">
       <!-- Card Header -->
