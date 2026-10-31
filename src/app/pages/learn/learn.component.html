@@ -1614,7 +1614,7 @@
         </div>
 
         <div class="deck-right">
-          <span class="capacity-text">Comparisons: <strong>{{ bsortComparisons }}</strong> | Swaps: <strong>{{ bsortSwaps }}</strong></span>
+          <span class="capacity-text">Pass <strong>i = {{ bsortI }}</strong> | Comparing <strong>j = {{ bsortJ }}</strong> &amp; <strong>j+1 = {{ bsortJ + 1 }}</strong> | Swaps: <strong>{{ bsortSwaps }}</strong></span>
         </div>
       </div>
 
@@ -1623,34 +1623,28 @@
           <div class="stage-header">
             <div>
               <h3 class="stage-heading">Bubble Sort (Adjacent Swap Pass)</h3>
-              <span class="stage-subheading">Repeatedly compares arr[j] and arr[j+1], bubbling the largest unsorted element to the right.</span>
+              <span class="stage-subheading">Outer loop i tracks pass count; inner pointer j compares arr[j] with arr[j+1].</span>
+            </div>
+            <div class="top-tag" *ngIf="!bsortDone">
+              <span>i = <strong>{{ bsortI }}</strong> | j = <strong>{{ bsortJ }}</strong></span>
             </div>
           </div>
 
-          <div class="sort-stage-container">
-            <div class="sort-bars-stage bsort-stage">
-              <div
-                *ngFor="let item of bsortItems; let idx = index; trackBy: trackById"
-                class="sort-bar-column"
-                [class.is-comparing]="!bsortDone && (idx === bsortJ || idx === bsortJ + 1)"
-                [class.is-swapping]="bsortSwappingIds.has(item.id)"
-                [class.is-sorted]="bsortDone || idx >= bsortSortedBound"
-              >
-                <div class="pointer-top-indicator">
-                  <span *ngIf="bsortSwappingIds.has(item.id)" class="ptr-badge ptr-swap">⇄ SWAP</span>
-                  <span *ngIf="!bsortSwappingIds.has(item.id) && !bsortDone && idx === bsortJ" class="ptr-badge ptr-mid">j ({{ idx }})</span>
-                  <span *ngIf="!bsortSwappingIds.has(item.id) && !bsortDone && idx === bsortJ + 1" class="ptr-badge ptr-left">j+1 ({{ idx }})</span>
-                </div>
-                <span class="sort-bar-val">{{ item.val }}</span>
-                <div
-                  class="sort-bar-pill"
-                  [style.height.px]="item.val * 3.4 + 24"
-                ></div>
+          <div class="sort-bars-stage">
+            <div *ngFor="let val of bsortArray; let idx = index; trackBy: trackByIndex" class="sort-bar-column">
+              <div class="pointer-top-indicator">
+                <span *ngIf="!bsortDone && idx === bsortI" class="ptr-badge ptr-left">i={{ idx }}</span>
+                <span *ngIf="!bsortDone && idx === bsortJ" class="ptr-badge ptr-mid">j={{ idx }}</span>
+                <span *ngIf="!bsortDone && idx === bsortJ + 1" class="ptr-badge ptr-right">j+1</span>
               </div>
-            </div>
-
-            <div class="sort-slots-row">
-              <div *ngFor="let idx of bsortSlots; trackBy: trackByIndex" class="slot-idx-cell">idx {{ idx }}</div>
+              <span class="sort-bar-val">{{ val }}</span>
+              <div
+                class="sort-bar-pill"
+                [class.is-comparing]="!bsortDone && (idx === bsortJ || idx === bsortJ + 1)"
+                [class.is-sorted]="bsortDone || idx >= bsortSortedBound"
+                [style.height.px]="val * 3.4 + 24"
+              ></div>
+              <span class="sort-bar-idx">[{{ idx }}]</span>
             </div>
           </div>
         </div>
@@ -1658,8 +1652,12 @@
         <div class="inspector-column">
           <div class="metrics-subgrid">
             <div class="stat-box">
-              <span class="stat-box-label">PASS (i)</span>
-              <span class="stat-box-value">{{ bsortI }}</span>
+              <span class="stat-box-label">OUTER (i)</span>
+              <span class="stat-box-value mono">{{ bsortI }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-box-label">INNER (j, j+1)</span>
+              <span class="stat-box-value mono text-accent">{{ bsortDone ? 'done' : bsortJ + ', ' + (bsortJ + 1) }}</span>
             </div>
             <div class="stat-box">
               <span class="stat-box-label">SWAPS</span>
@@ -1668,10 +1666,6 @@
             <div class="stat-box">
               <span class="stat-box-label">TIME</span>
               <span class="stat-box-value">O(N²)</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-box-label">SPACE</span>
-              <span class="stat-box-value text-easy">O(1)</span>
             </div>
           </div>
 
@@ -1737,32 +1731,22 @@
             </div>
           </div>
 
-          <div class="sort-stage-container">
-            <div class="sort-bars-stage qsort-stage">
+          <div class="sort-bars-stage">
+            <div *ngFor="let val of qsortArray; let idx = index; trackBy: trackByIndex" class="sort-bar-column">
+              <div class="pointer-top-indicator">
+                <span *ngIf="!qsortDone && idx === qsortI && idx !== qsortPivotIdx" class="ptr-badge ptr-left">i={{ idx }}</span>
+                <span *ngIf="!qsortDone && idx === qsortJ && idx !== qsortPivotIdx" class="ptr-badge ptr-mid">j={{ idx }}</span>
+                <span *ngIf="!qsortDone && idx === qsortPivotIdx" class="ptr-badge ptr-right">PIVOT</span>
+              </div>
+              <span class="sort-bar-val">{{ val }}</span>
               <div
-                *ngFor="let item of qsortItems; let idx = index; trackBy: trackById"
-                class="sort-bar-column"
+                class="sort-bar-pill"
                 [class.is-pivot]="!qsortDone && idx === qsortPivotIdx"
                 [class.is-comparing]="!qsortDone && (idx === qsortI || idx === qsortJ) && idx !== qsortPivotIdx"
-                [class.is-swapping]="qsortSwappingIds.has(item.id)"
                 [class.is-sorted]="qsortSortedIndices.has(idx)"
-              >
-                <div class="pointer-top-indicator">
-                  <span *ngIf="qsortSwappingIds.has(item.id)" class="ptr-badge ptr-swap">⇄ SWAP</span>
-                  <span *ngIf="!qsortSwappingIds.has(item.id) && !qsortDone && idx === qsortPivotIdx" class="ptr-badge ptr-right">PIVOT</span>
-                  <span *ngIf="!qsortSwappingIds.has(item.id) && !qsortDone && idx === qsortJ && idx !== qsortPivotIdx" class="ptr-badge ptr-mid">j ({{ idx }})</span>
-                  <span *ngIf="!qsortSwappingIds.has(item.id) && !qsortDone && idx === qsortI && idx !== qsortPivotIdx && idx !== qsortJ" class="ptr-badge ptr-left">i ({{ idx }})</span>
-                </div>
-                <span class="sort-bar-val">{{ item.val }}</span>
-                <div
-                  class="sort-bar-pill"
-                  [style.height.px]="item.val * 3.3 + 24"
-                ></div>
-              </div>
-            </div>
-
-            <div class="sort-slots-row">
-              <div *ngFor="let idx of qsortSlots; trackBy: trackByIndex" class="slot-idx-cell">idx {{ idx }}</div>
+                [style.height.px]="val * 3.3 + 24"
+              ></div>
+              <span class="sort-bar-idx">[{{ idx }}]</span>
             </div>
           </div>
         </div>

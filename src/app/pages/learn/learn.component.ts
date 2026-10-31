@@ -1,15 +1,10 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { IconComponent } from '../../shared/components/icon/icon.component';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { ProgressService } from '../../core/services/progress.service';
-
-export interface SortItem {
-  id: number;
-  val: number;
-}
 
 interface StackItem {
   id: number;
@@ -85,13 +80,12 @@ interface GraphEdgeItem {
 }
 
 interface QuickSortStep {
-  items: SortItem[];
+  array: number[];
   low: number;
   high: number;
   pivotIdx: number;
   iIdx: number;
   jIdx: number;
-  swappedIds?: [number, number] | null;
   sortedIndices: number[];
   message: string;
 }
@@ -155,7 +149,6 @@ export class LearnComponent implements OnInit, OnDestroy {
   private progressService = inject(ProgressService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
 
   learningPaths = this.progressService.learningPaths;
   Math = Math;
@@ -170,12 +163,6 @@ export class LearnComponent implements OnInit, OnDestroy {
     if (this.speedMode === 'slow') return 2100;
     if (this.speedMode === 'fast') return 750;
     return 1350;
-  }
-
-  get swapAnimDurationMs(): number {
-    if (this.speedMode === 'slow') return 800;
-    if (this.speedMode === 'fast') return 340;
-    return 520;
   }
 
   get bstDelayMs(): number {
@@ -389,17 +376,7 @@ export class LearnComponent implements OnInit, OnDestroy {
   // ==========================================
   // 11. BUBBLE SORT STATE
   // ==========================================
-  bsortItems: SortItem[] = [
-    { id: 1, val: 48 },
-    { id: 2, val: 22 },
-    { id: 3, val: 65 },
-    { id: 4, val: 14 },
-    { id: 5, val: 55 },
-    { id: 6, val: 31 },
-    { id: 7, val: 19 }
-  ];
-  bsortSwappingIds = new Set<number>();
-  bsortSlots = [0, 1, 2, 3, 4, 5, 6];
+  bsortArray = [48, 22, 65, 14, 55, 31, 19];
   bsortI = 0;
   bsortJ = 0;
   bsortSortedBound = 7;
@@ -409,26 +386,11 @@ export class LearnComponent implements OnInit, OnDestroy {
   bsortDone = false;
   bsortStatus = 'Status: Bubble Sort ready. Click Step Sort or Auto Run to compare adjacent pairs.';
 
-  get bsortArray(): number[] {
-    return this.bsortItems.map(item => item.val);
-  }
-
   // ==========================================
   // 12. QUICK SORT STATE
   // ==========================================
   qsortInitial = [38, 16, 52, 24, 63, 11, 45, 29];
-  qsortItems: SortItem[] = [
-    { id: 1, val: 38 },
-    { id: 2, val: 16 },
-    { id: 3, val: 52 },
-    { id: 4, val: 24 },
-    { id: 5, val: 63 },
-    { id: 6, val: 11 },
-    { id: 7, val: 45 },
-    { id: 8, val: 29 }
-  ];
-  qsortSwappingIds = new Set<number>();
-  qsortSlots = [0, 1, 2, 3, 4, 5, 6, 7];
+  qsortArray = [38, 16, 52, 24, 63, 11, 45, 29];
   qsortSteps: QuickSortStep[] = [];
   qsortStepIdx = 0;
   qsortLow = 0;
@@ -439,10 +401,6 @@ export class LearnComponent implements OnInit, OnDestroy {
   qsortSortedIndices = new Set<number>();
   qsortDone = false;
   qsortStatus = 'Status: Quick Sort ready (Lomuto Partition). Click Step Partition or Auto Run.';
-
-  get qsortArray(): number[] {
-    return this.qsortItems.map(item => item.val);
-  }
 
   // ==========================================
   // 13. BFS STATE
@@ -518,8 +476,6 @@ export class LearnComponent implements OnInit, OnDestroy {
   }
 
   stopAllAutoRuns(): void {
-    this.bsortSwappingIds.clear();
-    this.qsortSwappingIds.clear();
     this.stopBSTAnimation();
     this.stopAutoBinarySearch();
     this.stopAutoTwoPointers();
@@ -1693,77 +1649,6 @@ export class LearnComponent implements OnInit, OnDestroy {
   // ==========================================
   // 11. BUBBLE SORT METHODS
   // ==========================================
-  private animateSwapFLIP(
-    stageSelector: string,
-    beforeItems: SortItem[],
-    afterItems: SortItem[],
-    swappedIds: [number, number],
-    durationMs: number
-  ): void {
-    const stage = document.querySelector(stageSelector) as HTMLElement | null;
-    if (!stage) return;
-
-    // Reset previous transforms to measure true layout positions
-    const columnsBefore = stage.querySelectorAll('.sort-bar-column');
-    columnsBefore.forEach((col: Element) => {
-      const el = col as HTMLElement;
-      el.style.transition = 'none';
-      el.style.transform = '';
-      el.style.zIndex = '';
-    });
-
-    const firstLeftMap = new Map<number, number>();
-    beforeItems.forEach((item, idx) => {
-      const el = columnsBefore[idx] as HTMLElement;
-      if (el) {
-        firstLeftMap.set(item.id, el.getBoundingClientRect().left);
-      }
-    });
-
-    // Synchronously update Angular's DOM tree to match new array order
-    this.cdr.detectChanges();
-
-    const columnsAfter = stage.querySelectorAll('.sort-bar-column');
-    const [idA, idB] = swappedIds;
-
-    afterItems.forEach((item, newIdx) => {
-      if (item.id === idA || item.id === idB) {
-        const el = columnsAfter[newIdx] as HTMLElement;
-        const oldLeft = firstLeftMap.get(item.id);
-        if (el && oldLeft !== undefined) {
-          const newLeft = el.getBoundingClientRect().left;
-          const deltaX = oldLeft - newLeft;
-
-          if (Math.abs(deltaX) > 1) {
-            // Negative deltaX means oldLeft < newLeft -> moved to the right (hop over)
-            const movedRight = deltaX < 0;
-            const arcY = movedRight ? -24 : 12;
-
-            // Invert: snap immediately to old position without transition
-            el.style.transition = 'none';
-            el.style.transform = `translate(${deltaX}px, ${arcY}px)`;
-            el.style.zIndex = movedRight ? '15' : '8';
-
-            // Force reflow
-            void el.offsetHeight;
-
-            // Play: animate back to natural position (0, 0)
-            requestAnimationFrame(() => {
-              el.style.transition = `transform ${durationMs}ms cubic-bezier(0.22, 1, 0.36, 1)`;
-              el.style.transform = 'translate(0px, 0px)';
-
-              setTimeout(() => {
-                el.style.transition = '';
-                el.style.transform = '';
-                el.style.zIndex = '';
-              }, durationMs + 20);
-            });
-          }
-        }
-      }
-    });
-  }
-
   toggleAutoBubbleSort(): void {
     if (this.bsortAutoRunning) {
       this.stopAutoBubbleSort();
@@ -1794,43 +1679,28 @@ export class LearnComponent implements OnInit, OnDestroy {
   }
 
   stepBubbleSort(): void {
-    const n = this.bsortItems.length;
+    const n = this.bsortArray.length;
     if (this.bsortDone || this.bsortI >= n - 1) {
       this.bsortDone = true;
       this.bsortSortedBound = 0;
-      this.bsortSwappingIds.clear();
       this.bsortStatus = `Bubble Sort complete! Array sorted in ascending order after ${this.bsortComparisons} comparisons and ${this.bsortSwaps} swaps.`;
       this.stopAutoBubbleSort();
       return;
     }
 
-    const a = this.bsortItems[this.bsortJ];
-    const b = this.bsortItems[this.bsortJ + 1];
+    const a = this.bsortArray[this.bsortJ];
+    const b = this.bsortArray[this.bsortJ + 1];
     this.bsortComparisons++;
 
-    if (a.val > b.val) {
-      const prevItems = [...this.bsortItems];
-      this.bsortItems[this.bsortJ] = b;
-      this.bsortItems[this.bsortJ + 1] = a;
+    if (a > b) {
+      this.bsortArray[this.bsortJ] = b;
+      this.bsortArray[this.bsortJ + 1] = a;
       this.bsortSwaps++;
       this.bsortSwappedInLastStep = true;
-      this.bsortStatus = `Compare idx [${this.bsortJ}] (${a.val}) & [${this.bsortJ + 1}] (${b.val}): ${a.val} > ${b.val} → Swapping positions (${a.val} ⇄ ${b.val})!`;
-
-      const swappedIds: [number, number] = [a.id, b.id];
-      this.bsortSwappingIds = new Set(swappedIds);
-      this.animateSwapFLIP(
-        '.bsort-stage',
-        prevItems,
-        this.bsortItems,
-        swappedIds,
-        this.swapAnimDurationMs
-      );
-      setTimeout(() => this.bsortSwappingIds.clear(), this.swapAnimDurationMs + 40);
+      this.bsortStatus = `Compare idx [${this.bsortJ}] & [${this.bsortJ + 1}]: ${a} > ${b} → Swapped (${b}, ${a})!`;
     } else {
       this.bsortSwappedInLastStep = false;
-      this.bsortSwappingIds.clear();
-      this.bsortStatus = `Compare idx [${this.bsortJ}] (${a.val}) & [${this.bsortJ + 1}] (${b.val}): ${a.val} <= ${b.val} → Already in order.`;
-      this.cdr.detectChanges();
+      this.bsortStatus = `Compare idx [${this.bsortJ}] & [${this.bsortJ + 1}]: ${a} <= ${b} → Already in order.`;
     }
 
     this.bsortJ++;
@@ -1849,34 +1719,19 @@ export class LearnComponent implements OnInit, OnDestroy {
 
   shuffleBubbleSort(): void {
     this.stopAutoBubbleSort();
-    this.bsortSwappingIds.clear();
-    let idCounter = Date.now();
-    this.bsortItems = Array.from({ length: 7 }, () => ({
-      id: idCounter++,
-      val: Math.floor(Math.random() * 58) + 12
-    }));
+    this.bsortArray = Array.from({ length: 7 }, () => Math.floor(Math.random() * 58) + 12);
     this.bsortI = 0;
     this.bsortJ = 0;
-    this.bsortSortedBound = this.bsortItems.length;
+    this.bsortSortedBound = this.bsortArray.length;
     this.bsortComparisons = 0;
     this.bsortSwaps = 0;
     this.bsortDone = false;
     this.bsortStatus = 'Shuffled random array. Click Step Sort or Auto Run.';
-    this.cdr.detectChanges();
   }
 
   resetBubbleSort(): void {
     this.stopAutoBubbleSort();
-    this.bsortSwappingIds.clear();
-    this.bsortItems = [
-      { id: 1, val: 48 },
-      { id: 2, val: 22 },
-      { id: 3, val: 65 },
-      { id: 4, val: 14 },
-      { id: 5, val: 55 },
-      { id: 6, val: 31 },
-      { id: 7, val: 19 }
-    ];
+    this.bsortArray = [48, 22, 65, 14, 55, 31, 19];
     this.bsortI = 0;
     this.bsortJ = 0;
     this.bsortSortedBound = 7;
@@ -1884,35 +1739,24 @@ export class LearnComponent implements OnInit, OnDestroy {
     this.bsortSwaps = 0;
     this.bsortDone = false;
     this.bsortStatus = 'Reset: Bubble Sort initialized with [48, 22, 65, 14, 55, 31, 19].';
-    this.cdr.detectChanges();
   }
 
   // ==========================================
   // 12. QUICK SORT METHODS
   // ==========================================
   private initQuickSortSteps(sourceArr: number[]): void {
-    let idCounter = 1;
-    const items: SortItem[] = sourceArr.map(val => ({ id: idCounter++, val }));
+    const arr = [...sourceArr];
     const steps: QuickSortStep[] = [];
     const sorted = new Set<number>();
 
-    const record = (
-      low: number,
-      high: number,
-      pivotIdx: number,
-      iIdx: number,
-      jIdx: number,
-      swappedIds: [number, number] | null,
-      message: string
-    ) => {
+    const record = (low: number, high: number, pivotIdx: number, iIdx: number, jIdx: number, message: string) => {
       steps.push({
-        items: items.map(x => ({ ...x })),
+        array: [...arr],
         low,
         high,
         pivotIdx,
         iIdx,
         jIdx,
-        swappedIds,
         sortedIndices: Array.from(sorted),
         message
       });
@@ -1922,116 +1766,46 @@ export class LearnComponent implements OnInit, OnDestroy {
       if (low > high) return;
       if (low === high) {
         sorted.add(low);
-        record(
-          low,
-          high,
-          low,
-          low,
-          low,
-          null,
-          `Single element arr[${low}] = ${items[low].val} is in its final sorted position.`
-        );
+        record(low, high, low, low, low, `Single element arr[${low}] = ${arr[low]} is in its final sorted position.`);
         return;
       }
 
-      const pivotVal = items[high].val;
+      const pivot = arr[high];
       let i = low;
-      record(
-        low,
-        high,
-        high,
-        i,
-        low,
-        null,
-        `Partition [${low}..${high}]: Selected pivot = ${pivotVal} at index ${high}.`
-      );
+      record(low, high, high, i, low, `Partition [${low}..${high}]: Selected pivot = ${pivot} at index ${high}.`);
 
       for (let j = low; j < high; j++) {
-        if (items[j].val < pivotVal) {
-          if (i !== j) {
-            const idA = items[i].id;
-            const idB = items[j].id;
-            const tmp = items[i];
-            items[i] = items[j];
-            items[j] = tmp;
-            record(
-              low,
-              high,
-              high,
-              i,
-              j,
-              [idA, idB],
-              `arr[${j}] (${items[i].val}) < pivot (${pivotVal}) → swap with arr[${i}] (${items[j].val}) into left partition!`
-            );
-          } else {
-            record(
-              low,
-              high,
-              high,
-              i,
-              j,
-              null,
-              `arr[${j}] (${items[j].val}) < pivot (${pivotVal}) → already in left partition at index ${i}.`
-            );
-          }
+        if (arr[j] < pivot) {
+          const tmp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = tmp;
+          record(low, high, high, i, j, `arr[${j}] = ${arr[i]} < pivot (${pivot}) → swap into left partition at index ${i}.`);
           i++;
         } else {
-          record(
-            low,
-            high,
-            high,
-            i,
-            j,
-            null,
-            `arr[${j}] (${items[j].val}) >= pivot (${pivotVal}) → keep in right partition.`
-          );
+          record(low, high, high, i, j, `arr[${j}] = ${arr[j]} >= pivot (${pivot}) → keep in right partition.`);
         }
       }
 
-      if (i !== high) {
-        const idPivot = items[high].id;
-        const idTarget = items[i].id;
-        const tmp = items[i];
-        items[i] = items[high];
-        items[high] = tmp;
-        sorted.add(i);
-        record(
-          low,
-          high,
-          i,
-          i,
-          high,
-          [idPivot, idTarget],
-          `Placed pivot ${pivotVal} at final sorted index ${i} (swapped with ${items[high].val})!`
-        );
-      } else {
-        sorted.add(i);
-        record(
-          low,
-          high,
-          i,
-          i,
-          high,
-          null,
-          `Placed pivot ${pivotVal} at final sorted index ${i}!`
-        );
-      }
+      const tmp = arr[i];
+      arr[i] = arr[high];
+      arr[high] = tmp;
+      sorted.add(i);
+      record(low, high, i, i, high, `Placed pivot ${pivot} at final sorted index ${i}!`);
 
       quickSortRec(low, i - 1);
       quickSortRec(i + 1, high);
     };
 
-    quickSortRec(0, items.length - 1);
+    quickSortRec(0, arr.length - 1);
     this.qsortSteps = steps;
     this.qsortStepIdx = 0;
-    this.qsortItems = sourceArr.map((val, idx) => ({ id: idx + 1, val }));
+    this.qsortArray = [...sourceArr];
     this.qsortLow = 0;
     this.qsortHigh = sourceArr.length - 1;
     this.qsortPivotIdx = sourceArr.length - 1;
     this.qsortI = 0;
     this.qsortJ = 0;
     this.qsortSortedIndices.clear();
-    this.qsortSwappingIds.clear();
     this.qsortDone = false;
   }
 
@@ -2067,16 +1841,14 @@ export class LearnComponent implements OnInit, OnDestroy {
   stepQuickSort(): void {
     if (this.qsortStepIdx >= this.qsortSteps.length) {
       this.qsortDone = true;
-      this.qsortSortedIndices = new Set(this.qsortItems.map((_, idx) => idx));
-      this.qsortSwappingIds.clear();
+      this.qsortSortedIndices = new Set(this.qsortArray.map((_, idx) => idx));
       this.qsortStatus = 'Quick Sort complete! All partitions sorted in O(N log N) time.';
       this.stopAutoQuickSort();
       return;
     }
 
     const s = this.qsortSteps[this.qsortStepIdx];
-    const prevItems = [...this.qsortItems];
-    this.qsortItems = s.items.map(x => ({ ...x }));
+    this.qsortArray = [...s.array];
     this.qsortLow = s.low;
     this.qsortHigh = s.high;
     this.qsortPivotIdx = s.pivotIdx;
@@ -2086,43 +1858,24 @@ export class LearnComponent implements OnInit, OnDestroy {
     this.qsortStatus = s.message;
     this.qsortStepIdx++;
 
-    if (s.swappedIds) {
-      this.qsortSwappingIds = new Set(s.swappedIds);
-      this.animateSwapFLIP(
-        '.qsort-stage',
-        prevItems,
-        this.qsortItems,
-        s.swappedIds,
-        this.swapAnimDurationMs
-      );
-      setTimeout(() => this.qsortSwappingIds.clear(), this.swapAnimDurationMs + 40);
-    } else {
-      this.qsortSwappingIds.clear();
-      this.cdr.detectChanges();
-    }
-
     if (this.qsortStepIdx >= this.qsortSteps.length) {
       this.qsortDone = true;
-      this.qsortSortedIndices = new Set(this.qsortItems.map((_, idx) => idx));
+      this.qsortSortedIndices = new Set(this.qsortArray.map((_, idx) => idx));
       this.stopAutoQuickSort();
     }
   }
 
   shuffleQuickSort(): void {
     this.stopAutoQuickSort();
-    this.qsortSwappingIds.clear();
     const randomArr = Array.from({ length: 8 }, () => Math.floor(Math.random() * 58) + 10);
     this.initQuickSortSteps(randomArr);
     this.qsortStatus = 'Shuffled new 8-element array for Quick Sort.';
-    this.cdr.detectChanges();
   }
 
   resetQuickSort(): void {
     this.stopAutoQuickSort();
-    this.qsortSwappingIds.clear();
     this.initQuickSortSteps(this.qsortInitial);
     this.qsortStatus = 'Reset: Quick Sort ready with initial array. Click Step Partition or Auto Run.';
-    this.cdr.detectChanges();
   }
 
   // ==========================================

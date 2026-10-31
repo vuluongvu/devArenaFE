@@ -874,6 +874,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 3px;
 }
 .ptr-badge {
   font-family: var(--font-mono);
@@ -1137,76 +1138,28 @@
 }
 
 /* Sorting Bars Stage */
-.sort-stage-container {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--color-sidebar);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
-}
 .sort-bars-stage {
   display: flex;
   align-items: flex-end;
   justify-content: center;
   gap: 16px;
-  min-height: 290px;
+  min-height: 310px;
   padding: 24px 16px 12px;
-  position: relative;
-}
-.sort-slots-row {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  padding: 8px 16px 10px;
-  background-color: var(--color-surface);
-  border-top: 1px dashed var(--color-border);
-}
-.slot-idx-cell {
-  width: 38px;
-  text-align: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-muted);
+  background-color: var(--color-sidebar);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
 }
 .sort-bar-column {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  width: 38px;
-  position: relative;
-  will-change: transform;
-}
-.sort-bar-column.is-swapping {
-  filter: drop-shadow(0 8px 18px rgba(224, 35, 78, 0.35));
-}
-.sort-bar-column.is-swapping .sort-bar-pill {
-  border-color: var(--color-accent) !important;
-  background-color: var(--color-accent-subtle) !important;
-  box-shadow: 0 0 0 3px rgba(224, 35, 78, 0.35);
-  transform: translateY(-8px) scaleX(1.08);
-}
-.sort-bar-column.is-swapping .sort-bar-val {
-  color: var(--color-accent);
-  font-weight: 800;
-  transform: scale(1.18);
-}
-.ptr-badge.ptr-swap {
-  background-color: var(--color-accent);
-  color: #fff;
-  font-weight: 800;
-  box-shadow: 0 0 12px rgba(224, 35, 78, 0.5);
-  animation: badgePop 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .sort-bar-val {
   font-family: var(--font-mono);
   font-size: 12.5px;
   font-weight: 700;
   color: var(--color-text-primary);
-  transition: color 0.25s ease, transform 0.25s ease;
 }
 .sort-bar-pill {
   width: 38px;
@@ -1215,7 +1168,7 @@
   border-radius: var(--radius-sm) var(--radius-sm) 3px 3px;
   will-change: height, transform, background-color, border-color, box-shadow;
   transition:
-    height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     background-color 0.35s ease,
     border-color 0.35s ease,
