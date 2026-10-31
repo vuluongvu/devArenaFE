@@ -250,8 +250,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'stack'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ stackStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(stackStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -430,8 +433,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'queue'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ queueStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(queueStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -581,8 +587,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'linked-list'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ listStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(listStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -713,8 +722,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'bst'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ bstStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(bstStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -845,8 +857,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'min-heap'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ heapStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(heapStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -991,8 +1006,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'hash-table'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ hashStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(hashStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -1136,8 +1154,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'graph'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ graphStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(graphStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -1277,8 +1298,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'binary-search'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ bsStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(bsStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -1387,8 +1411,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'two-pointers'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ tpStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(tpStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -1488,8 +1515,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'sliding-window'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ swStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(swStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -1584,9 +1614,12 @@
     <!-- 11. BUBBLE SORT ALGORITHM VISUALIZER -->
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'bubble-sort'" class="topic-content-wrapper">
-      <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ bsortStatus }}</span>
+      <div class="status-bar" [class.is-swapped-bar]="bsortSwappedInLastStep">
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(bsortStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -1689,8 +1722,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'quick-sort'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ qsortStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(qsortStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -1799,8 +1835,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'bfs'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ bfsStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(bfsStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -1925,8 +1964,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'dfs'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ dfsStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(dfsStatus)"></span>
       </div>
 
       <div class="control-deck-card">
@@ -2047,8 +2089,11 @@
     <!-- ============================================================= -->
     <div *ngIf="activeTopic === 'dp'" class="topic-content-wrapper">
       <div class="status-bar">
-        <app-icon name="terminal" [size]="14" customClass="text-accent"></app-icon>
-        <span class="status-text">{{ dpStatus }}</span>
+        <span class="status-badge">
+          <app-icon name="terminal" [size]="13"></app-icon>
+          <span>TRACE</span>
+        </span>
+        <span class="status-text" [innerHTML]="formatStatus(dpStatus)"></span>
       </div>
 
       <div class="control-deck-card">

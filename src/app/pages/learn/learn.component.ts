@@ -214,6 +214,42 @@ export class LearnComponent implements OnInit, OnDestroy {
     return node.val;
   }
 
+  formatStatus(text: string): string {
+    if (!text) return '';
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const formatSegment = (seg: string): string => {
+      return seg
+        .replace(/\[([^\]]+)\]/g, '<span class="st-idx">[$1]</span>')
+        .replace(/'([^']+)'/g, '<span class="st-val">\'$1\'</span>')
+        .replace(/\(([^)]+)\)/g, '<span class="st-val">($1)</span>');
+    };
+
+    const formatWithColon = (seg: string): string => {
+      const colonIdx = seg.indexOf(':');
+      if (colonIdx > 0 && colonIdx < 42) {
+        const prefix = formatSegment(seg.slice(0, colonIdx + 1));
+        const rest = formatSegment(seg.slice(colonIdx + 1));
+        return `<span class="st-prefix">${prefix}</span><span class="st-cmp">${rest}</span>`;
+      }
+      return formatSegment(seg);
+    };
+
+    const arrowParts = escaped.split(/\s*(?:→|-&gt;)\s*/);
+    if (arrowParts.length > 1) {
+      const left = formatWithColon(arrowParts[0]);
+      const rightRaw = arrowParts.slice(1).join(' → ');
+      const isPositive = /Swapped|FOUND|Inserted|Placed|complete|PALINDROME|enqueued|Visit/i.test(rightRaw);
+      const badgeClass = isPositive ? 'st-action st-action-success' : 'st-action';
+      return `${left} <span class="st-arrow">→</span> <span class="${badgeClass}">${formatSegment(rightRaw)}</span>`;
+    }
+
+    return formatWithColon(escaped);
+  }
+
   // BST state & animation trackers
   bstActiveEdges = new Set<string>();
   bstHighlightedVals = new Set<number>();
