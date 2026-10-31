@@ -1627,16 +1627,30 @@
             </div>
           </div>
 
-          <div class="sort-bars-stage">
-            <div *ngFor="let val of bsortArray; let idx = index; trackBy: trackByIndex" class="sort-bar-column">
-              <span class="sort-bar-val">{{ val }}</span>
+          <div class="sort-stage-container">
+            <div class="sort-bars-stage bsort-stage">
               <div
-                class="sort-bar-pill"
+                *ngFor="let item of bsortItems; let idx = index; trackBy: trackById"
+                class="sort-bar-column"
                 [class.is-comparing]="!bsortDone && (idx === bsortJ || idx === bsortJ + 1)"
+                [class.is-swapping]="bsortSwappingIds.has(item.id)"
                 [class.is-sorted]="bsortDone || idx >= bsortSortedBound"
-                [style.height.px]="val * 3.4 + 24"
-              ></div>
-              <span class="sort-bar-idx">[{{ idx }}]</span>
+              >
+                <div class="pointer-top-indicator">
+                  <span *ngIf="bsortSwappingIds.has(item.id)" class="ptr-badge ptr-swap">⇄ SWAP</span>
+                  <span *ngIf="!bsortSwappingIds.has(item.id) && !bsortDone && idx === bsortJ" class="ptr-badge ptr-mid">j ({{ idx }})</span>
+                  <span *ngIf="!bsortSwappingIds.has(item.id) && !bsortDone && idx === bsortJ + 1" class="ptr-badge ptr-left">j+1 ({{ idx }})</span>
+                </div>
+                <span class="sort-bar-val">{{ item.val }}</span>
+                <div
+                  class="sort-bar-pill"
+                  [style.height.px]="item.val * 3.4 + 24"
+                ></div>
+              </div>
+            </div>
+
+            <div class="sort-slots-row">
+              <div *ngFor="let idx of bsortSlots; trackBy: trackByIndex" class="slot-idx-cell">idx {{ idx }}</div>
             </div>
           </div>
         </div>
@@ -1723,21 +1737,32 @@
             </div>
           </div>
 
-          <div class="sort-bars-stage">
-            <div *ngFor="let val of qsortArray; let idx = index; trackBy: trackByIndex" class="sort-bar-column">
-              <div class="pointer-top-indicator">
-                <span *ngIf="!qsortDone && idx === qsortPivotIdx" class="ptr-badge ptr-right">PIVOT</span>
-                <span *ngIf="!qsortDone && idx === qsortJ && idx !== qsortPivotIdx" class="ptr-badge ptr-mid">j</span>
-              </div>
-              <span class="sort-bar-val">{{ val }}</span>
+          <div class="sort-stage-container">
+            <div class="sort-bars-stage qsort-stage">
               <div
-                class="sort-bar-pill"
+                *ngFor="let item of qsortItems; let idx = index; trackBy: trackById"
+                class="sort-bar-column"
                 [class.is-pivot]="!qsortDone && idx === qsortPivotIdx"
                 [class.is-comparing]="!qsortDone && (idx === qsortI || idx === qsortJ) && idx !== qsortPivotIdx"
+                [class.is-swapping]="qsortSwappingIds.has(item.id)"
                 [class.is-sorted]="qsortSortedIndices.has(idx)"
-                [style.height.px]="val * 3.3 + 24"
-              ></div>
-              <span class="sort-bar-idx">[{{ idx }}]</span>
+              >
+                <div class="pointer-top-indicator">
+                  <span *ngIf="qsortSwappingIds.has(item.id)" class="ptr-badge ptr-swap">⇄ SWAP</span>
+                  <span *ngIf="!qsortSwappingIds.has(item.id) && !qsortDone && idx === qsortPivotIdx" class="ptr-badge ptr-right">PIVOT</span>
+                  <span *ngIf="!qsortSwappingIds.has(item.id) && !qsortDone && idx === qsortJ && idx !== qsortPivotIdx" class="ptr-badge ptr-mid">j ({{ idx }})</span>
+                  <span *ngIf="!qsortSwappingIds.has(item.id) && !qsortDone && idx === qsortI && idx !== qsortPivotIdx && idx !== qsortJ" class="ptr-badge ptr-left">i ({{ idx }})</span>
+                </div>
+                <span class="sort-bar-val">{{ item.val }}</span>
+                <div
+                  class="sort-bar-pill"
+                  [style.height.px]="item.val * 3.3 + 24"
+                ></div>
+              </div>
+            </div>
+
+            <div class="sort-slots-row">
+              <div *ngFor="let idx of qsortSlots; trackBy: trackByIndex" class="slot-idx-cell">idx {{ idx }}</div>
             </div>
           </div>
         </div>
